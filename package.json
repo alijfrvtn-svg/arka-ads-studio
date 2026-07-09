@@ -5,7 +5,7 @@
   "description": "ARKA — Cinematic Creative Production House & Digital Marketing Studio (RTL/FA)",
   "scripts": {
     "dev": "next dev -p 3100",
-    "build": "node scripts/setup-netlify-db.cjs && prisma generate && prisma db push && next build",
+    "build": "prisma generate && prisma db push && next build",
     "start": "next start -p 3100",
     "lint": "next lint",
     "postinstall": "prisma generate",
@@ -18,7 +18,6 @@
     "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
-    "@netlify/database": "^1.0.0",
     "@prisma/client": "^6.3.0",
     "bcryptjs": "^2.4.3",
     "clsx": "^2.1.1",
