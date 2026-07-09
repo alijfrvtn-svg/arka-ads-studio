@@ -2,9 +2,10 @@
 
 import { useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Check, Copy, Film, Image as ImageIcon, Loader2, Search, Trash2, UploadCloud } from "lucide-react";
+import { AlertCircle, Check, Copy, Film, Image as ImageIcon, Loader2, Search, Trash2, UploadCloud } from "lucide-react";
 import { createMedia, deleteMedia } from "@/lib/actions";
 import { cn, faDate } from "@/lib/utils";
+import { isEmbedUrl } from "@/lib/embed";
 
 interface Item {
   id: string;
@@ -15,8 +16,6 @@ interface Item {
   createdAt: Date;
 }
 
-const SAMPLE_VIDEO = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4";
-
 export function MediaLibrary({ items }: { items: Item[] }) {
   const router = useRouter();
   const [pending, start] = useTransition();
@@ -25,6 +24,8 @@ export function MediaLibrary({ items }: { items: Item[] }) {
   const [drag, setDrag] = useState(false);
   const [copied, setCopied] = useState<string | null>(null);
   const [url, setUrl] = useState("");
+  const [uploading, setUploading] = useState(0); // count of in-flight uploads
+  const [error, setError] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const add = (url: string, name: string, type: string) =>
@@ -38,15 +39,30 @@ export function MediaLibrary({ items }: { items: Item[] }) {
       router.refresh();
     });
 
-  // Dev: simulate a CDN upload with a deterministic placeholder (production → S3 presigned direct upload).
+  const uploadOne = async (f: File) => {
+    setUploading((n) => n + 1);
+    setError(null);
+    try {
+      const fd = new FormData();
+      fd.set("file", f);
+      const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.url) {
+        setError(data.error || "آپلود فایل ناموفق بود.");
+        return;
+      }
+      const type = f.type.startsWith("video") ? "VIDEO" : "IMAGE";
+      add(data.url, f.name, type);
+    } catch {
+      setError("آپلود فایل ناموفق بود. اتصال اینترنت را بررسی کنید.");
+    } finally {
+      setUploading((n) => Math.max(0, n - 1));
+    }
+  };
+
   const onFiles = (files: FileList | null) => {
     if (!files) return;
-    Array.from(files).forEach((f) => {
-      const type = f.type.startsWith("video") ? "VIDEO" : "IMAGE";
-      const seed = encodeURIComponent(f.name.replace(/\.[^.]+$/, "") || "upload");
-      const dest = type === "VIDEO" ? SAMPLE_VIDEO : `https://picsum.photos/seed/${seed}/1200/800`;
-      add(dest, f.name, type);
-    });
+    Array.from(files).forEach((f) => uploadOne(f));
   };
 
   const copy = (u: string) => {
@@ -74,25 +90,42 @@ export function MediaLibrary({ items }: { items: Item[] }) {
       >
         <input ref={fileRef} type="file" multiple accept="image/*,video/*" className="hidden" onChange={(e) => onFiles(e.target.files)} />
         <div className="mb-3 grid h-14 w-14 place-items-center rounded-2xl border border-card-border bg-background/50 text-primary">
-          {pending ? <Loader2 className="h-6 w-6 animate-spin" /> : <UploadCloud className="h-6 w-6" />}
+          {uploading > 0 || pending ? <Loader2 className="h-6 w-6 animate-spin" /> : <UploadCloud className="h-6 w-6" />}
         </div>
-        <p className="font-semibold text-foreground">فایل‌ها را اینجا رها کنید یا کلیک کنید</p>
-        <p className="mt-1 text-xs text-foreground-muted">تصویر و ویدیو — آپلود مستقیم (نمونه)</p>
+        <p className="font-semibold text-foreground">
+          {uploading > 0 ? `در حال آپلود (${uploading})…` : "فایل‌ها را اینجا رها کنید یا کلیک کنید"}
+        </p>
+        <p className="mt-1 text-xs text-foreground-muted">تصویر و ویدیو — حداکثر ۲۵ مگابایت</p>
         <div className="mt-4 flex w-full max-w-md items-center gap-2" onClick={(e) => e.stopPropagation()}>
           <input
             value={url}
             onChange={(e) => setUrl(e.target.value)}
-            placeholder="یا آدرس فایل را الصاق کنید…"
+            placeholder="یا لینک مستقیم فایل / آپارات / یوتیوب را الصاق کنید…"
             dir="ltr"
             className="h-10 flex-1 rounded-xl border border-card-border bg-background/50 px-3 text-left text-sm text-foreground outline-none focus:border-primary"
           />
           <button
-            onClick={() => { if (url.trim()) { add(url.trim(), url.split("/").pop() || "file", /\.(mp4|webm|mov)$/i.test(url) ? "VIDEO" : "IMAGE"); setUrl(""); } }}
+            onClick={() => {
+              if (!url.trim()) return;
+              const trimmed = url.trim();
+              const isVideo = /\.(mp4|webm|mov)(\?|$)/i.test(trimmed) || isEmbedUrl(trimmed);
+              add(trimmed, trimmed.split("/").pop() || "file", isVideo ? "VIDEO" : "IMAGE");
+              setUrl("");
+            }}
             className="h-10 rounded-xl bg-primary px-4 text-sm font-semibold text-primary-foreground"
           >
             افزودن
           </button>
         </div>
+        {error && (
+          <div
+            className="mt-3 flex items-center gap-2 rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs text-rose-400"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <AlertCircle className="h-4 w-4 shrink-0" />
+            {error}
+          </div>
+        )}
       </div>
 
       {/* toolbar */}
@@ -115,7 +148,11 @@ export function MediaLibrary({ items }: { items: Item[] }) {
         {list.map((m) => (
           <div key={m.id} className="group relative overflow-hidden rounded-xl border border-card-border bg-surface">
             <div className="relative aspect-square overflow-hidden bg-background">
-              {m.type === "VIDEO" ? (
+              {m.type === "VIDEO" && isEmbedUrl(m.url) ? (
+                <div className="grid h-full w-full place-items-center bg-black/40 text-white">
+                  <Film className="h-8 w-8 opacity-70" />
+                </div>
+              ) : m.type === "VIDEO" ? (
                 <video src={m.url} muted className="h-full w-full object-cover" />
               ) : (
                 // eslint-disable-next-line @next/next/no-img-element

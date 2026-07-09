@@ -228,7 +228,18 @@ export async function createMedia(fd: FormData) {
 
 export async function deleteMedia(id: string) {
   await requirePermission("media.manage");
-  await db.media.delete({ where: { id } });
+  const item = await db.media.delete({ where: { id } });
+  // Best-effort: also remove the underlying file if it was a real upload
+  // (URLs pasted from elsewhere, e.g. Aparat/YouTube links, are left alone).
+  const match = item.url.match(/^\/api\/media\/(.+)$/);
+  if (match) {
+    try {
+      const { getStore } = await import("@netlify/blobs");
+      await getStore("media").delete(match[1]);
+    } catch {
+      // non-fatal — an orphaned blob doesn't affect the site
+    }
+  }
   revalidateSite("/admin/media");
   return { ok: true };
 }

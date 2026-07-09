@@ -156,8 +156,8 @@ export function ProjectEditor({
             <Field label="تصویر کاور" required>
               <ImageInput value={p.cover} onChange={(v) => set({ cover: v })} />
             </Field>
-            <Field label="ویدیو هیرو (HLS/MP4)">
-              <ImageInput value={p.heroVideo ?? ""} onChange={(v) => set({ heroVideo: v })} video placeholder="https://…/video.mp4" />
+            <Field label="ویدیو هیرو" hint="لینک مستقیم فایل (mp4) یا لینک آپارات/یوتیوب">
+              <ImageInput value={p.heroVideo ?? ""} onChange={(v) => set({ heroVideo: v })} video placeholder="https://…/video.mp4 یا https://aparat.com/v/…" />
             </Field>
             <div className="grid gap-4 sm:grid-cols-2">
               <Field label="تصویر «قبل»">

@@ -5,6 +5,8 @@ import Link from "next/link";
 import { ArrowUpLeft } from "lucide-react";
 import { Icon } from "@/components/ui/Icon";
 import { cn } from "@/lib/utils";
+import { getEmbedUrl } from "@/lib/embed";
+import { EmbedFrame } from "@/components/media/EmbedFrame";
 
 interface Ind {
   id: string;
@@ -25,7 +27,13 @@ export function IndustryShowcase({ industries }: { industries: Ind[] }) {
     <div className="relative overflow-hidden rounded-3xl border border-card-border">
       {/* interactive background */}
       <div className="absolute inset-0">
-        {cur?.heroVideo ? (
+        {cur?.heroVideo && getEmbedUrl(cur.heroVideo, { autoplay: true, mute: true, loop: true }) ? (
+          <EmbedFrame
+            key={cur.id}
+            src={getEmbedUrl(cur.heroVideo, { autoplay: true, mute: true, loop: true })!}
+            className="pointer-events-none h-full w-full object-cover opacity-25"
+          />
+        ) : cur?.heroVideo ? (
           <video
             key={cur.id}
             src={cur.heroVideo}

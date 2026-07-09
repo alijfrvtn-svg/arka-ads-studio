@@ -35,7 +35,7 @@ export default async function IndustryForm({ params }: { params: Promise<{ id: s
           <Field label="خلاصه" required><Textarea name="excerpt" defaultValue={ind?.excerpt} required /></Field>
           <Field label="توضیحات"><Textarea name="description" defaultValue={ind?.description} className="min-h-28" /></Field>
           <Field label="تصویر کاور"><Input name="cover" defaultValue={ind?.cover ?? ""} dir="ltr" className="text-left" placeholder="https://…" /></Field>
-          <Field label="ویدیو هیرو (هاور)" hint="با هاور روی نام صنعت پخش می‌شود"><Input name="heroVideo" defaultValue={ind?.heroVideo ?? ""} dir="ltr" className="text-left" placeholder="https://…/video.mp4" /></Field>
+          <Field label="ویدیو هیرو (هاور)" hint="با هاور روی نام صنعت پخش می‌شود — لینک مستقیم فایل یا لینک آپارات/یوتیوب"><Input name="heroVideo" defaultValue={ind?.heroVideo ?? ""} dir="ltr" className="text-left" placeholder="https://…/video.mp4 یا https://aparat.com/v/…" /></Field>
         </FormSection>
         <div className="flex items-center justify-between rounded-2xl border border-card-border bg-surface p-5">
           <Toggle name="published" label="منتشر شده" defaultChecked={ind?.published ?? true} />

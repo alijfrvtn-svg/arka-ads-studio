@@ -4,6 +4,7 @@ import { useState } from "react";
 import { X } from "lucide-react";
 import { inputCls } from "./form";
 import { cn } from "@/lib/utils";
+import { getEmbedUrl } from "@/lib/embed";
 
 export function TagInput({
   value,
@@ -95,11 +96,14 @@ export function ImageInput({
   placeholder?: string;
   video?: boolean;
 }) {
+  const embedUrl = video ? getEmbedUrl(value) : null;
   return (
     <div className="flex items-center gap-3">
       <div className="grid h-16 w-24 shrink-0 place-items-center overflow-hidden rounded-lg border border-card-border bg-background/50 text-foreground-faint">
         {value ? (
-          video ? (
+          embedUrl ? (
+            <iframe src={embedUrl} className="h-full w-full" style={{ border: 0 }} title="پیش‌نمایش" />
+          ) : video ? (
             <video src={value} className="h-full w-full object-cover" muted />
           ) : (
             // eslint-disable-next-line @next/next/no-img-element

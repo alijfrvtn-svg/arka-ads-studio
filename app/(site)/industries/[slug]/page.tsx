@@ -9,6 +9,8 @@ import { Reveal } from "@/components/fx/Reveal";
 import { ProjectCard } from "@/components/work/ProjectCard";
 import { buildMetadata } from "@/lib/seo";
 import { parseArr } from "@/lib/utils";
+import { getEmbedUrl } from "@/lib/embed";
+import { EmbedFrame } from "@/components/media/EmbedFrame";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
@@ -37,7 +39,12 @@ export default async function IndustryPage({ params }: { params: Promise<{ slug:
     <>
       {/* hero with industry video */}
       <section className="relative flex min-h-[70vh] items-end overflow-hidden pb-16 pt-40">
-        {ind.heroVideo ? (
+        {ind.heroVideo && getEmbedUrl(ind.heroVideo, { autoplay: true, mute: true, loop: true }) ? (
+          <EmbedFrame
+            src={getEmbedUrl(ind.heroVideo, { autoplay: true, mute: true, loop: true })!}
+            className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-30"
+          />
+        ) : ind.heroVideo ? (
           <video src={ind.heroVideo} poster={ind.cover ?? undefined} autoPlay muted loop playsInline className="absolute inset-0 h-full w-full object-cover opacity-30" />
         ) : (
           // eslint-disable-next-line @next/next/no-img-element

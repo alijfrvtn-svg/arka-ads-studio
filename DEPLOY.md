@@ -1,75 +1,39 @@
-# راهنمای دیپلوی ARKA روی Netlify
+# راهنمای دیپلوی و نگهداری ARKA روی Netlify
 
-## چیزهایی که از قبل آماده شده
+## وضعیت فعلی
 
-- سایت Netlify با نام **arka-ads-studio** ساخته شده → آدرس نهایی: `https://arka-ads-studio.netlify.app`
-- اکستنشن **Neon** (Netlify DB / Postgres رایگان) روی این سایت نصب شده.
-- `prisma/schema.prisma` از SQLite به `postgresql` تغییر کرد.
-- `package.json` → اسکریپت `build` حالا این‌طوریه:
-  `node scripts/setup-netlify-db.cjs && prisma generate && prisma db push && next build`
-  یعنی هر بار که روی Netlify بیلد می‌شه: دیتابیس Neon وصل می‌شه، Prisma Client ساخته می‌شه، و اسکیمای دیتابیس sync می‌شه.
-- فایل `scripts/setup-netlify-db.cjs` فقط روی Netlify اجرا می‌شه (لوکال دست نمی‌زنه).
-- `netlify.toml` و `.gitignore` (اضافه شدن `.netlify/`) آماده‌ست.
-- env var مربوط به `NEXT_PUBLIC_SITE_URL` روی سایت ست شده.
+- سایت زنده‌ست: **https://arka-ads-studio.netlify.app**
+- ریپو گیت‌هاب: **github.com/alijfrvtn-svg/arka-ads-studio** — هر `git push` به شاخه `main` یعنی دیپلوی خودکار.
+- دیتابیس: Postgres (Netlify DB / Neon) — آدرس ثابت در env var `DATABASE_URL` تنظیم شده.
+- ورود پنل مدیریت: `/admin` — ایمیل و پسورد پیش‌فرض seed (مگر تغییرشون داده باشید):
+  - ایمیل: `ali.jafari@arka.studio`
+  - پسورد: `Arka@2026!`
+  (پیشنهاد می‌شه بعد از اولین ورود پسورد رو عوض کنید.)
 
-## مرحله ۱ — پوش کردن پروژه به گیت‌هاب
+## اگر خواستید دوباره دیتابیس رو seed کنید (بازنشانی کامل محتوای نمونه)
 
-توی ترمینال خودتون، داخل پوشه‌ی پروژه:
+⚠️ این کار همه محتوای فعلی (پروژه‌ها، مقاله‌ها، کاربران و...) رو پاک می‌کنه و دوباره داده‌ی نمونه می‌سازه. برای دیتای واقعی این کار رو **نکنید**.
 
-```bash
-git init
-git add .
-git commit -m "Initial commit"
+آدرس زیر رو در مرورگر باز کنید:
+```
+https://arka-ads-studio.netlify.app/api/admin/seed?secret=62a73dc85d0facfdced86df6f4f794607125af5ecbac0ea3
 ```
 
-بعد یک ریپوی جدید (خالی) توی گیت‌هاب بسازید (arka-ads-studio) و:
+## نکات فنی مهم
 
-```bash
-git remote add origin https://github.com/<username>/arka-ads-studio.git
-git branch -M main
-git push -u origin main
-```
+- صفحات سایت به‌صورت **کاملاً پویا (dynamic)** رندر می‌شن — یعنی هر درخواست مستقیم از دیتابیس می‌خونه، نه از cache ساخته‌شده در زمان build. این توی `app/(site)/layout.tsx` با `export const dynamic = "force-dynamic"` تنظیم شده.
+- `prisma/schema.prisma` روی `postgresql` تنظیمه (نه SQLite). برای دولوپمنت لوکال باید `DATABASE_URL` توی `.env` به یک Postgres واقعی اشاره کنه — یا از همون آدرس production استفاده کنید، یا یک Postgres لوکال/جدا داشته باشید.
+- `npm run build` هم `prisma generate` و هم `prisma db push` رو اجرا می‌کنه، یعنی تغییرات اسکیما (مثل اضافه کردن فیلد جدید) با هر دیپلوی خودکار روی دیتابیس اعمال می‌شه.
 
-## مرحله ۲ — وصل کردن ریپو به سایت Netlify موجود
+## آپلود فایل و لینک‌دهی ویدیو
 
-سایت از قبل ساخته شده، فقط باید بهش گیت وصل کنید:
+کتابخانه رسانه (Media Library) پنل ادمین الان دو راه واقعی داره:
 
-1. `https://app.netlify.com/sites/arka-ads-studio/configuration/deploys` رو باز کنید
-2. **Link repository** → گیت‌هاب رو انتخاب و ریپوی `arka-ads-studio` رو وصل کنید
-3. Build command و Publish directory از `netlify.toml` خودکار خونده می‌شن — نیازی به تغییر نیست
+- **آپلود واقعی**: فایل روی Netlify Blobs ذخیره می‌شه (نه یک placeholder ساختگی) و از مسیر `/api/media/[key]` سرو می‌شه — پایدار می‌مونه و با دیپلوی بعدی از بین نمی‌ره. سقف حجم فایل **۸ مگابایت** است (محدودیت خود پلتفرم Netlify Functions روی حجم درخواست).
+- **لینک‌دهی**: لینک مستقیم فایل (mp4/webm/...) یا لینک صفحه آپارات/یوتیوب/اینستاگرام رو می‌شه مستقیم پیست کرد؛ سیستم خودش تشخیص می‌ده و به‌صورت embed (iframe) نمایش می‌ده. برای ویدیوهای کامل و طولانی (مثلاً معرفی شرکت)، همین روش لینک‌دهی بهتره — چون از CDN و پخش‌کننده خود آپارات/یوتیوب استفاده می‌شه و روی هزینه/حجم ما اثر نمی‌ذاره.
 
-از این به بعد هر `git push` به شاخه‌ی `main` یعنی دیپلوی خودکار.
+## مسیرهای تشخیصی (Debug) — پیشنهاد می‌شه بعداً حذف بشن
 
-## مرحله ۳ — تنظیم AUTH_SECRET
-
-این مقدار برای امضای JWT ادمین استفاده می‌شه و باید تصادفی و امن باشه. توی ترمینال خودتون:
-
-```bash
-node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
-```
-
-خروجی رو کپی کنید و در Netlify دو راه دارید:
-- Dashboard: Site configuration → Environment variables → Add variable → `AUTH_SECRET`
-- یا با CLI: `netlify env:set AUTH_SECRET "<مقدار تولید شده>"`
-
-## مرحله ۴ — اولین دیپلوی و seed کردن دیتابیس
-
-بعد از وصل شدن ریپو، اولین دیپلوی خودش شروع می‌شه و دیتابیس Postgres رایگان (Neon) رو می‌سازه و اسکیمای Prisma رو روش push می‌کنه — نیازی به کار دستی نیست.
-
-⚠️ ولی **seed** (داده‌ی نمونه اولیه + کاربر ادمین) خودکار اجرا نمی‌شه، چون `prisma/seed.ts` هر بار قبلش همه‌چیز رو پاک می‌کنه و اگه توی build خودکار بذاریمش، هر دیپلوی محتوای واقعی رو پاک می‌کنه. برای seed کردن یک‌بار:
-
-1. از Netlify → Extensions → Neon، connection string دیتابیس پروداکشن رو کپی کنید
-2. لوکال، توی `.env` مقدار `DATABASE_URL` رو موقتاً به همون بذارید
-3. اجرا کنید:
-   ```bash
-   npm run db:seed
-   ```
-4. مقدار `DATABASE_URL` لوکال رو برگردونید سر جاش (یا برای دولوپمنت هم از همون Postgres استفاده کنید، چون دیگه اسکیمای SQLite ساپورت نمی‌شه)
-
-## نکته مهم: آپلود فایل
-
-`public/uploads` (کتابخانه‌ی رسانه‌ی لوکال) روی Netlify هیچ فایل سیستم دائمی نداره — هر فایلی که از پنل ادمین آپلود بشه، بعد از دیپلوی بعدی از بین می‌ره. برای پروداکشن باید آپلودها به یک storage خارجی (مثل Cloudinary، S3، یا Netlify Blobs) وصل بشه. این تغییر جدا از دیپلوی فعلیه — هر وقت خواستید انجامش بدیم بگید.
-
-## خلاصه‌ی وضعیت دیتابیس لوکال بعد از این تغییر
-
-چون `schema.prisma` حالا `postgresql` هست، دیگه SQLite لوکال (`dev.db`) کار نمی‌کنه. برای دولوپمنت لوکال یا از همون Neon connection string استفاده کنید، یا دستور `netlify dev` رو به‌جای `npm run dev` اجرا کنید تا خودش یه دیتابیس جدا برای دولوپمنت بسازه.
+دو مسیر موقت برای عیب‌یابی این دیپلوی ساخته شد:
+- `/api/admin/seed` — برای seed کردن (بالا توضیح داده شد؛ نگه داشتنش بی‌خطره چون secret داره)
+- `/api/admin/debug` — فقط برای دیباگ اتصال دیتابیس بود، دیگه لازم نیست؛ فایلش `app/api/admin/debug/route.ts` هست و می‌شه حذفش کرد.

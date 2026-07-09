@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { Play } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { getEmbedUrl } from "@/lib/embed";
+import { EmbedFrame } from "@/components/media/EmbedFrame";
 
 export function VideoPlayer({
   src,
@@ -15,6 +17,10 @@ export function VideoPlayer({
 }) {
   const [play, setPlay] = useState(false);
   if (play) {
+    const embedUrl = getEmbedUrl(src, { autoplay: true });
+    if (embedUrl) {
+      return <EmbedFrame src={embedUrl} className={cn("h-full w-full bg-black", className)} />;
+    }
     return <video src={src} controls autoPlay className={cn("h-full w-full bg-black object-cover", className)} />;
   }
   return (
