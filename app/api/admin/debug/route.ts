@@ -16,13 +16,21 @@ export async function GET(req: NextRequest) {
   } catch {}
 
   try {
-    const [projects, services, industries, clients] = await Promise.all([
+    const [projects, projectsPublished, services, industries, clients, sample] = await Promise.all([
       db.project.count(),
+      db.project.count({ where: { published: true } }),
       db.service.count(),
       db.industry.count(),
       db.client.count(),
+      db.project.findFirst({ select: { slug: true, title: true, published: true } }),
     ]);
-    return NextResponse.json({ ok: true, dbHost, counts: { projects, services, industries, clients } });
+    return NextResponse.json({
+      ok: true,
+      dbHost,
+      nodeEnv: process.env.NODE_ENV,
+      counts: { projects, projectsPublished, services, industries, clients },
+      sample,
+    });
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     return NextResponse.json({ ok: false, dbHost, error: message }, { status: 500 });
