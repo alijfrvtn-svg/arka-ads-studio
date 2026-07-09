@@ -1,0 +1,257 @@
+// ARKA — Prisma schema (SQLite dev / Postgres-ready)
+// Relations mirror the spec: 1:1 Project↔Seo, 1:N Client→Projects,
+// M:N Projects↔Services and Projects↔Industries.
+// JSON-shaped values are stored as String (JSON.stringify) for SQLite
+// portability and parsed at the app boundary (see lib/utils parseArr/parseObj).
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// Admin users with role-based + granular permission access control.
+model User {
+  id          String    @id @default(cuid())
+  email       String    @unique
+  password    String
+  name        String
+  avatar      String?
+  role        String    @default("EDITOR") // SUPER_ADMIN | ADMIN | EDITOR | AUTHOR | VIEWER
+  permissions String    @default("[]") // JSON string[] — granular overrides on top of role
+  bio         String?
+  active      Boolean   @default(true)
+  lastLoginAt DateTime?
+  posts       Post[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+/// Brands ARKA works with (1:N → projects, testimonials).
+model Client {
+  id           String        @id @default(cuid())
+  name         String
+  nameEn       String?
+  logo         String?
+  website      String?
+  industry     String?
+  featured     Boolean       @default(false)
+  order        Int           @default(0)
+  projects     Project[]
+  testimonials Testimonial[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+/// Core service offerings, each with its own landing page.
+model Service {
+  id              String    @id @default(cuid())
+  slug            String    @unique
+  title           String
+  titleEn         String?
+  titleAr         String?
+  tagline         String?
+  excerpt         String
+  description     String
+  department      String    @default("FILM") // FILM | DIGITAL | DESIGN | STRATEGY
+  icon            String    @default("Clapperboard")
+  cover           String?
+  heroVideo       String?
+  priceFrom       Int?
+  priceUnit       String?   @default("تومان")
+  features        String    @default("[]") // JSON string[]
+  workflow        String    @default("[]") // JSON [{step,title,desc}]
+  faqs            String    @default("[]") // JSON [{q,a}]
+  pricing         String    @default("[]") // JSON [{name,price,unit,features[],featured}]
+  order           Int       @default(0)
+  published       Boolean   @default(true)
+  metaTitle       String?
+  metaDescription String?
+  ogImage         String?
+  keywords        String    @default("[]")
+  projects        Project[] @relation("ProjectServices")
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+/// Industry verticals, each a dedicated landing page with a hover hero video.
+model Industry {
+  id              String    @id @default(cuid())
+  slug            String    @unique
+  title           String
+  titleEn         String?
+  titleAr         String?
+  excerpt         String
+  description     String
+  icon            String    @default("Building2")
+  cover           String?
+  heroVideo       String? // hover-to-play background video
+  approach        String    @default("[]") // JSON string[]
+  order           Int       @default(0)
+  published       Boolean   @default(true)
+  metaTitle       String?
+  metaDescription String?
+  ogImage         String?
+  keywords        String    @default("[]")
+  projects        Project[] @relation("ProjectIndustries")
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+/// Portfolio project / case study — the core content type.
+model Project {
+  id          String     @id @default(cuid())
+  slug        String     @unique
+  title       String
+  titleEn     String?
+  subtitle    String?
+  clientId    String?
+  client      Client?    @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  category    String     @default("Film")
+  cover       String
+  poster      String?
+  heroVideo   String?
+  gallery     String     @default("[]") // JSON string[]
+  year        Int        @default(2025)
+  location    String?
+  accent      String     @default("#6699ff")
+  featured    Boolean    @default(false)
+  published   Boolean    @default(true)
+  order       Int        @default(0)
+  tags        String     @default("[]") // JSON string[]
+  // storytelling framework: Goal → Problem → Idea → Production → Marketing → Result
+  goal        String?
+  problem     String?
+  idea        String?
+  production  String?
+  marketing   String?
+  result      String?
+  metrics     String     @default("[]") // JSON [{label,value,suffix}]
+  beforeImage String?
+  afterImage  String?
+  credits     String     @default("[]") // JSON [{role,name}]
+  views       Int        @default(0)
+  services    Service[]  @relation("ProjectServices")
+  industries  Industry[] @relation("ProjectIndustries")
+  seo         Seo? // 1:1
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  publishedAt DateTime   @default(now())
+}
+
+/// 1:1 SEO record attached to a project.
+model Seo {
+  id              String  @id @default(cuid())
+  projectId       String  @unique
+  project         Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  metaTitle       String?
+  metaDescription String?
+  ogImage         String?
+  canonical       String?
+  keywords        String  @default("[]")
+  noindex         Boolean @default(false)
+}
+
+/// Blog / Journal editorial posts.
+model Post {
+  id              String   @id @default(cuid())
+  slug            String   @unique
+  title           String
+  titleEn         String?
+  excerpt         String
+  cover           String
+  content         String // markdown
+  category        String   @default("Insights")
+  tags            String   @default("[]")
+  authorId        String?
+  author          User?    @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  readingMinutes  Int      @default(5)
+  featured        Boolean  @default(false)
+  published       Boolean  @default(true)
+  views           Int      @default(0)
+  metaTitle       String?
+  metaDescription String?
+  ogImage         String?
+  keywords        String   @default("[]")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  publishedAt     DateTime @default(now())
+}
+
+/// Media library asset (S3/CDN URL in prod; sample CDN links in dev).
+model Media {
+  id        String   @id @default(cuid())
+  url       String
+  type      String   @default("IMAGE") // IMAGE | VIDEO | DOC
+  name      String
+  alt       String?
+  folder    String   @default("uploads")
+  width     Int?
+  height    Int?
+  size      Int? // bytes
+  createdAt DateTime @default(now())
+}
+
+/// Client testimonials.
+model Testimonial {
+  id        String   @id @default(cuid())
+  author    String
+  role      String?
+  company   String?
+  avatar    String?
+  quote     String
+  rating    Int      @default(5)
+  clientId  String?
+  client    Client?  @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  featured  Boolean  @default(true)
+  published Boolean  @default(true)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+}
+
+/// Inbound inquiries from the contact form → CRM pipeline.
+model Lead {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  phone     String?
+  company   String?
+  budget    String?
+  service   String?
+  message   String
+  status    String   @default("NEW") // NEW | CONTACTED | PROPOSAL | WON | LOST
+  source    String   @default("website")
+  createdAt DateTime @default(now())
+}
+
+/// Editable homepage statistic counters.
+model Stat {
+  id     String @id @default(cuid())
+  label  String
+  value  Int
+  suffix String @default("+")
+  order  Int    @default(0)
+}
+
+/// "The Minds Behind the Magic" team members.
+model TeamMember {
+  id        String  @id @default(cuid())
+  name      String
+  nameEn    String?
+  role      String
+  bio       String?
+  avatar    String?
+  socials   String  @default("[]") // JSON [{platform,href}]
+  order     Int     @default(0)
+  published Boolean @default(true)
+}
+
+/// Global key/value site settings (JSON values).
+model Setting {
+  key   String @id
+  value String // JSON
+}
