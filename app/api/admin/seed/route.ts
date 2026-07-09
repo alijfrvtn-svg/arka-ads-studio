@@ -1,10 +1,11 @@
 // One-time, secret-protected endpoint to seed the production database.
-// Trigger once after the first deploy: POST /api/admin/seed?secret=<SEED_SECRET>
+// Trigger once after the first deploy by opening (GET) or POSTing to:
+//   /api/admin/seed?secret=<SEED_SECRET>
 // SEED_SECRET is set as a Netlify environment variable (not committed to git).
 import { NextRequest, NextResponse } from "next/server";
 import { seedDatabase } from "../../../../prisma/seed-logic";
 
-export async function POST(req: NextRequest) {
+async function handle(req: NextRequest) {
   const secret = req.nextUrl.searchParams.get("secret");
 
   if (!process.env.SEED_SECRET || secret !== process.env.SEED_SECRET) {
@@ -19,3 +20,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: false, error: message }, { status: 500 });
   }
 }
+
+export const GET = handle;
+export const POST = handle;
