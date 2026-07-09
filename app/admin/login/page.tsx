@@ -10,8 +10,8 @@ import { SITE } from "@/lib/constants";
 
 export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState("ali.jafari@arka.studio");
-  const [password, setPassword] = useState("Arka@2026!");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [show, setShow] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -102,6 +102,7 @@ export default function LoginPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   dir="ltr"
                   required
+                  autoComplete="username"
                   className="h-12 w-full rounded-xl border border-card-border bg-surface pr-10 pl-4 text-left text-foreground outline-none transition-colors focus:border-primary"
                   placeholder="you@arka.studio"
                 />
@@ -118,6 +119,7 @@ export default function LoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   dir="ltr"
                   required
+                  autoComplete="current-password"
                   className="h-12 w-full rounded-xl border border-card-border bg-surface pr-10 pl-11 text-left text-foreground outline-none transition-colors focus:border-primary"
                   placeholder="••••••••"
                 />
@@ -146,13 +148,6 @@ export default function LoginPage() {
               {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : "ورود به پنل"}
             </button>
           </form>
-
-          <div className="mt-6 rounded-xl border border-dashed border-card-border bg-surface/50 p-4 text-sm">
-            <p className="font-medium text-foreground">دسترسی نمایشی</p>
-            <p className="mt-1 text-foreground-muted ltr-nums">
-              ali.jafari@arka.studio · Arka@2026!
-            </p>
-          </div>
 
           <Link
             href="/"
