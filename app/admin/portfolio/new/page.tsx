@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
-import { ProjectEditor, emptyProject } from "@/components/admin/ProjectEditor";
+import { ProjectEditor } from "@/components/admin/ProjectEditor";
+import { emptyProject } from "@/lib/empty-content";
 
 export default async function NewProjectPage() {
   const [clients, services, industries] = await Promise.all([

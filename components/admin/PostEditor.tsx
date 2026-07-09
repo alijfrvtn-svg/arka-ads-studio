@@ -119,11 +119,3 @@ export function PostEditor({ initial }: { initial: PostInput }) {
     </div>
   );
 }
-
-export function emptyPost(): PostInput {
-  return {
-    slug: "", title: "", excerpt: "", cover: "https://picsum.photos/seed/new-post/1600/900",
-    content: "## مقدمه\n\nمتن مطلب را اینجا بنویسید…", category: "استراتژی برند", tags: [],
-    featured: false, published: true, readingMinutes: 3, metaTitle: "", metaDescription: "", ogImage: "", keywords: [],
-  };
-}

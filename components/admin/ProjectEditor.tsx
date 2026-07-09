@@ -311,37 +311,3 @@ export function ProjectEditor({
 function patch<T>(arr: T[], i: number, part: Partial<T>): T[] {
   return arr.map((x, j) => (j === i ? { ...x, ...part } : x));
 }
-
-export function emptyProject(): ProjectInput {
-  return {
-    slug: "",
-    title: "",
-    titleEn: "",
-    subtitle: "",
-    category: "فیلم تبلیغاتی",
-    cover: "",
-    poster: "",
-    heroVideo: "",
-    gallery: [],
-    year: new Date().getFullYear(),
-    location: "تهران، ایران",
-    accent: "#6699ff",
-    featured: false,
-    published: true,
-    tags: [],
-    goal: "",
-    problem: "",
-    idea: "",
-    production: "",
-    marketing: "",
-    result: "",
-    metrics: [],
-    beforeImage: "",
-    afterImage: "",
-    credits: [],
-    clientId: "",
-    serviceSlugs: [],
-    industrySlugs: [],
-    seo: { metaTitle: "", metaDescription: "", ogImage: "", keywords: [] },
-  };
-}
