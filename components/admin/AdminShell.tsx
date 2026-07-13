@@ -13,6 +13,7 @@ import {
   Users,
   MessageSquareQuote,
   Inbox,
+  ListTodo,
   Shield,
   Settings,
   Search,
@@ -58,6 +59,10 @@ const NAV: { group: string; items: NavItem[] }[] = [
       { label: "نظرات", href: "/admin/testimonials", icon: MessageSquareQuote, perm: "testimonials.manage" },
       { label: "سرنخ‌ها", href: "/admin/leads", icon: Inbox, perm: "leads.view" },
     ],
+  },
+  {
+    group: "پرسنل",
+    items: [{ label: "تسک‌ها", href: "/admin/tasks", icon: ListTodo, perm: "tasks.view" }],
   },
   {
     group: "سیستم",

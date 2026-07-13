@@ -447,3 +447,49 @@ export async function saveSettings(fd: FormData) {
   revalidateSite("/admin/settings", "/");
   redirect("/admin/settings");
 }
+
+// ============================================================
+// TASKS (admin/CMS side — gated by tasks.manage; staff self-service lives in lib/portal-actions.ts)
+// ============================================================
+export async function saveTask(fd: FormData) {
+  const user = await requirePermission("tasks.manage");
+  const id = S(fd, "id");
+  const dueDateRaw = S(fd, "dueDate");
+  const status = S(fd, "status", "TODO");
+  const data = {
+    title: S(fd, "title"),
+    description: S(fd, "description") || null,
+    status,
+    priority: S(fd, "priority", "MEDIUM"),
+    dueDate: dueDateRaw ? new Date(dueDateRaw) : null,
+    assigneeId: S(fd, "assigneeId"),
+    completedAt: status === "DONE" ? new Date() : null,
+  };
+  if (id) await db.task.update({ where: { id }, data });
+  else await db.task.create({ data: { ...data, createdById: user.id } });
+  revalidateSite("/admin/tasks");
+  redirect("/admin/tasks");
+}
+
+export async function deleteTask(id: string) {
+  await requirePermission("tasks.manage");
+  await db.task.delete({ where: { id } });
+  revalidateSite("/admin/tasks");
+  return { ok: true };
+}
+
+export async function updateTaskStatus(id: string, status: string) {
+  await requirePermission("tasks.manage");
+  await db.task.update({ where: { id }, data: { status, completedAt: status === "DONE" ? new Date() : null } });
+  revalidateSite("/admin/tasks");
+  return { ok: true };
+}
+
+export async function addTaskComment(taskId: string, body: string) {
+  const user = await requirePermission("tasks.manage");
+  const trimmed = body.trim();
+  if (!trimmed) return { ok: false, error: "متن یادداشت خالی است" };
+  await db.taskComment.create({ data: { taskId, authorId: user.id, body: trimmed } });
+  revalidatePath(`/admin/tasks/${taskId}`);
+  return { ok: true };
+}

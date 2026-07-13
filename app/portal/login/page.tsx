@@ -8,7 +8,7 @@ import { ArrowLeft, Eye, EyeOff, Loader2, Lock, Mail, ShieldCheck } from "lucide
 import { Logo, LogoMark } from "@/components/brand/Logo";
 import { SITE } from "@/lib/constants";
 
-export default function LoginPage() {
+export default function PortalLoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -32,7 +32,7 @@ export default function LoginPage() {
         setLoading(false);
         return;
       }
-      const from = new URLSearchParams(window.location.search).get("from") || "/admin";
+      const from = new URLSearchParams(window.location.search).get("from") || "/portal";
       router.push(from);
       router.refresh();
     } catch {
@@ -57,15 +57,15 @@ export default function LoginPage() {
               transition={{ duration: 0.7 }}
               className="font-display text-5xl font-extrabold leading-tight text-white"
             >
-              پنل مدیریت
+              پنل کاربران
               <br />
               <span className="text-sky">آرکا استودیو</span>
             </motion.h2>
             <p className="mt-5 max-w-md text-lg text-white/70">
-              کنترل کامل محتوا، نمونه‌کارها، کمپین‌ها و تیم؛ همه در یک داشبورد یکپارچه و امن.
+              تسک‌های محول‌شده از سمت مدیریت رو ببین، وضعیتشون رو به‌روز کن و یادداشت بذار.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              {["نمونه‌کار", "ژورنال", "رسانه", "CRM", "سئو", "کاربران"].map((t) => (
+              {["تسک‌ها", "وضعیت", "یادداشت", "پیگیری"].map((t) => (
                 <span
                   key={t}
                   className="rounded-full border border-white/20 bg-white/5 px-4 py-1.5 text-sm text-white/80 backdrop-blur"
@@ -77,7 +77,7 @@ export default function LoginPage() {
           </div>
           <div className="flex items-center gap-2 text-sm text-white/50">
             <ShieldCheck className="h-4 w-4" />
-            ورود امن با رمزنگاری و کنترل دسترسی نقش‌محور (RBAC)
+            دسترسی محرمانه — فقط قابل مشاهده برای شما و مدیریت
           </div>
         </div>
       </div>
@@ -89,7 +89,7 @@ export default function LoginPage() {
             <LogoMark className="h-11 w-11" />
           </div>
           <h1 className="font-display text-3xl font-bold text-foreground">خوش آمدید 👋</h1>
-          <p className="mt-2 text-foreground-muted">برای ورود به پنل مدیریت، وارد شوید.</p>
+          <p className="mt-2 text-foreground-muted">برای ورود به پنل کاربران، وارد شوید.</p>
 
           <form onSubmit={submit} className="mt-8 space-y-4">
             <div>
@@ -154,8 +154,8 @@ export default function LoginPage() {
               <ArrowLeft className="h-4 w-4" />
               بازگشت به سایت {SITE.nameEn}
             </Link>
-            <Link href="/portal/login" className="text-foreground-muted hover:text-primary">
-              ورود پرسنل / کارمندان
+            <Link href="/admin/login" className="text-foreground-muted hover:text-primary">
+              ورود مدیر
             </Link>
           </div>
         </div>

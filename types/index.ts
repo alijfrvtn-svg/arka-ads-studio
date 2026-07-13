@@ -1,11 +1,13 @@
 // Shared domain types. Prisma stores JSON-shaped fields as strings;
 // these describe the parsed shapes used across the UI.
 
-export type Role = "SUPER_ADMIN" | "ADMIN" | "EDITOR" | "AUTHOR" | "VIEWER";
+export type Role = "SUPER_ADMIN" | "ADMIN" | "EDITOR" | "AUTHOR" | "VIEWER" | "STAFF";
 export type Department = "FILM" | "DIGITAL" | "DESIGN" | "STRATEGY";
 export type LeadStatus = "NEW" | "CONTACTED" | "PROPOSAL" | "WON" | "LOST";
 export type MediaType = "IMAGE" | "VIDEO" | "DOC";
 export type Locale = "fa" | "en" | "ar";
+export type TaskStatus = "TODO" | "IN_PROGRESS" | "DONE" | "CANCELLED";
+export type TaskPriority = "LOW" | "MEDIUM" | "HIGH" | "URGENT";
 
 export interface Metric {
   label: string;

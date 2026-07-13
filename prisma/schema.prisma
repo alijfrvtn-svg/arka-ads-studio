@@ -16,19 +16,22 @@ datasource db {
 
 /// Admin users with role-based + granular permission access control.
 model User {
-  id          String    @id @default(cuid())
-  email       String    @unique
-  password    String
-  name        String
-  avatar      String?
-  role        String    @default("EDITOR") // SUPER_ADMIN | ADMIN | EDITOR | AUTHOR | VIEWER
-  permissions String    @default("[]") // JSON string[] — granular overrides on top of role
-  bio         String?
-  active      Boolean   @default(true)
-  lastLoginAt DateTime?
-  posts       Post[]
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id            String        @id @default(cuid())
+  email         String        @unique
+  password      String
+  name          String
+  avatar        String?
+  role          String        @default("EDITOR") // SUPER_ADMIN | ADMIN | EDITOR | AUTHOR | VIEWER | STAFF
+  permissions   String        @default("[]") // JSON string[] — granular overrides on top of role
+  bio           String?
+  active        Boolean       @default(true)
+  lastLoginAt   DateTime?
+  posts         Post[]
+  tasksAssigned Task[]        @relation("TaskAssignee")
+  tasksCreated  Task[]        @relation("TaskCreatedBy")
+  taskComments  TaskComment[]
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
 }
 
 /// Brands ARKA works with (1:N → projects, testimonials).
@@ -254,4 +257,33 @@ model TeamMember {
 model Setting {
   key   String @id
   value String // JSON
+}
+
+/// Internal task assigned by an admin to a staff/team member (viewed in /portal).
+model Task {
+  id          String        @id @default(cuid())
+  title       String
+  description String?
+  status      String        @default("TODO") // TODO | IN_PROGRESS | DONE | CANCELLED
+  priority    String        @default("MEDIUM") // LOW | MEDIUM | HIGH | URGENT
+  dueDate     DateTime?
+  assigneeId  String
+  assignee    User          @relation("TaskAssignee", fields: [assigneeId], references: [id], onDelete: Cascade)
+  createdById String?
+  createdBy   User?         @relation("TaskCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  comments    TaskComment[]
+  completedAt DateTime?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+/// Status/note thread on a Task — addable by the assignee (/portal) and by admins with tasks.manage.
+model TaskComment {
+  id        String   @id @default(cuid())
+  taskId    String
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  authorId  String?
+  author    User?    @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  body      String
+  createdAt DateTime @default(now())
 }

@@ -1,4 +1,4 @@
-import type { Department, Role } from "@/types";
+import type { Department, Role, TaskPriority, TaskStatus } from "@/types";
 
 export const SITE = {
   name: "آرکا",
@@ -137,6 +137,7 @@ export const ROLES: { value: Role; label: string; desc: string }[] = [
   { value: "EDITOR", label: "ویرایشگر", desc: "مدیریت نمونه‌کار، خدمات و رسانه" },
   { value: "AUTHOR", label: "نویسنده", desc: "نگارش و انتشار مطالب ژورنال" },
   { value: "VIEWER", label: "بازدیدکننده", desc: "فقط مشاهده داشبورد و گزارش‌ها" },
+  { value: "STAFF", label: "پرسنل", desc: "دسترسی فقط به پنل کاربران و تسک‌های شخصی" },
 ];
 
 export interface PermissionDef {
@@ -161,6 +162,8 @@ export const PERMISSIONS: PermissionDef[] = [
   { key: "seo.manage", label: "مدیریت سئو", group: "سئو" },
   { key: "users.manage", label: "مدیریت کاربران و نقش‌ها", group: "سیستم" },
   { key: "settings.manage", label: "مدیریت تنظیمات", group: "سیستم" },
+  { key: "tasks.view", label: "مشاهده تسک‌ها", group: "تسک‌ها" },
+  { key: "tasks.manage", label: "مدیریت تسک‌ها", group: "تسک‌ها" },
 ];
 
 /** Default permission sets per role (SUPER_ADMIN gets everything via wildcard). */
@@ -181,6 +184,8 @@ export const ROLE_PERMISSIONS: Record<Role, string[]> = {
     "leads.manage",
     "seo.manage",
     "settings.manage",
+    "tasks.view",
+    "tasks.manage",
   ],
   EDITOR: [
     "dashboard.view",
@@ -194,4 +199,22 @@ export const ROLE_PERMISSIONS: Record<Role, string[]> = {
   ],
   AUTHOR: ["dashboard.view", "blog.view", "blog.manage", "media.manage"],
   VIEWER: ["dashboard.view", "portfolio.view", "blog.view", "leads.view"],
+  // STAFF only ever uses /portal — zero CMS permissions, even via overrides (defense in depth; middleware is the real gate).
+  STAFF: [],
 };
+
+// ————— Tasks —————
+
+export const TASK_STATUSES: { value: TaskStatus; label: string; color: string }[] = [
+  { value: "TODO", label: "در انتظار", color: "#6699ff" },
+  { value: "IN_PROGRESS", label: "در حال انجام", color: "#f59e0b" },
+  { value: "DONE", label: "انجام‌شده", color: "#34d399" },
+  { value: "CANCELLED", label: "لغوشده", color: "#fb7185" },
+];
+
+export const TASK_PRIORITIES: { value: TaskPriority; label: string; color: string }[] = [
+  { value: "LOW", label: "کم", color: "#94a3b8" },
+  { value: "MEDIUM", label: "متوسط", color: "#6699ff" },
+  { value: "HIGH", label: "بالا", color: "#f59e0b" },
+  { value: "URGENT", label: "فوری", color: "#fb7185" },
+];

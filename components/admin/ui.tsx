@@ -120,6 +120,10 @@ const STATUS: Record<string, { label: string; cls: string }> = {
   LOST: { label: "از دست رفته", cls: "border-rose-400/30 bg-rose-400/10 text-rose-400" },
   PUBLISHED: { label: "منتشر شده", cls: "border-emerald-400/30 bg-emerald-400/10 text-emerald-400" },
   DRAFT: { label: "پیش‌نویس", cls: "border-foreground-faint/30 bg-card-hover text-foreground-muted" },
+  TODO: { label: "در انتظار", cls: "border-primary/30 bg-primary/10 text-primary" },
+  IN_PROGRESS: { label: "در حال انجام", cls: "border-amber-400/30 bg-amber-400/10 text-amber-400" },
+  DONE: { label: "انجام‌شده", cls: "border-emerald-400/30 bg-emerald-400/10 text-emerald-400" },
+  CANCELLED: { label: "لغوشده", cls: "border-rose-400/30 bg-rose-400/10 text-rose-400" },
 };
 
 export function StatusBadge({ status }: { status: string }) {
