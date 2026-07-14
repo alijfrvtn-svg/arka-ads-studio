@@ -5,6 +5,9 @@ import { Cormorant_Garamond, Space_Grotesk, IBM_Plex_Mono } from "next/font/goog
 import { ArrowUpLeft, Play } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Magnetic } from "@/components/fx/Magnetic";
+import { useTheme } from "@/components/theme/ThemeProvider";
+
+const DESKTOP_QUERY = "(min-width: 1024px)";
 
 const cormorant = Cormorant_Garamond({ subsets: ["latin"], weight: ["400", "500"], display: "swap" });
 const spaceGrotesk = Space_Grotesk({ subsets: ["latin"], weight: ["400", "500", "600", "700"], display: "swap" });
@@ -24,12 +27,46 @@ const LENGTH_VH: Record<Length, number> = { compact: 440, standard: 640, epic: 9
  * unlike the original (which read document.documentElement.scrollHeight),
  * so it behaves as one hero section among others, not a whole-page takeover.
  */
-function computeVals(p: number, showScrollHint: boolean) {
+function computeVals(p: number, showScrollHint: boolean, isLight: boolean) {
   const clamp = (v: number, a: number, b: number) => Math.max(a, Math.min(b, v));
   const rng = (x: number, a: number, b: number) => clamp((x - a) / (b - a), 0, 1);
   const sm = (t: number) => t * t * (3 - 2 * t);
   const seg = (x: number, a: number, b: number) => sm(rng(x, a, b));
   const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+
+  // The lens/tunnel/panels are treated as "hardware" (a camera lens is dark
+  // glass regardless of room light) and stay constant; only the surrounding
+  // stage + finale text — which read as page chrome, not a physical object —
+  // swap with the site's light/dark theme.
+  const stage = isLight
+    ? {
+        bg: "#f5f8fe",
+        radial: "radial-gradient(120% 120% at 50% 46%, #ffffff 0%, #eef3fc 45%, #dde6f5 100%)",
+        vignette: "radial-gradient(70% 70% at 50% 48%, transparent 40%, rgba(10,19,46,0.12) 100%)",
+        floodBg:
+          "radial-gradient(60% 100% at 50% 50%, rgba(255,255,255,0.92) 0%, rgba(166,201,255,0.65) 30%, rgba(166,201,255,0.3) 55%, transparent 78%), linear-gradient(120deg, transparent 20%, rgba(43,86,214,0.18) 48%, transparent 62%)",
+        logoColor: "#0a132e",
+        logoShadow: "0 2px 30px rgba(43,86,214,0.18)",
+        taglineColor: "rgba(43,86,214,0.85)",
+        servicesColor: "rgba(10,19,46,0.55)",
+        hintColor: "rgba(10,19,46,0.55)",
+        progressGrad: "linear-gradient(90deg, rgba(43,86,214,0.35), #2b56d6)",
+        progressGlow: "0 0 10px rgba(43,86,214,0.4)",
+      }
+    : {
+        bg: "#050506",
+        radial: "radial-gradient(120% 120% at 50% 46%, #0b0b0f 0%, #060608 45%, #030304 100%)",
+        vignette: "radial-gradient(70% 70% at 50% 48%, transparent 40%, rgba(0,0,0,0.55) 100%)",
+        floodBg:
+          "radial-gradient(60% 100% at 50% 50%, rgba(255,250,240,0.98) 0%, rgba(166,201,255,0.85) 30%, rgba(166,201,255,0.4) 55%, transparent 78%), linear-gradient(120deg, transparent 20%, rgba(255,240,214,0.5) 48%, transparent 62%)",
+        logoColor: "#f6efe2",
+        logoShadow: "0 2px 40px rgba(166,201,255,0.25)",
+        taglineColor: "rgba(166,201,255,0.9)",
+        servicesColor: "rgba(240,232,218,0.55)",
+        hintColor: "rgba(230,225,215,0.6)",
+        progressGrad: "linear-gradient(90deg, rgba(166,201,255,0.5), #a6c9ff)",
+        progressGlow: "0 0 10px rgba(166,201,255,0.6)",
+      };
 
   let phaseLabel = "Silhouette";
   if (p >= 0.9) phaseLabel = "Finale";
@@ -252,25 +289,28 @@ function computeVals(p: number, showScrollHint: boolean) {
     opacity: flash * 0.95, pointerEvents: "none",
   };
 
-  const flood = seg(p, 0.9, 0.955);
-  const floodOut = seg(p, 0.955, 1);
+  // Finale — spread generously across the last ~15% of scroll (was crammed
+  // into the last ~5-10%, which read as sudden/instant) so each element
+  // eases in gradually and the cascade feels cinematic, not a jump-cut.
+  const flood = seg(p, 0.85, 0.93);
+  const floodOut = seg(p, 0.93, 1);
   const leakStyle: CSSProperties = {
     position: "absolute", inset: 0, zIndex: 40, pointerEvents: "none",
-    background: "radial-gradient(60% 100% at 50% 50%, rgba(255,250,240,0.98) 0%, rgba(166,201,255,0.85) 30%, rgba(166,201,255,0.4) 55%, transparent 78%), linear-gradient(120deg, transparent 20%, rgba(255,240,214,0.5) 48%, transparent 62%)",
+    background: stage.floodBg,
     opacity: flood * (1 - floodOut * 0.92),
     filter: "blur(3px)",
   };
-  const logoIn = seg(p, 0.95, 0.99);
+  const logoIn = seg(p, 0.87, 0.96);
   const logoStyle: CSSProperties = {
     position: "absolute", left: "50%", top: "40%", zIndex: 50, textAlign: "center",
-    whiteSpace: "nowrap", transform: `translate(-50%,-50%) scale(${lerp(1.09, 1, seg(p, 0.95, 1)).toFixed(3)})`,
+    whiteSpace: "nowrap", transform: `translate(-50%,-50%) scale(${lerp(1.09, 1, seg(p, 0.87, 0.97)).toFixed(3)})`,
     opacity: logoIn,
   };
   const taglineStyle: CSSProperties = {
     position: "absolute", left: "50%", top: "52%", zIndex: 50, textAlign: "center",
-    transform: "translate(-50%,-50%)", opacity: seg(p, 0.965, 0.995),
+    transform: "translate(-50%,-50%)", opacity: seg(p, 0.9, 0.98),
   };
-  const servicesIn = seg(p, 0.982, 1);
+  const servicesIn = seg(p, 0.93, 0.99);
   const servicesStyle: CSSProperties = {
     position: "absolute", left: "50%", top: "61%", zIndex: 50,
     display: "flex", alignItems: "center", gap: "22px",
@@ -279,13 +319,13 @@ function computeVals(p: number, showScrollHint: boolean) {
   };
 
   // Persian CTA — the very last thing to appear, once the cinematic reveal has landed.
-  const ctaIn = seg(p, 0.988, 1);
+  const ctaIn = seg(p, 0.96, 1);
   const ctaStyle: CSSProperties = {
     position: "absolute", left: "50%", top: "76%", zIndex: 50,
     display: "flex", flexDirection: "column", alignItems: "center", gap: "18px",
     transform: `translate(-50%,-50%) translateY(${lerp(16, 0, ctaIn).toFixed(1)}px)`,
     opacity: ctaIn,
-    pointerEvents: p > 0.994 ? "auto" : "none",
+    pointerEvents: p > 0.99 ? "auto" : "none",
   };
 
   const hintStyle: CSSProperties = {
@@ -296,7 +336,7 @@ function computeVals(p: number, showScrollHint: boolean) {
   const hideHint = showScrollHint === false ? true : undefined;
 
   return {
-    phaseLabel, lensGroupStyle, focalRingAStyle, focalRingBStyle, rimStyle,
+    stage, phaseLabel, lensGroupStyle, focalRingAStyle, focalRingBStyle, rimStyle,
     glassStyle, glassShimmerStyle, sloganStyle, coreGlowStyle,
     tunnelStyle, rings, lightsStyle, beams, neons,
     filmStyle: film.style, codeStyle: code.style, photoStyle: photo.style,
@@ -317,8 +357,15 @@ export function EyeOfCreation({
   const scaffoldRef = useRef<HTMLDivElement>(null);
   const [progress, setProgress] = useState(0);
   const ticking = useRef(false);
+  const { theme } = useTheme();
 
+  // Desktop-only: below the `lg` breakpoint this component is hidden by its
+  // wrapper (see Hero.tsx), so skip the scroll math entirely rather than
+  // pay for it on every mobile/tablet scroll tick.
   useEffect(() => {
+    const mq = window.matchMedia(DESKTOP_QUERY);
+    let detachScroll: (() => void) | null = null;
+
     const onScroll = () => {
       if (ticking.current) return;
       ticking.current = true;
@@ -333,32 +380,49 @@ export function EyeOfCreation({
         ticking.current = false;
       });
     };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
-    onScroll();
+
+    const sync = () => {
+      if (mq.matches) {
+        if (detachScroll) return;
+        window.addEventListener("scroll", onScroll, { passive: true });
+        window.addEventListener("resize", onScroll);
+        onScroll();
+        detachScroll = () => {
+          window.removeEventListener("scroll", onScroll);
+          window.removeEventListener("resize", onScroll);
+        };
+      } else {
+        detachScroll?.();
+        detachScroll = null;
+        setProgress(0);
+      }
+    };
+
+    sync();
+    mq.addEventListener("change", sync);
     return () => {
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
+      mq.removeEventListener("change", sync);
+      detachScroll?.();
     };
   }, []);
 
-  const v = computeVals(progress, showScrollHint);
+  const v = computeVals(progress, showScrollHint, theme === "light");
   const labelStyle: CSSProperties = { fontFamily: FONT_DISPLAY, letterSpacing: "0.28em", color: "#d3ebfe" };
   const logoImg = (
     <div style={{ position: "absolute", inset: 0, borderRadius: "50%", background: "radial-gradient(circle, rgba(211,235,254,0.20) 0%, transparent 66%)", filter: "blur(4px)" }} />
   );
 
   return (
-    <div ref={scaffoldRef} style={{ position: "relative", height: `${LENGTH_VH[length]}vh`, background: "#050506" }}>
+    <div ref={scaffoldRef} style={{ position: "relative", height: `${LENGTH_VH[length]}vh`, background: v.stage.bg }}>
       <div
         style={{
           position: "sticky", top: 0, height: "100vh", width: "100%", overflow: "hidden",
-          background: "radial-gradient(120% 120% at 50% 46%, #0b0b0f 0%, #060608 45%, #030304 100%)",
+          background: v.stage.radial,
           perspective: "1200px",
         }}
         data-screen-label={v.phaseLabel}
       >
-        <div style={{ position: "absolute", inset: 0, background: "radial-gradient(70% 70% at 50% 48%, transparent 40%, rgba(0,0,0,0.55) 100%)", pointerEvents: "none", zIndex: 2 }} />
+        <div style={{ position: "absolute", inset: 0, background: v.stage.vignette, pointerEvents: "none", zIndex: 2 }} />
 
         <div style={{ position: "absolute", inset: 0, zIndex: 3, pointerEvents: "none", opacity: 0.5 }}>
           <div style={{ position: "absolute", left: "22%", top: "34%", width: 3, height: 3, borderRadius: "50%", background: "rgba(166,201,255,0.5)", filter: "blur(0.4px)", animation: "eoc-drift1 13s ease-in-out infinite" }} />
@@ -483,26 +547,26 @@ export function EyeOfCreation({
         <div style={v.leakStyle} />
 
         <div dir="ltr" style={v.logoStyle}>
-          <div style={{ fontFamily: FONT_SERIF, fontWeight: 500, color: "#f6efe2", fontSize: "min(11vw,150px)", lineHeight: 0.95, letterSpacing: "0.02em", textShadow: "0 2px 40px rgba(166,201,255,0.25)" }}>
+          <div style={{ fontFamily: FONT_SERIF, fontWeight: 500, color: v.stage.logoColor, fontSize: "min(11vw,150px)", lineHeight: 0.95, letterSpacing: "0.02em", textShadow: v.stage.logoShadow }}>
             Arka Ads Studios
           </div>
         </div>
         <div dir="ltr" style={v.taglineStyle}>
-          <span style={{ fontFamily: FONT_DISPLAY, letterSpacing: "0.55em", fontSize: 14, color: "rgba(166,201,255,0.9)", textTransform: "uppercase" }}>
+          <span style={{ fontFamily: FONT_DISPLAY, letterSpacing: "0.55em", fontSize: 14, color: v.stage.taglineColor, textTransform: "uppercase" }}>
             Creative Studio &nbsp;·&nbsp; Production House
           </span>
         </div>
         <div dir="ltr" style={v.servicesStyle}>
-          <div style={{ fontFamily: FONT_DISPLAY, letterSpacing: "0.32em", fontSize: 12, color: "rgba(240,232,218,0.55)" }}>FILM PRODUCTION</div>
+          <div style={{ fontFamily: FONT_DISPLAY, letterSpacing: "0.32em", fontSize: 12, color: v.stage.servicesColor }}>FILM PRODUCTION</div>
           <div style={{ width: 1, height: 14, background: "rgba(166,201,255,0.4)" }} />
-          <div style={{ fontFamily: FONT_DISPLAY, letterSpacing: "0.32em", fontSize: 12, color: "rgba(240,232,218,0.55)" }}>WEB DEVELOPMENT</div>
+          <div style={{ fontFamily: FONT_DISPLAY, letterSpacing: "0.32em", fontSize: 12, color: v.stage.servicesColor }}>WEB DEVELOPMENT</div>
           <div style={{ width: 1, height: 14, background: "rgba(166,201,255,0.4)" }} />
-          <div style={{ fontFamily: FONT_DISPLAY, letterSpacing: "0.32em", fontSize: 12, color: "rgba(240,232,218,0.55)" }}>PHOTOGRAPHY</div>
+          <div style={{ fontFamily: FONT_DISPLAY, letterSpacing: "0.32em", fontSize: 12, color: v.stage.servicesColor }}>PHOTOGRAPHY</div>
         </div>
 
         {/* Persian CTA — the actionable payoff, revealed last */}
         <div style={v.ctaStyle}>
-          <span className="rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-medium text-white/80 backdrop-blur">
+          <span className="rounded-full border border-card-border bg-surface/60 px-4 py-1.5 text-xs font-medium text-foreground-muted backdrop-blur">
             استودیوی خلاقیت، پروداکشن و دیجیتال مارکتینگ
           </span>
           <div className="flex flex-wrap items-center justify-center gap-4">
@@ -513,8 +577,8 @@ export function EyeOfCreation({
               </Button>
             </Magnetic>
             {onWatchReel && (
-              <button onClick={onWatchReel} className="group inline-flex items-center gap-3 text-white">
-                <span className="relative grid h-14 w-14 place-items-center rounded-full border border-white/20 bg-white/5 backdrop-blur transition-colors group-hover:border-primary">
+              <button onClick={onWatchReel} className="group inline-flex items-center gap-3 text-foreground">
+                <span className="relative grid h-14 w-14 place-items-center rounded-full border border-card-border bg-surface/60 backdrop-blur transition-colors group-hover:border-primary">
                   <span className="absolute inset-0 animate-ping-slow rounded-full border border-primary/40" />
                   <Play className="h-5 w-5 translate-x-0.5 fill-current text-primary" />
                 </span>
@@ -526,14 +590,14 @@ export function EyeOfCreation({
 
         {/* scroll hint */}
         <div style={v.hintStyle} hidden={v.hideHint}>
-          <span style={{ fontFamily: FONT_DISPLAY, letterSpacing: "0.5em", fontSize: 11, color: "rgba(230,225,215,0.6)", textTransform: "uppercase" }}>
+          <span style={{ fontFamily: FONT_DISPLAY, letterSpacing: "0.5em", fontSize: 11, color: v.stage.hintColor, textTransform: "uppercase" }}>
             برای ورود اسکرول کن
           </span>
           <div style={{ width: 1, height: 34, margin: "14px auto 0", background: "linear-gradient(180deg, rgba(166,201,255,0.8), transparent)" }} />
         </div>
 
         {/* progress line */}
-        <div style={{ position: "absolute", left: 0, bottom: 0, height: 2, background: "linear-gradient(90deg, rgba(166,201,255,0.5), #a6c9ff)", zIndex: 60, width: v.progressWidth, boxShadow: "0 0 10px rgba(166,201,255,0.6)" }} />
+        <div style={{ position: "absolute", left: 0, bottom: 0, height: 2, background: v.stage.progressGrad, zIndex: 60, width: v.progressWidth, boxShadow: v.stage.progressGlow }} />
       </div>
     </div>
   );

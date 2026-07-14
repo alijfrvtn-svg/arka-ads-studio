@@ -4,18 +4,28 @@ import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
 import { EyeOfCreation } from "./EyeOfCreation";
+import { ClassicHero } from "./ClassicHero";
 import { SAMPLE } from "@/lib/media";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
-export function Hero() {
+export function Hero({ stats }: { stats: { label: string; value: number; suffix: string }[] }) {
   const [reel, setReel] = useState(false);
+  const openReel = () => setReel(true);
 
   return (
     <section className="relative">
-      <EyeOfCreation onWatchReel={() => setReel(true)} />
+      {/* Desktop: cinematic scroll-driven animation. Mobile/tablet (<lg): the
+          static classic hero instead — the animation is disabled entirely
+          below `lg`, not just visually hidden (see EyeOfCreation's matchMedia gate). */}
+      <div className="hidden lg:block">
+        <EyeOfCreation onWatchReel={openReel} />
+      </div>
+      <div className="lg:hidden">
+        <ClassicHero stats={stats} onWatchReel={openReel} />
+      </div>
 
-      {/* showreel modal */}
+      {/* showreel modal (shared by both variants) */}
       <AnimatePresence>
         {reel && (
           <motion.div

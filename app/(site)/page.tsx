@@ -25,7 +25,7 @@ export default async function HomePage() {
 
   return (
     <>
-      <Hero />
+      <Hero stats={statData} />
       <TrustMarquee clients={clients.map((c) => ({ name: c.name, nameEn: c.nameEn }))} />
       <Departments />
       <FeaturedWork projects={projects} />
