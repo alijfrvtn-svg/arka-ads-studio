@@ -19,6 +19,18 @@ const B = (fd: FormData, k: string) => {
   return v === "on" || v === "true" || v === "1";
 };
 const J = (x: unknown) => JSON.stringify(x ?? []);
+// One item per line.
+const L = (fd: FormData, k: string) =>
+  S(fd, k).split("\n").map((l) => l.trim()).filter(Boolean);
+// One item per line, `field1 | field2 | ...` — for simple multi-field lists
+// (values cards, timeline entries, social links) without a dynamic add/remove UI.
+const PL = (fd: FormData, k: string, fields: string[]) =>
+  L(fd, k).map((line) => {
+    const parts = line.split("|").map((p) => p.trim());
+    const obj: Record<string, string> = {};
+    fields.forEach((f, i) => (obj[f] = parts[i] || ""));
+    return obj;
+  });
 
 function revalidateSite(...paths: string[]) {
   for (const p of paths) revalidatePath(p);
@@ -491,5 +503,98 @@ export async function addTaskComment(taskId: string, body: string) {
   if (!trimmed) return { ok: false, error: "متن یادداشت خالی است" };
   await db.taskComment.create({ data: { taskId, authorId: user.id, body: trimmed } });
   revalidatePath(`/admin/tasks/${taskId}`);
+  return { ok: true };
+}
+
+// ============================================================
+// ABOUT PAGE (singleton)
+// ============================================================
+export async function saveAboutPage(fd: FormData) {
+  await requirePermission("about.manage");
+  const data = {
+    heroEyebrow: S(fd, "heroEyebrow"),
+    heroTitle: S(fd, "heroTitle"),
+    heroTitleHighlight: S(fd, "heroTitleHighlight"),
+    heroDescription: S(fd, "heroDescription"),
+    storyEyebrow: S(fd, "storyEyebrow"),
+    storyHeading: S(fd, "storyHeading"),
+    storyParagraphs: J(L(fd, "storyParagraphs")),
+    storyVideo: S(fd, "storyVideo") || null,
+    storyPoster: S(fd, "storyPoster") || null,
+    valuesEyebrow: S(fd, "valuesEyebrow"),
+    valuesHeading: S(fd, "valuesHeading"),
+    values: J(PL(fd, "values", ["icon", "title", "desc"])),
+    teamEyebrow: S(fd, "teamEyebrow"),
+    teamHeading: S(fd, "teamHeading"),
+    timelineEyebrow: S(fd, "timelineEyebrow"),
+    timelineHeading: S(fd, "timelineHeading"),
+    timeline: J(PL(fd, "timeline", ["year", "title", "desc"])),
+    galleryEyebrow: S(fd, "galleryEyebrow"),
+    galleryHeading: S(fd, "galleryHeading"),
+    galleryVideo: S(fd, "galleryVideo") || null,
+    galleryPoster: S(fd, "galleryPoster") || null,
+    galleryImages: J(L(fd, "galleryImages")),
+    metaTitle: S(fd, "metaTitle") || null,
+    metaDescription: S(fd, "metaDescription") || null,
+  };
+  await db.aboutPage.upsert({ where: { id: "about" }, create: { id: "about", ...data }, update: data });
+  revalidateSite("/admin/about", "/about");
+  redirect("/admin/about");
+}
+
+// ============================================================
+// CONTACT PAGE (singleton)
+// ============================================================
+export async function saveContactPage(fd: FormData) {
+  await requirePermission("contact.manage");
+  const data = {
+    heroEyebrow: S(fd, "heroEyebrow"),
+    heroTitle: S(fd, "heroTitle"),
+    heroTitleHighlight: S(fd, "heroTitleHighlight"),
+    heroDescription: S(fd, "heroDescription"),
+    address: S(fd, "address"),
+    phone: S(fd, "phone"),
+    phoneDisplay: S(fd, "phoneDisplay"),
+    email: S(fd, "email"),
+    officeHours: S(fd, "officeHours"),
+    mapLat: N(fd, "mapLat", 35.7448),
+    mapLng: N(fd, "mapLng", 51.4101),
+    socials: J(PL(fd, "socials", ["platform", "href", "label"])),
+    serviceOptions: J(L(fd, "serviceOptions")),
+    budgetOptions: J(L(fd, "budgetOptions")),
+    metaTitle: S(fd, "metaTitle") || null,
+    metaDescription: S(fd, "metaDescription") || null,
+  };
+  await db.contactPage.upsert({ where: { id: "contact" }, create: { id: "contact", ...data }, update: data });
+  revalidateSite("/admin/contact", "/contact");
+  redirect("/admin/contact");
+}
+
+// ============================================================
+// TEAM
+// ============================================================
+export async function saveTeamMember(fd: FormData) {
+  await requirePermission("team.manage");
+  const id = S(fd, "id");
+  const data = {
+    name: S(fd, "name"),
+    nameEn: S(fd, "nameEn") || null,
+    role: S(fd, "role"),
+    bio: S(fd, "bio") || null,
+    avatar: S(fd, "avatar") || null,
+    socials: J(PL(fd, "socials", ["platform", "href"])),
+    order: N(fd, "order"),
+    published: B(fd, "published"),
+  };
+  if (id) await db.teamMember.update({ where: { id }, data });
+  else await db.teamMember.create({ data });
+  revalidateSite("/admin/team", "/about");
+  redirect("/admin/team");
+}
+
+export async function deleteTeamMember(id: string) {
+  await requirePermission("team.manage");
+  await db.teamMember.delete({ where: { id } });
+  revalidateSite("/admin/team", "/about");
   return { ok: true };
 }

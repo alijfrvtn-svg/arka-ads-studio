@@ -164,6 +164,9 @@ export const PERMISSIONS: PermissionDef[] = [
   { key: "settings.manage", label: "مدیریت تنظیمات", group: "سیستم" },
   { key: "tasks.view", label: "مشاهده تسک‌ها", group: "تسک‌ها" },
   { key: "tasks.manage", label: "مدیریت تسک‌ها", group: "تسک‌ها" },
+  { key: "about.manage", label: "مدیریت صفحه درباره ما", group: "صفحات" },
+  { key: "contact.manage", label: "مدیریت صفحه تماس", group: "صفحات" },
+  { key: "team.manage", label: "مدیریت تیم", group: "صفحات" },
 ];
 
 /** Default permission sets per role (SUPER_ADMIN gets everything via wildcard). */
@@ -186,6 +189,9 @@ export const ROLE_PERMISSIONS: Record<Role, string[]> = {
     "settings.manage",
     "tasks.view",
     "tasks.manage",
+    "about.manage",
+    "contact.manage",
+    "team.manage",
   ],
   EDITOR: [
     "dashboard.view",

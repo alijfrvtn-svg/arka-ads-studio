@@ -259,6 +259,58 @@ model Setting {
   value String // JSON
 }
 
+/// Singleton content for the public /about page (one row, id fixed to "about").
+model AboutPage {
+  id                 String   @id @default("about")
+  heroEyebrow        String   @default("درباره آرکا")
+  heroTitle          String   @default("ذهن‌های پشتِ جادو")
+  heroTitleHighlight String   @default("جادو") // substring of heroTitle rendered in the gradient accent
+  heroDescription    String   @default("ما فقط محتوا نمی‌سازیم؛ برای برندها روایت می‌سازیم، تجربه خلق می‌کنیم و تأثیر می‌گذاریم.")
+  storyEyebrow       String   @default("داستان ما")
+  storyHeading       String   @default("یک پروداکشن‌هاوس، نه صرفاً یک آژانس")
+  storyParagraphs    String   @default("[]") // JSON string[]
+  storyVideo         String?
+  storyPoster        String?
+  valuesEyebrow      String   @default("ارزش‌ها")
+  valuesHeading      String   @default("آنچه ما را متمایز می‌کند")
+  values             String   @default("[]") // JSON [{icon,title,desc}]
+  teamEyebrow        String   @default("تیم")
+  teamHeading        String   @default("ذهن‌های خلاق آرکا")
+  timelineEyebrow    String   @default("مسیر رشد")
+  timelineHeading    String   @default("سفر آرکا در یک نگاه")
+  timeline           String   @default("[]") // JSON [{year,title,desc}]
+  galleryEyebrow     String   @default("پشت صحنه")
+  galleryHeading     String   @default("جادو چگونه ساخته می‌شود")
+  galleryVideo       String?
+  galleryPoster      String?
+  galleryImages      String   @default("[]") // JSON string[]
+  metaTitle          String?
+  metaDescription    String?
+  updatedAt          DateTime @updatedAt
+}
+
+/// Singleton content for the public /contact page (one row, id fixed to "contact").
+model ContactPage {
+  id              String   @id @default("contact")
+  heroEyebrow     String   @default("تماس")
+  heroTitle       String   @default("بیایید شروع کنیم")
+  heroTitleHighlight String @default("شروع کنیم") // substring of heroTitle rendered in the gradient accent
+  heroDescription String   @default("ایده‌ای در سر دارید؟ فرم را پر کنید یا مستقیم با ما در ارتباط باشید.")
+  address         String   @default("تهران، خیابان ولیعصر، برج آرکا، طبقه ۱۲")
+  phone           String   @default("+982188000000")
+  phoneDisplay    String   @default("۰۲۱ ۸۸۰۰ ۰۰۰۰")
+  email           String   @default("hello@arka.studio")
+  officeHours     String   @default("شنبه تا چهارشنبه، ۹ تا ۱۸")
+  mapLat          Float    @default(35.7448)
+  mapLng          Float    @default(51.4101)
+  socials         String   @default("[]") // JSON [{platform,href,label}]
+  serviceOptions  String   @default("[]") // JSON string[] — contact form "service" dropdown
+  budgetOptions   String   @default("[]") // JSON string[] — contact form "budget" dropdown
+  metaTitle       String?
+  metaDescription String?
+  updatedAt       DateTime @updatedAt
+}
+
 /// Internal task assigned by an admin to a staff/team member (viewed in /portal).
 model Task {
   id          String        @id @default(cuid())

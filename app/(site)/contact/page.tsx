@@ -5,23 +5,39 @@ import { Section, Container } from "@/components/ui/Section";
 import { Reveal } from "@/components/fx/Reveal";
 import { ContactForm } from "@/components/contact/ContactForm";
 import { SocialIcon } from "@/components/layout/SocialIcon";
-import { SITE } from "@/lib/constants";
+import { getContactPage } from "@/lib/queries";
 import { buildMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = buildMetadata({
-  title: "تماس با ما",
-  path: "/contact",
-  description: "بریف پروژه‌تان را بفرستید یا با تیم آرکا در تهران تماس بگیرید.",
-});
+export async function generateMetadata(): Promise<Metadata> {
+  const c = await getContactPage();
+  return buildMetadata({ title: c.metaTitle, path: "/contact", description: c.metaDescription });
+}
 
-export default function ContactPage() {
+function HighlightedTitle({ title, highlight }: { title: string; highlight: string }) {
+  const idx = highlight ? title.indexOf(highlight) : -1;
+  if (idx === -1) return <>{title}</>;
+  return (
+    <>
+      {title.slice(0, idx)}
+      <span className="text-gradient">{highlight}</span>
+      {title.slice(idx + highlight.length)}
+    </>
+  );
+}
+
+export default async function ContactPage() {
+  const c = await getContactPage();
+  const bboxLat = 0.03;
+  const bboxLng = 0.03;
+  const bbox = `${c.mapLng - bboxLng}%2C${c.mapLat - bboxLat}%2C${c.mapLng + bboxLng}%2C${c.mapLat + bboxLat}`;
+
   return (
     <>
       <PageHero
-        eyebrow="تماس"
+        eyebrow={c.heroEyebrow}
         breadcrumb={[{ label: "خانه", href: "/" }, { label: "تماس" }]}
-        title={<>بیایید <span className="text-gradient">شروع کنیم</span></>}
-        description="ایده‌ای در سر دارید؟ فرم را پر کنید یا مستقیم با ما در ارتباط باشید."
+        title={<HighlightedTitle title={c.heroTitle} highlight={c.heroTitleHighlight} />}
+        description={c.heroDescription}
       />
 
       <Section className="pt-0">
@@ -29,24 +45,24 @@ export default function ContactPage() {
           <div className="grid gap-8 lg:grid-cols-[1.2fr_1fr]">
             <Reveal>
               <div className="rounded-2xl border border-card-border bg-surface/50 p-6 md:p-8">
-                <ContactForm />
+                <ContactForm serviceOptions={c.serviceOptions} budgetOptions={c.budgetOptions} />
               </div>
             </Reveal>
 
             <Reveal delay={0.1}>
               <div className="space-y-6">
                 <div className="space-y-3">
-                  <ContactRow icon={MapPin} label="دفتر مرکزی" value={SITE.address} />
-                  <ContactRow icon={Phone} label="تلفن" value={SITE.phoneDisplay} href={`tel:${SITE.phone}`} ltr />
-                  <ContactRow icon={Mail} label="ایمیل" value={SITE.email} href={`mailto:${SITE.email}`} ltr />
-                  <ContactRow icon={Clock} label="ساعات کاری" value="شنبه تا چهارشنبه، ۹ تا ۱۸" />
+                  <ContactRow icon={MapPin} label="دفتر مرکزی" value={c.address} />
+                  <ContactRow icon={Phone} label="تلفن" value={c.phoneDisplay} href={`tel:${c.phone}`} ltr />
+                  <ContactRow icon={Mail} label="ایمیل" value={c.email} href={`mailto:${c.email}`} ltr />
+                  <ContactRow icon={Clock} label="ساعات کاری" value={c.officeHours} />
                 </div>
 
                 {/* dark-themed map */}
                 <div className="relative overflow-hidden rounded-2xl border border-card-border">
                   <iframe
                     title="نقشه آرکا"
-                    src="https://www.openstreetmap.org/export/embed.html?bbox=51.38%2C35.72%2C51.44%2C35.77&layer=mapnik&marker=35.7448%2C51.4101"
+                    src={`https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${c.mapLat}%2C${c.mapLng}`}
                     className="h-64 w-full"
                     style={{ filter: "invert(0.92) hue-rotate(180deg) saturate(0.8) contrast(0.9)" }}
                     loading="lazy"
@@ -57,7 +73,7 @@ export default function ContactPage() {
                 <div className="rounded-2xl border border-card-border bg-surface/50 p-6">
                   <p className="mb-4 text-sm font-semibold text-foreground">ما را دنبال کنید</p>
                   <div className="flex gap-2">
-                    {SITE.socials.map((s) => (
+                    {c.socials.map((s) => (
                       <a
                         key={s.platform}
                         href={s.href}

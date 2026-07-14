@@ -3,13 +3,16 @@
 import { useState } from "react";
 import { CheckCircle2, Loader2, Send } from "lucide-react";
 
-const SERVICES = ["فیلم و تیزر", "عکاسی", "برندینگ", "طراحی وب", "دیجیتال مارکتینگ", "سایر"];
-const BUDGETS = ["زیر ۵۰ میلیون", "۵۰ تا ۱۵۰ میلیون", "۱۵۰ تا ۳۰۰ میلیون", "بالای ۳۰۰ میلیون"];
-
 const field = "peer h-14 w-full rounded-xl border border-card-border bg-surface px-4 pt-4 text-foreground outline-none transition-colors focus:border-primary placeholder-transparent";
 const lbl = "pointer-events-none absolute right-4 top-4 text-foreground-faint transition-all peer-focus:top-1.5 peer-focus:text-xs peer-focus:text-primary peer-[:not(:placeholder-shown)]:top-1.5 peer-[:not(:placeholder-shown)]:text-xs";
 
-export function ContactForm() {
+export function ContactForm({
+  serviceOptions,
+  budgetOptions,
+}: {
+  serviceOptions: string[];
+  budgetOptions: string[];
+}) {
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
   const [error, setError] = useState("");
@@ -74,11 +77,11 @@ export function ContactForm() {
       <div className="grid gap-4 sm:grid-cols-2">
         <select name="service" className="h-14 w-full rounded-xl border border-card-border bg-surface px-4 text-foreground outline-none focus:border-primary" defaultValue="">
           <option value="" disabled>نوع خدمت</option>
-          {SERVICES.map((s) => <option key={s} value={s}>{s}</option>)}
+          {serviceOptions.map((s) => <option key={s} value={s}>{s}</option>)}
         </select>
         <select name="budget" className="h-14 w-full rounded-xl border border-card-border bg-surface px-4 text-foreground outline-none focus:border-primary" defaultValue="">
           <option value="" disabled>بودجه تقریبی</option>
-          {BUDGETS.map((b) => <option key={b} value={b}>{b}</option>)}
+          {budgetOptions.map((b) => <option key={b} value={b}>{b}</option>)}
         </select>
       </div>
       <div className="relative">

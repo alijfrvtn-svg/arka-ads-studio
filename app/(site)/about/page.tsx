@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Sparkles, Target, Gem, Zap } from "lucide-react";
+import { Sparkles, Target, Gem, Zap, type LucideIcon } from "lucide-react";
 import { PageHero } from "@/components/ui/PageHero";
 import { Section, Container, SectionHeading, Eyebrow } from "@/components/ui/Section";
 import { Reveal } from "@/components/fx/Reveal";
@@ -7,45 +7,42 @@ import { StatsBar } from "@/components/home/StatsBar";
 import { FinalCTA } from "@/components/home/FinalCTA";
 import { VideoPlayer } from "@/components/work/VideoPlayer";
 import { SocialIcon } from "@/components/layout/SocialIcon";
-import { getStats, getTeam } from "@/lib/queries";
+import { getStats, getTeam, getAboutPage } from "@/lib/queries";
 import { buildMetadata } from "@/lib/seo";
-import { SAMPLE } from "@/lib/media";
-import { parseArr, toFa } from "@/lib/utils";
+import { parseArr } from "@/lib/utils";
 import type { Social } from "@/types";
 
-export const metadata: Metadata = buildMetadata({
-  title: "درباره ما",
-  path: "/about",
-  description: "آرکا؛ تیمی از ذهن‌های خلاق که برندها را با روایت بصری سینمایی متحول می‌کنند.",
-});
+export async function generateMetadata(): Promise<Metadata> {
+  const a = await getAboutPage();
+  return buildMetadata({ title: a.metaTitle, path: "/about", description: a.metaDescription });
+}
 
-const VALUES = [
-  { icon: "Target", title: "استراتژی‌محور", desc: "هر تصمیم خلاقانه ریشه در داده و هدف دارد." },
-  { icon: "Gem", title: "کیفیت بی‌سازش", desc: "استانداردهای سینمایی در هر فریم و پیکسل." },
-  { icon: "Zap", title: "سرعت و چابکی", desc: "تحویل به‌موقع بدون قربانی‌کردن کیفیت." },
-  { icon: "Sparkles", title: "خلاقیت بی‌مرز", desc: "ایده‌هایی که مرزها را جابه‌جا می‌کنند." },
-];
-const ICONS: Record<string, any> = { Target, Gem, Zap, Sparkles };
+const ICONS: Record<string, LucideIcon> = { Target, Gem, Zap, Sparkles };
 
-const TIMELINE = [
-  { year: "۱۳۹۶", title: "تولد آرکا", desc: "با یک دوربین و یک رؤیا، کار را آغاز کردیم." },
-  { year: "۱۳۹۸", title: "اولین کمپین ملی", desc: "نخستین برندفیلمی که در تلویزیون ملی پخش شد." },
-  { year: "۱۴۰۰", title: "دپارتمان دیجیتال", desc: "افزودن پرفورمنس مارکتینگ و سئو به خدمات." },
-  { year: "۱۴۰۲", title: "جوایز خلاقیت", desc: "کسب چند جایزه ملی و بین‌المللی طراحی." },
-  { year: "۱۴۰۴", title: "بیش از ۴۸۰ پروژه", desc: "همراهی با ۱۲۰ برند در ۱۲ صنعت مختلف." },
-];
+/** Splits a title on its highlighted substring and wraps that part in the gradient accent span. */
+function HighlightedTitle({ title, highlight }: { title: string; highlight: string }) {
+  const idx = highlight ? title.indexOf(highlight) : -1;
+  if (idx === -1) return <>{title}</>;
+  return (
+    <>
+      {title.slice(0, idx)}
+      <span className="text-gradient">{highlight}</span>
+      {title.slice(idx + highlight.length)}
+    </>
+  );
+}
 
 export default async function AboutPage() {
-  const [team, stats] = await Promise.all([getTeam(), getStats()]);
+  const [team, stats, a] = await Promise.all([getTeam(), getStats(), getAboutPage()]);
   const statData = stats.map((s) => ({ label: s.label, value: s.value, suffix: s.suffix }));
 
   return (
     <>
       <PageHero
-        eyebrow="درباره آرکا"
+        eyebrow={a.heroEyebrow}
         breadcrumb={[{ label: "خانه", href: "/" }, { label: "درباره ما" }]}
-        title={<>ذهن‌های پشتِ <span className="text-gradient">جادو</span></>}
-        description="ما فقط محتوا نمی‌سازیم؛ برای برندها روایت می‌سازیم، تجربه خلق می‌کنیم و تأثیر می‌گذاریم."
+        title={<HighlightedTitle title={a.heroTitle} highlight={a.heroTitleHighlight} />}
+        description={a.heroDescription}
       />
 
       {/* story */}
@@ -54,18 +51,19 @@ export default async function AboutPage() {
           <div className="grid items-center gap-12 lg:grid-cols-2">
             <Reveal>
               <div className="aspect-[4/3] overflow-hidden rounded-2xl border border-card-border">
-                <VideoPlayer src={SAMPLE.reels[0]} poster={SAMPLE.bts[0]} />
+                <VideoPlayer src={a.storyVideo} poster={a.storyPoster} />
               </div>
             </Reveal>
             <Reveal delay={0.1}>
               <div>
-                <Eyebrow>داستان ما</Eyebrow>
+                <Eyebrow>{a.storyEyebrow}</Eyebrow>
                 <h2 className="mt-4 font-display text-3xl font-bold text-foreground md:text-4xl">
-                  یک پروداکشن‌هاوس، نه صرفاً یک آژانس
+                  {a.storyHeading}
                 </h2>
                 <div className="mt-5 space-y-4 leading-loose text-foreground-muted">
-                  <p>آرکا در سال ۱۳۹۶ با این باور متولد شد که برندهای بزرگ با روایت‌های بزرگ ساخته می‌شوند. ما ترکیبی از هنر سینما، تفکر استراتژیک و داده هستیم.</p>
-                  <p>امروز، تیمی چندتخصصی از کارگردان، طراح، استراتژیست و بازاریاب، زیر یک سقف گرد آمده‌اند تا مشکلات واقعی برندها را حل کنند.</p>
+                  {a.storyParagraphs.map((p, i) => (
+                    <p key={i}>{p}</p>
+                  ))}
                 </div>
               </div>
             </Reveal>
@@ -78,10 +76,10 @@ export default async function AboutPage() {
       {/* values */}
       <Section>
         <Container>
-          <SectionHeading align="center" eyebrow="ارزش‌ها" title="آنچه ما را متمایز می‌کند" className="mx-auto mb-14 max-w-2xl" />
+          <SectionHeading align="center" eyebrow={a.valuesEyebrow} title={a.valuesHeading} className="mx-auto mb-14 max-w-2xl" />
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {VALUES.map((v, i) => {
-              const I = ICONS[v.icon];
+            {a.values.map((v, i) => {
+              const I = ICONS[v.icon] ?? Sparkles;
               return (
                 <Reveal key={v.title} delay={i * 0.08}>
                   <div className="h-full rounded-2xl border border-card-border bg-surface p-6">
@@ -101,7 +99,7 @@ export default async function AboutPage() {
       {/* team */}
       <Section className="bg-background-2">
         <Container>
-          <SectionHeading align="center" eyebrow="تیم" title="ذهن‌های خلاق آرکا" className="mx-auto mb-14 max-w-2xl" />
+          <SectionHeading align="center" eyebrow={a.teamEyebrow} title={a.teamHeading} className="mx-auto mb-14 max-w-2xl" />
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {team.map((m, i) => {
               const socials = parseArr<Social>(m.socials);
@@ -135,10 +133,10 @@ export default async function AboutPage() {
       {/* timeline */}
       <Section>
         <Container className="max-w-3xl">
-          <SectionHeading align="center" eyebrow="مسیر رشد" title="سفر آرکا در یک نگاه" className="mx-auto mb-14 max-w-2xl" />
+          <SectionHeading align="center" eyebrow={a.timelineEyebrow} title={a.timelineHeading} className="mx-auto mb-14 max-w-2xl" />
           <div className="relative border-r-2 border-card-border pr-8">
-            {TIMELINE.map((t, i) => (
-              <Reveal key={t.year} delay={i * 0.08}>
+            {a.timeline.map((t, i) => (
+              <Reveal key={t.year + t.title} delay={i * 0.08}>
                 <div className="relative pb-10 last:pb-0">
                   <span className="absolute -right-[41px] top-1 grid h-5 w-5 place-items-center rounded-full border-2 border-primary bg-background">
                     <span className="h-2 w-2 rounded-full bg-primary" />
@@ -156,15 +154,15 @@ export default async function AboutPage() {
       {/* BTS gallery */}
       <Section className="bg-background-2">
         <Container>
-          <SectionHeading eyebrow="پشت صحنه" title="جادو چگونه ساخته می‌شود" className="mb-10" />
+          <SectionHeading eyebrow={a.galleryEyebrow} title={a.galleryHeading} className="mb-10" />
           <div className="grid gap-4 md:grid-cols-3">
             <Reveal className="md:col-span-2">
               <div className="aspect-video overflow-hidden rounded-2xl border border-card-border">
-                <VideoPlayer src={SAMPLE.reels[1]} poster={SAMPLE.bts[1]} />
+                <VideoPlayer src={a.galleryVideo} poster={a.galleryPoster} />
               </div>
             </Reveal>
             <div className="grid grid-cols-2 gap-4 md:grid-cols-1">
-              {SAMPLE.bts.slice(2, 4).map((b, i) => (
+              {a.galleryImages.map((b, i) => (
                 <Reveal key={i} delay={i * 0.1}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={b} alt="" className="aspect-video w-full rounded-2xl border border-card-border object-cover" />
