@@ -51,6 +51,7 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
         breadcrumb={[{ label: "خانه", href: "/" }, { label: "خدمات", href: "/services" }, { label: s.title }]}
         title={s.title}
         description={s.description}
+        image={s.cover}
       >
         <div className="mt-8 flex flex-wrap gap-4">
           <Link href="/contact" className="inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3.5 font-semibold text-primary-foreground transition-transform hover:scale-[1.03]">

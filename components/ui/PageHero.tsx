@@ -8,16 +8,25 @@ export function PageHero({
   title,
   description,
   breadcrumb,
+  image,
   children,
 }: {
   eyebrow?: string;
   title: React.ReactNode;
   description?: React.ReactNode;
   breadcrumb?: { label: string; href?: string }[];
+  image?: string | null;
   children?: React.ReactNode;
 }) {
   return (
     <section className="relative overflow-hidden pb-14 pt-36 md:pt-44">
+      {image && (
+        <>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={image} alt="" className="absolute inset-0 h-full w-full object-cover opacity-25" />
+          <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/85 to-background" />
+        </>
+      )}
       <div className="hero-grid absolute inset-0 opacity-50" />
       <div className="aurora animate-aurora-1 -left-32 -top-24 h-96 w-96 bg-primary/20" />
       <Container className="relative">
