@@ -45,12 +45,12 @@ export default async function IndustryPage({ params }: { params: Promise<{ slug:
             className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-30"
           />
         ) : ind.heroVideo ? (
-          <video src={ind.heroVideo} poster={ind.cover ?? undefined} autoPlay muted loop playsInline className="absolute inset-0 h-full w-full object-cover opacity-30" />
+          <video src={ind.heroVideo} poster={ind.cover ?? undefined} autoPlay muted loop playsInline className="absolute inset-0 h-full w-full object-cover opacity-50" />
         ) : (
           // eslint-disable-next-line @next/next/no-img-element
-          ind.cover && <img src={ind.cover} alt="" className="absolute inset-0 h-full w-full object-cover opacity-30" />
+          ind.cover && <img src={ind.cover} alt="" className="absolute inset-0 h-full w-full object-cover opacity-50" />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/70 to-background/50" />
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/45 to-background/25" />
         <Container className="relative">
           <Reveal>
             <nav className="mb-4 text-xs text-foreground-muted">

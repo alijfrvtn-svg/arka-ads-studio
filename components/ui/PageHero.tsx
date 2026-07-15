@@ -23,8 +23,8 @@ export function PageHero({
       {image && (
         <>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={image} alt="" className="absolute inset-0 h-full w-full object-cover opacity-25" />
-          <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/85 to-background" />
+          <img src={image} alt="" className="absolute inset-0 h-full w-full object-cover opacity-45" />
+          <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-background/55 to-background" />
         </>
       )}
       <div className="hero-grid absolute inset-0 opacity-50" />
