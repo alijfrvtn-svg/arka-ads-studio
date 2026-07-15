@@ -87,6 +87,10 @@ export function IndustryHero({
           e.stopPropagation();
           setHover(false);
         }}
+        onMouseLeave={(e) => {
+          e.stopPropagation();
+          setHover(true);
+        }}
       >
         <Reveal>
           <nav className="mb-4 text-xs text-foreground-muted">
