@@ -128,7 +128,10 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
                         </li>
                       ))}
                     </ul>
-                    <Link href="/contact" className={`mt-7 inline-flex h-12 items-center justify-center rounded-xl font-semibold transition-all ${tier.featured ? "bg-primary text-primary-foreground hover:brightness-110" : "border border-card-border text-foreground hover:border-primary"}`}>
+                    <Link
+                      href={`/contact?plan=${encodeURIComponent(`${tier.name} (${s.title})`)}`}
+                      className={`mt-7 inline-flex h-12 items-center justify-center rounded-xl font-semibold transition-all ${tier.featured ? "bg-primary text-primary-foreground hover:brightness-110" : "border border-card-border text-foreground hover:border-primary"}`}
+                    >
                       انتخاب پلن
                     </Link>
                   </div>

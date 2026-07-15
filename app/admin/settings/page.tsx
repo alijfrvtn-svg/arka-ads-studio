@@ -1,9 +1,9 @@
-import { Globe, Palette, ShieldAlert } from "lucide-react";
+import { Globe, ShieldAlert } from "lucide-react";
 import { db } from "@/lib/db";
 import { PageHeader } from "@/components/admin/ui";
 import { Field, Input, Textarea, Select, Toggle, FormSection } from "@/components/admin/form";
 import { SubmitButton } from "@/components/admin/SubmitButton";
-import { saveSettings } from "@/lib/actions";
+import { saveSettings, saveStats } from "@/lib/actions";
 import { parseObj } from "@/lib/utils";
 
 interface SiteSettings {
@@ -15,7 +15,10 @@ interface SiteSettings {
 }
 
 export default async function SettingsPage() {
-  const row = await db.setting.findUnique({ where: { key: "site" } });
+  const [row, stats] = await Promise.all([
+    db.setting.findUnique({ where: { key: "site" } }),
+    db.stat.findMany({ orderBy: { order: "asc" } }),
+  ]);
   const s = parseObj<SiteSettings>(row?.value, {
     heroHeadline: "طراحی کن. خلق کن. تأثیر بگذار.",
     contactEmail: "hello@arka.studio",
@@ -23,6 +26,7 @@ export default async function SettingsPage() {
     maintenance: false,
     defaultLocale: "fa",
   });
+  const statsText = stats.map((st) => `${st.label} | ${st.value} | ${st.suffix}`).join("\n");
 
   return (
     <div className="mx-auto max-w-3xl">
@@ -72,6 +76,23 @@ export default async function SettingsPage() {
         <div className="flex justify-end">
           <SubmitButton>ذخیره تنظیمات</SubmitButton>
         </div>
+      </form>
+
+      <form action={saveStats} className="mt-5">
+        <FormSection
+          title="آمار سایت"
+          description="اعداد نمایش داده‌شده در صفحه اول و درباره ما (مثل «۴۸۰+ پروژه موفق»)"
+        >
+          <Field
+            label="آمار"
+            hint="هر خط یک آیتم: برچسب | عدد | پسوند — مثال: پروژه موفق | 480 | + — ترتیب خطوط، ترتیب نمایش است"
+          >
+            <Textarea name="stats" defaultValue={statsText} className="min-h-32" />
+          </Field>
+          <div className="flex justify-end">
+            <SubmitButton>ذخیره آمار</SubmitButton>
+          </div>
+        </FormSection>
       </form>
     </div>
   );

@@ -9,6 +9,7 @@ const schema = z.object({
   company: z.string().optional(),
   service: z.string().optional(),
   budget: z.string().optional(),
+  plan: z.string().optional(),
   message: z.string().min(5, "پیام را کامل‌تر بنویسید"),
 });
 

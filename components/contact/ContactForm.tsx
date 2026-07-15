@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { CheckCircle2, Loader2, Send } from "lucide-react";
 
 const field = "peer h-14 w-full rounded-xl border border-card-border bg-surface px-4 pt-4 text-foreground outline-none transition-colors focus:border-primary placeholder-transparent";
@@ -16,6 +17,8 @@ export function ContactForm({
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
   const [error, setError] = useState("");
+  const searchParams = useSearchParams();
+  const planFromUrl = searchParams.get("plan") ?? "";
 
   const submit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -83,6 +86,10 @@ export function ContactForm({
           <option value="" disabled>بودجه تقریبی</option>
           {budgetOptions.map((b) => <option key={b} value={b}>{b}</option>)}
         </select>
+      </div>
+      <div className="relative">
+        <input name="plan" defaultValue={planFromUrl} placeholder="پلن انتخابی" className={field} />
+        <label className={lbl}>پلن انتخابی (اختیاری)</label>
       </div>
       <div className="relative">
         <textarea name="message" required placeholder="پیام" rows={5} className={`${field} pt-5 resize-none`} />

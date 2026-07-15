@@ -7,6 +7,7 @@ import { SubmitButton } from "@/components/admin/SubmitButton";
 import { saveService } from "@/lib/actions";
 import { DEPARTMENTS } from "@/lib/constants";
 import { parseArr } from "@/lib/utils";
+import type { PricingTier } from "@/types";
 
 export default async function ServiceForm({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -14,6 +15,9 @@ export default async function ServiceForm({ params }: { params: Promise<{ id: st
   const s = isNew ? null : await db.service.findUnique({ where: { id } });
   if (!isNew && !s) notFound();
   const features = parseArr<string>(s?.features).join("\n");
+  const pricing = parseArr<PricingTier>(s?.pricing)
+    .map((t) => `${t.name} | ${t.price} | ${t.unit ?? ""} | ${(t.features ?? []).join(";")} | ${t.featured ? "بله" : "خیر"}`)
+    .join("\n");
 
   return (
     <div className="mx-auto max-w-3xl">
@@ -49,6 +53,15 @@ export default async function ServiceForm({ params }: { params: Promise<{ id: st
           <Field label="تصویر کاور"><Input name="cover" defaultValue={s?.cover ?? ""} dir="ltr" className="text-left" placeholder="https://…" /></Field>
           <Field label="ویژگی‌ها" hint="هر ویژگی در یک خط">
             <Textarea name="features" defaultValue={features} className="min-h-28" />
+          </Field>
+        </FormSection>
+
+        <FormSection title="پلن‌های قیمت‌گذاری" description="همان پلن‌هایی که در صفحه‌ی این سرویس با دکمه‌ی «انتخاب پلن» نمایش داده می‌شوند">
+          <Field
+            label="پلن‌ها"
+            hint="هر خط یک پلن: نام | قیمت | واحد | ویژگی۱;ویژگی۲;ویژگی۳ | بله/خیر (پیشنهادی) — مثال: حرفه‌ای | ۲۵,۰۰۰,۰۰۰ | تومان | استراتژی اختصاصی;سه راند بازنگری | بله"
+          >
+            <Textarea name="pricing" defaultValue={pricing} className="min-h-32" dir="rtl" />
           </Field>
         </FormSection>
 

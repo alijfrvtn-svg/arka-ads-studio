@@ -225,6 +225,7 @@ model Lead {
   company   String?
   budget    String?
   service   String?
+  plan      String? // pricing tier selected via a service page's "انتخاب پلن" button
   message   String
   status    String   @default("NEW") // NEW | CONTACTED | PROPOSAL | WON | LOST
   source    String   @default("website")

@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Mail, Phone, Trash2, Building2, Wallet } from "lucide-react";
+import { Mail, Phone, Trash2, Building2, Wallet, Tag } from "lucide-react";
 import { updateLeadStatus, deleteLead } from "@/lib/actions";
 import { cn, faTimeAgo } from "@/lib/utils";
 
@@ -14,6 +14,7 @@ interface Lead {
   company: string | null;
   budget: string | null;
   service: string | null;
+  plan: string | null;
   message: string;
   status: string;
   createdAt: Date;
@@ -70,6 +71,12 @@ export function LeadsBoard({ leads }: { leads: Lead[] }) {
                     </button>
                   </div>
                   {l.service && <p className="mt-0.5 text-xs text-primary">{l.service}</p>}
+                  {l.plan && (
+                    <span className="mt-1.5 inline-flex items-center gap-1 rounded-full border border-primary/30 bg-primary/10 px-2 py-0.5 text-[11px] text-primary">
+                      <Tag className="h-3 w-3" />
+                      {l.plan}
+                    </span>
+                  )}
                   <p className="mt-1.5 line-clamp-2 text-xs text-foreground-muted">{l.message}</p>
                   <div className="mt-2 flex flex-wrap gap-2 text-[11px] text-foreground-faint">
                     {l.company && <span className="flex items-center gap-1"><Building2 className="h-3 w-3" />{l.company}</span>}

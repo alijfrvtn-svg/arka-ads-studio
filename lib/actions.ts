@@ -336,6 +336,18 @@ export async function saveService(fd: FormData) {
     cover: S(fd, "cover") || null,
     priceFrom: N(fd, "priceFrom") || null,
     features: J(parseLines("features")),
+    pricing: J(
+      parseLines("pricing").map((line) => {
+        const [name, price, unit, featuresRaw, featuredRaw] = line.split("|").map((p) => p.trim());
+        return {
+          name: name || "",
+          price: price || "",
+          unit: unit || "",
+          features: (featuresRaw || "").split(";").map((f) => f.trim()).filter(Boolean),
+          featured: /^(بله|true|yes|1)$/i.test((featuredRaw || "").trim()),
+        };
+      }),
+    ),
     published: B(fd, "published"),
     metaTitle: S(fd, "metaTitle") || null,
     metaDescription: S(fd, "metaDescription") || null,
@@ -457,6 +469,24 @@ export async function saveSettings(fd: FormData) {
     update: { value: J(value) },
   });
   revalidateSite("/admin/settings", "/");
+  redirect("/admin/settings");
+}
+
+export async function saveStats(fd: FormData) {
+  await requirePermission("settings.manage");
+  const rows = PL(fd, "stats", ["label", "value", "suffix"]);
+  await db.$transaction([
+    db.stat.deleteMany({}),
+    db.stat.createMany({
+      data: rows.map((r, i) => ({
+        label: r.label,
+        value: Number(r.value) || 0,
+        suffix: r.suffix || "+",
+        order: i,
+      })),
+    }),
+  ]);
+  revalidateSite("/admin/settings", "/", "/about");
   redirect("/admin/settings");
 }
 
