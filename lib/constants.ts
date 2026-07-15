@@ -89,35 +89,6 @@ export const DEPARTMENTS: DepartmentDef[] = [
   },
 ];
 
-/** Static nav mirrors of seeded content (avoids DB calls in header/footer). */
-export const SERVICE_LINKS: { slug: string; title: string; department: Department }[] = [
-  { slug: "video-production", title: "تولید فیلم و تیزر", department: "FILM" },
-  { slug: "photography", title: "عکاسی تبلیغاتی", department: "FILM" },
-  { slug: "motion-cgi", title: "موشن‌گرافیک و CGI", department: "FILM" },
-  { slug: "web-design", title: "طراحی وب‌سایت", department: "DESIGN" },
-  { slug: "branding", title: "برندینگ و هویت", department: "DESIGN" },
-  { slug: "ui-ux", title: "طراحی UI/UX", department: "DESIGN" },
-  { slug: "digital-marketing", title: "دیجیتال مارکتینگ", department: "DIGITAL" },
-  { slug: "seo", title: "سئو و محتوا", department: "DIGITAL" },
-  { slug: "social-media", title: "شبکه‌های اجتماعی", department: "DIGITAL" },
-  { slug: "brand-strategy", title: "استراتژی برند", department: "STRATEGY" },
-];
-
-export const INDUSTRY_LINKS: { slug: string; title: string; icon: string }[] = [
-  { slug: "medical", title: "پزشکی و سلامت", icon: "Stethoscope" },
-  { slug: "automotive", title: "خودرو", icon: "Car" },
-  { slug: "fashion", title: "مد و فشن", icon: "Shirt" },
-  { slug: "startups", title: "استارتاپ‌ها", icon: "Rocket" },
-  { slug: "real-estate", title: "املاک", icon: "Building2" },
-  { slug: "food", title: "رستوران و کافه", icon: "UtensilsCrossed" },
-  { slug: "beauty", title: "زیبایی و آرایشی", icon: "Sparkles" },
-  { slug: "technology", title: "فناوری و صنعت", icon: "Cpu" },
-  { slug: "fintech", title: "مالی و فین‌تک", icon: "Landmark" },
-  { slug: "hospitality", title: "گردشگری", icon: "Plane" },
-  { slug: "education", title: "آموزش", icon: "GraduationCap" },
-  { slug: "retail", title: "خرده‌فروشی", icon: "ShoppingBag" },
-];
-
 /** Top-level portfolio filter categories. */
 export const WORK_CATEGORIES = [
   "همه",

@@ -2,9 +2,15 @@ import Link from "next/link";
 import { ArrowUpLeft, Mail, MapPin, Phone } from "lucide-react";
 import { Logo } from "@/components/brand/Logo";
 import { SocialIcon } from "./SocialIcon";
-import { SITE, SERVICE_LINKS, INDUSTRY_LINKS, NAV } from "@/lib/constants";
+import { SITE, NAV } from "@/lib/constants";
 
-export function SiteFooter() {
+export function SiteFooter({
+  services,
+  industries,
+}: {
+  services: { slug: string; title: string }[];
+  industries: { slug: string; title: string }[];
+}) {
   const year = new Intl.DateTimeFormat("fa-IR-u-ca-persian", { year: "numeric" }).format(new Date());
   return (
     <footer className="relative overflow-hidden border-t border-card-border bg-background-2">
@@ -50,8 +56,8 @@ export function SiteFooter() {
             </div>
           </div>
 
-          <FooterCol title="خدمات" links={SERVICE_LINKS.slice(0, 6).map((s) => ({ label: s.title, href: `/services/${s.slug}` }))} />
-          <FooterCol title="صنایع" links={INDUSTRY_LINKS.slice(0, 6).map((i) => ({ label: i.title, href: `/industries/${i.slug}` }))} />
+          <FooterCol title="خدمات" links={services.slice(0, 6).map((s) => ({ label: s.title, href: `/services/${s.slug}` }))} />
+          <FooterCol title="صنایع" links={industries.slice(0, 6).map((i) => ({ label: i.title, href: `/industries/${i.slug}` }))} />
           <div>
             <h4 className="mb-4 text-sm font-bold text-foreground">تماس</h4>
             <ul className="flex flex-col gap-3 text-sm text-foreground-muted">

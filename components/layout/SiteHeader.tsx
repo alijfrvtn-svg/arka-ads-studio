@@ -9,10 +9,17 @@ import { Logo } from "@/components/brand/Logo";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { Button } from "@/components/ui/Button";
 import { Magnetic } from "@/components/fx/Magnetic";
-import { NAV, DEPARTMENTS, SERVICE_LINKS, INDUSTRY_LINKS } from "@/lib/constants";
+import { NAV, DEPARTMENTS } from "@/lib/constants";
 import { cn } from "@/lib/utils";
+import type { Department } from "@/types";
 
-export function SiteHeader() {
+export function SiteHeader({
+  services,
+  industries,
+}: {
+  services: { slug: string; title: string; department: Department }[];
+  industries: { slug: string; title: string }[];
+}) {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
@@ -122,7 +129,7 @@ export function SiteHeader() {
                           {d.title}
                         </p>
                         <div className="flex flex-col">
-                          {SERVICE_LINKS.filter((s) => s.department === d.key).map((s) => (
+                          {services.filter((s) => s.department === d.key).map((s) => (
                             <Link
                               key={s.slug}
                               href={`/services/${s.slug}`}
@@ -137,7 +144,7 @@ export function SiteHeader() {
                   </div>
                 ) : (
                   <div className="grid grid-cols-4 gap-1 p-2">
-                    {INDUSTRY_LINKS.map((i) => (
+                    {industries.map((i) => (
                       <Link
                         key={i.slug}
                         href={`/industries/${i.slug}`}
