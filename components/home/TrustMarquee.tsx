@@ -2,12 +2,18 @@ import { Marquee } from "@/components/fx/Marquee";
 import { LogoMark } from "@/components/brand/Logo";
 
 /** Infinite client-logo trust flow (styled wordmark chips). */
-export function TrustMarquee({ clients }: { clients: { name: string; nameEn: string | null }[] }) {
+export function TrustMarquee({
+  clients,
+  caption,
+}: {
+  clients: { name: string; nameEn: string | null }[];
+  caption: string;
+}) {
   const row = clients.length ? clients : [{ name: "برند", nameEn: "Brand" }];
   return (
     <div className="border-y border-card-border bg-surface/30 py-8">
       <p className="container-x mb-6 text-center text-xs uppercase tracking-[0.3em] text-foreground-faint">
-        اعتماد بیش از ۱۲۰ برند پیشرو
+        {caption}
       </p>
       <Marquee speed={38}>
         {row.map((c, i) => (

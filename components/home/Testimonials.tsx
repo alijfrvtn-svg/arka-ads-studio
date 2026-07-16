@@ -5,6 +5,8 @@ import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronLeft, ChevronRight, Quote, Star } from "lucide-react";
 import { Section, Container, SectionHeading } from "@/components/ui/Section";
+import { HighlightedTitle } from "@/components/ui/HighlightedTitle";
+import type { HomeContent } from "@/lib/queries";
 
 interface T {
   id: string;
@@ -16,7 +18,7 @@ interface T {
   rating: number;
 }
 
-export function Testimonials({ items }: { items: T[] }) {
+export function Testimonials({ items, content }: { items: T[]; content: HomeContent }) {
   const [i, setI] = useState(0);
   const n = items.length;
   const go = useCallback((d: number) => setI((p) => (p + d + n) % n), [n]);
@@ -35,12 +37,8 @@ export function Testimonials({ items }: { items: T[] }) {
       <Container>
         <SectionHeading
           align="center"
-          eyebrow="صدای مشتریان"
-          title={
-            <>
-              برندهایی که <span className="text-gradient">به ما اعتماد کردند</span>
-            </>
-          }
+          eyebrow={content.testimonialsEyebrow}
+          title={<HighlightedTitle title={content.testimonialsHeading} highlight={content.testimonialsHeadingHighlight} />}
           className="mx-auto mb-14 max-w-2xl"
         />
 

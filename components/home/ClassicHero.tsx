@@ -5,8 +5,8 @@ import { ArrowUpLeft, Play } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Magnetic } from "@/components/fx/Magnetic";
 import { SAMPLE } from "@/lib/media";
-import { SITE } from "@/lib/constants";
 import { toFa } from "@/lib/utils";
+import type { HomeContent } from "@/lib/queries";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -15,9 +15,11 @@ const EASE = [0.16, 1, 0.3, 1] as const;
  * background + copy + CTAs + stats) is what phones/tablets see instead. */
 export function ClassicHero({
   stats,
+  content,
   onWatchReel,
 }: {
   stats: { label: string; value: number; suffix: string }[];
+  content: HomeContent;
   onWatchReel: () => void;
 }) {
   return (
@@ -49,17 +51,17 @@ export function ClassicHero({
             <span className="absolute inline-flex h-full w-full animate-ping-slow rounded-full bg-primary" />
             <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
           </span>
-          {SITE.positioning}
+          {content.heroBadge}
         </motion.div>
 
         <h1 className="font-display text-[13vw] font-extrabold leading-[0.95] tracking-tight sm:text-7xl md:text-8xl lg:text-[7.5rem]">
-          {["طراحی کن.", "خلق کن.", "تأثیر بگذار."].map((line, i) => (
+          {content.heroHeadline.map((line, i) => (
             <motion.span
               key={line}
               initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.15 + i * 0.12, ease: EASE }}
-              className={i === 2 ? "block text-gradient" : "block text-foreground"}
+              className={i === content.heroHeadline.length - 1 ? "block text-gradient" : "block text-foreground"}
             >
               {line}
             </motion.span>
@@ -72,8 +74,7 @@ export function ClassicHero({
           transition={{ duration: 0.8, delay: 0.55, ease: EASE }}
           className="mt-8 max-w-xl text-lg leading-relaxed text-foreground-muted"
         >
-          آرکا یک پروداکشن‌هاوس خلاق است؛ برندها را با هنر بصری سینمایی، راهکارهای دیجیتال و
-          روایت داده‌محور به سطحی تازه می‌رساند.
+          {content.heroDescription}
         </motion.p>
 
         <motion.div
@@ -84,7 +85,7 @@ export function ClassicHero({
         >
           <Magnetic strength={0.4}>
             <Button href="/contact" size="lg" variant="glow">
-              شروع پروژه
+              {content.heroCtaLabel}
               <ArrowUpLeft className="h-5 w-5 transition-transform group-hover:-translate-x-1 group-hover:-translate-y-1" />
             </Button>
           </Magnetic>
@@ -96,7 +97,7 @@ export function ClassicHero({
               <span className="absolute inset-0 animate-ping-slow rounded-full border border-primary/40" />
               <Play className="h-5 w-5 translate-x-0.5 fill-current text-primary" />
             </span>
-            <span className="text-sm font-medium">تماشای شوریل ۲۰۲۵</span>
+            <span className="text-sm font-medium">{content.heroReelLabel}</span>
           </button>
         </motion.div>
 

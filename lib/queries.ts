@@ -47,6 +47,118 @@ export const getTeam = () =>
   db.teamMember.findMany({ where: { published: true }, orderBy: { order: "asc" } });
 
 // ============================================================
+// HOMEPAGE (singleton, id "home") — same in-code-default fallback pattern as
+// About/Contact below, seeded from the site's current hardcoded copy.
+// ============================================================
+export interface HomeContent {
+  heroBadge: string;
+  heroHeadline: string[];
+  heroDescription: string;
+  heroCtaLabel: string;
+  heroReelLabel: string;
+  trustCaption: string;
+  departmentsEyebrow: string;
+  departmentsHeading: string;
+  departmentsHeadingHighlight: string;
+  departmentsDescription: string;
+  departmentsCtaLabel: string;
+  featuredEyebrow: string;
+  featuredHeading: string;
+  featuredHeadingHighlight: string;
+  featuredDescription: string;
+  featuredCtaLabel: string;
+  workflowEyebrow: string;
+  workflowHeading: string;
+  workflowHeadingHighlight: string;
+  workflowDescription: string;
+  workflowSteps: { icon: string; title: string; desc: string }[];
+  testimonialsEyebrow: string;
+  testimonialsHeading: string;
+  testimonialsHeadingHighlight: string;
+  finalEyebrow: string;
+  finalHeading: string;
+  finalHeadingHighlight: string;
+  finalDescription: string;
+  finalCtaLabel: string;
+}
+
+const HOME_DEFAULTS: HomeContent = {
+  heroBadge: "استودیوی خلاقیت، پروداکشن و دیجیتال مارکتینگ",
+  heroHeadline: ["طراحی کن.", "خلق کن.", "تأثیر بگذار."],
+  heroDescription:
+    "آرکا یک پروداکشن‌هاوس خلاق است؛ برندها را با هنر بصری سینمایی، راهکارهای دیجیتال و روایت داده‌محور به سطحی تازه می‌رساند.",
+  heroCtaLabel: "شروع پروژه",
+  heroReelLabel: "تماشای شوریل ۲۰۲۵",
+  trustCaption: "اعتماد بیش از ۱۲۰ برند پیشرو",
+  departmentsEyebrow: "۴ دپارتمان تخصصی",
+  departmentsHeading: "یک تیم، تمام تخصص‌ها",
+  departmentsHeadingHighlight: "تمام تخصص‌ها",
+  departmentsDescription: "از ایده تا اکران؛ همه‌ی آنچه برای ساختن یک برند متمایز لازم است، زیر یک سقف.",
+  departmentsCtaLabel: "کشف خدمات",
+  featuredEyebrow: "نمونه‌کارهای منتخب",
+  featuredHeading: "کارهایی که حرف می‌زنند",
+  featuredHeadingHighlight: "حرف می‌زنند",
+  featuredDescription: "هر پروژه، یک داستان است: از چالش تا نتیجه‌ای قابل‌اندازه‌گیری.",
+  featuredCtaLabel: "تمام پروژه‌ها",
+  workflowEyebrow: "فرایند کار",
+  workflowHeading: "مسیری شفاف تا تأثیر واقعی",
+  workflowHeadingHighlight: "تأثیر واقعی",
+  workflowDescription: "چهار گام روشن که خلاقیت را به نتیجه‌ی تجاری تبدیل می‌کند.",
+  workflowSteps: [
+    { icon: "Target", title: "کشف و استراتژی", desc: "شناخت عمیق برند، بازار و اهداف؛ ترسیم نقشه‌راه دقیق." },
+    { icon: "Sparkles", title: "ایده و کانسپت", desc: "خلق ایده مرکزی و روایتی که برند شما را متمایز می‌کند." },
+    { icon: "Clapperboard", title: "تولید و اجرا", desc: "اجرای حرفه‌ای با بالاترین استانداردهای سینمایی و فنی." },
+    { icon: "TrendingUp", title: "انتشار و تحلیل", desc: "انتشار چندکاناله و بهینه‌سازی مستمر بر پایه داده." },
+  ],
+  testimonialsEyebrow: "صدای مشتریان",
+  testimonialsHeading: "برندهایی که به ما اعتماد کردند",
+  testimonialsHeadingHighlight: "به ما اعتماد کردند",
+  finalEyebrow: "آماده‌اید متمایز شوید؟",
+  finalHeading: "بیایید برندی بسازیم که فراموش نشود",
+  finalHeadingHighlight: "فراموش نشود",
+  finalDescription: "یک ایده کافی است. باقی مسیر را با هم می‌سازیم.",
+  finalCtaLabel: "شروع پروژه",
+};
+
+export async function getHomePage(): Promise<HomeContent> {
+  const row = await db.homePage.findUnique({ where: { id: "home" } });
+  if (!row) return HOME_DEFAULTS;
+  const headline = parseArr<string>(row.heroHeadline);
+  const steps = parseArr<{ icon: string; title: string; desc: string }>(row.workflowSteps);
+  return {
+    heroBadge: row.heroBadge,
+    heroHeadline: headline.length ? headline : HOME_DEFAULTS.heroHeadline,
+    heroDescription: row.heroDescription,
+    heroCtaLabel: row.heroCtaLabel,
+    heroReelLabel: row.heroReelLabel,
+    trustCaption: row.trustCaption,
+    departmentsEyebrow: row.departmentsEyebrow,
+    departmentsHeading: row.departmentsHeading,
+    departmentsHeadingHighlight: row.departmentsHeadingHighlight,
+    departmentsDescription: row.departmentsDescription,
+    departmentsCtaLabel: row.departmentsCtaLabel,
+    featuredEyebrow: row.featuredEyebrow,
+    featuredHeading: row.featuredHeading,
+    featuredHeadingHighlight: row.featuredHeadingHighlight,
+    featuredDescription: row.featuredDescription,
+    featuredCtaLabel: row.featuredCtaLabel,
+    workflowEyebrow: row.workflowEyebrow,
+    workflowHeading: row.workflowHeading,
+    workflowHeadingHighlight: row.workflowHeadingHighlight,
+    workflowDescription: row.workflowDescription,
+    workflowSteps: steps.length ? steps : HOME_DEFAULTS.workflowSteps,
+    testimonialsEyebrow: row.testimonialsEyebrow,
+    testimonialsHeading: row.testimonialsHeading,
+    testimonialsHeadingHighlight: row.testimonialsHeadingHighlight,
+    finalEyebrow: row.finalEyebrow,
+    finalHeading: row.finalHeading,
+    finalHeadingHighlight: row.finalHeadingHighlight,
+    finalDescription: row.finalDescription,
+    finalCtaLabel: row.finalCtaLabel,
+  };
+}
+
+// ============================================================
 // ABOUT PAGE (singleton, id "about") — falls back to these in-code defaults
 // (the site's current content) until an admin saves the page for the first
 // time, so a fresh deploy never shows a blank/empty page.

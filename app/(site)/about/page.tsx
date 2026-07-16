@@ -7,9 +7,10 @@ import { StatsBar } from "@/components/home/StatsBar";
 import { FinalCTA } from "@/components/home/FinalCTA";
 import { VideoPlayer } from "@/components/work/VideoPlayer";
 import { SocialIcon } from "@/components/layout/SocialIcon";
-import { getStats, getTeam, getAboutPage } from "@/lib/queries";
+import { getStats, getTeam, getAboutPage, getHomePage, getContactPage } from "@/lib/queries";
 import { buildMetadata } from "@/lib/seo";
 import { parseArr } from "@/lib/utils";
+import { HighlightedTitle } from "@/components/ui/HighlightedTitle";
 import type { Social } from "@/types";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -19,21 +20,14 @@ export async function generateMetadata(): Promise<Metadata> {
 
 const ICONS: Record<string, LucideIcon> = { Target, Gem, Zap, Sparkles };
 
-/** Splits a title on its highlighted substring and wraps that part in the gradient accent span. */
-function HighlightedTitle({ title, highlight }: { title: string; highlight: string }) {
-  const idx = highlight ? title.indexOf(highlight) : -1;
-  if (idx === -1) return <>{title}</>;
-  return (
-    <>
-      {title.slice(0, idx)}
-      <span className="text-gradient">{highlight}</span>
-      {title.slice(idx + highlight.length)}
-    </>
-  );
-}
-
 export default async function AboutPage() {
-  const [team, stats, a] = await Promise.all([getTeam(), getStats(), getAboutPage()]);
+  const [team, stats, a, home, contact] = await Promise.all([
+    getTeam(),
+    getStats(),
+    getAboutPage(),
+    getHomePage(),
+    getContactPage(),
+  ]);
   const statData = stats.map((s) => ({ label: s.label, value: s.value, suffix: s.suffix }));
 
   return (
@@ -173,7 +167,7 @@ export default async function AboutPage() {
         </Container>
       </Section>
 
-      <FinalCTA />
+      <FinalCTA content={home} phone={contact.phone} phoneDisplay={contact.phoneDisplay} />
     </>
   );
 }

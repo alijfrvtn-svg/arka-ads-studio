@@ -6,6 +6,7 @@ import { ArrowUpLeft, Play } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Magnetic } from "@/components/fx/Magnetic";
 import { useTheme } from "@/components/theme/ThemeProvider";
+import type { HomeContent } from "@/lib/queries";
 
 const DESKTOP_QUERY = "(min-width: 1024px)";
 
@@ -348,10 +349,12 @@ function computeVals(p: number, showScrollHint: boolean, isLight: boolean) {
 export function EyeOfCreation({
   length = "standard",
   showScrollHint = true,
+  content,
   onWatchReel,
 }: {
   length?: Length;
   showScrollHint?: boolean;
+  content: HomeContent;
   onWatchReel?: () => void;
 }) {
   const scaffoldRef = useRef<HTMLDivElement>(null);
@@ -567,12 +570,12 @@ export function EyeOfCreation({
         {/* Persian CTA — the actionable payoff, revealed last */}
         <div style={v.ctaStyle}>
           <span className="rounded-full border border-card-border bg-surface/60 px-4 py-1.5 text-xs font-medium text-foreground-muted backdrop-blur">
-            استودیوی خلاقیت، پروداکشن و دیجیتال مارکتینگ
+            {content.heroBadge}
           </span>
           <div className="flex flex-wrap items-center justify-center gap-4">
             <Magnetic strength={0.4}>
               <Button href="/contact" size="lg" variant="glow">
-                شروع پروژه
+                {content.heroCtaLabel}
                 <ArrowUpLeft className="h-5 w-5 transition-transform group-hover:-translate-x-1 group-hover:-translate-y-1" />
               </Button>
             </Magnetic>
@@ -582,7 +585,7 @@ export function EyeOfCreation({
                   <span className="absolute inset-0 animate-ping-slow rounded-full border border-primary/40" />
                   <Play className="h-5 w-5 translate-x-0.5 fill-current text-primary" />
                 </span>
-                <span className="text-sm font-medium">تماشای شوریل ۲۰۲۵</span>
+                <span className="text-sm font-medium">{content.heroReelLabel}</span>
               </button>
             )}
           </div>

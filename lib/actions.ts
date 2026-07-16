@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { db } from "./db";
 import { requirePermission } from "./auth";
 import { hashPassword } from "./auth";
-import { slugify } from "./utils";
+import { slugify, parseObj } from "./utils";
 import type { Credit, Metric } from "@/types";
 
 // ————— helpers —————
@@ -453,20 +453,42 @@ export async function deleteLead(id: string) {
 // ============================================================
 // SETTINGS
 // ============================================================
+// The "site" Setting row is a single shared JSON blob edited by several
+// independent forms on the Settings page (general, stats, footer) — always
+// read-modify-write so saving one form never wipes another's fields.
+async function mergeSiteSetting(patch: Record<string, unknown>) {
+  const row = await db.setting.findUnique({ where: { key: "site" } });
+  const existing = parseObj<Record<string, unknown>>(row?.value, {});
+  const value = { ...existing, ...patch };
+  await db.setting.upsert({
+    where: { key: "site" },
+    create: { key: "site", value: J(value) },
+    update: { value: J(value) },
+  });
+}
+
 export async function saveSettings(fd: FormData) {
   await requirePermission("settings.manage");
-  const value = {
+  await mergeSiteSetting({
     heroHeadline: S(fd, "heroHeadline"),
     contactEmail: S(fd, "contactEmail"),
     primaryColor: S(fd, "primaryColor", "#6699ff"),
     maintenance: B(fd, "maintenance"),
     defaultLocale: S(fd, "defaultLocale", "fa"),
     locales: ["fa", "en", "ar"],
-  };
-  await db.setting.upsert({
-    where: { key: "site" },
-    create: { key: "site", value: J(value) },
-    update: { value: J(value) },
+  });
+  revalidateSite("/admin/settings", "/");
+  redirect("/admin/settings");
+}
+
+export async function saveFooterSettings(fd: FormData) {
+  await requirePermission("settings.manage");
+  await mergeSiteSetting({
+    footerCtaHeading: S(fd, "footerCtaHeading"),
+    footerCtaBody: S(fd, "footerCtaBody"),
+    footerCtaButtonLabel: S(fd, "footerCtaButtonLabel"),
+    footerDescription: S(fd, "footerDescription"),
+    footerCopyright: S(fd, "footerCopyright"),
   });
   revalidateSite("/admin/settings", "/");
   redirect("/admin/settings");
@@ -534,6 +556,47 @@ export async function addTaskComment(taskId: string, body: string) {
   await db.taskComment.create({ data: { taskId, authorId: user.id, body: trimmed } });
   revalidatePath(`/admin/tasks/${taskId}`);
   return { ok: true };
+}
+
+// ============================================================
+// HOMEPAGE (singleton)
+// ============================================================
+export async function saveHomePage(fd: FormData) {
+  await requirePermission("home.manage");
+  const data = {
+    heroBadge: S(fd, "heroBadge"),
+    heroHeadline: J(L(fd, "heroHeadline")),
+    heroDescription: S(fd, "heroDescription"),
+    heroCtaLabel: S(fd, "heroCtaLabel"),
+    heroReelLabel: S(fd, "heroReelLabel"),
+    trustCaption: S(fd, "trustCaption"),
+    departmentsEyebrow: S(fd, "departmentsEyebrow"),
+    departmentsHeading: S(fd, "departmentsHeading"),
+    departmentsHeadingHighlight: S(fd, "departmentsHeadingHighlight"),
+    departmentsDescription: S(fd, "departmentsDescription"),
+    departmentsCtaLabel: S(fd, "departmentsCtaLabel"),
+    featuredEyebrow: S(fd, "featuredEyebrow"),
+    featuredHeading: S(fd, "featuredHeading"),
+    featuredHeadingHighlight: S(fd, "featuredHeadingHighlight"),
+    featuredDescription: S(fd, "featuredDescription"),
+    featuredCtaLabel: S(fd, "featuredCtaLabel"),
+    workflowEyebrow: S(fd, "workflowEyebrow"),
+    workflowHeading: S(fd, "workflowHeading"),
+    workflowHeadingHighlight: S(fd, "workflowHeadingHighlight"),
+    workflowDescription: S(fd, "workflowDescription"),
+    workflowSteps: J(PL(fd, "workflowSteps", ["icon", "title", "desc"])),
+    testimonialsEyebrow: S(fd, "testimonialsEyebrow"),
+    testimonialsHeading: S(fd, "testimonialsHeading"),
+    testimonialsHeadingHighlight: S(fd, "testimonialsHeadingHighlight"),
+    finalEyebrow: S(fd, "finalEyebrow"),
+    finalHeading: S(fd, "finalHeading"),
+    finalHeadingHighlight: S(fd, "finalHeadingHighlight"),
+    finalDescription: S(fd, "finalDescription"),
+    finalCtaLabel: S(fd, "finalCtaLabel"),
+  };
+  await db.homePage.upsert({ where: { id: "home" }, create: { id: "home", ...data }, update: data });
+  revalidateSite("/admin/home", "/");
+  redirect("/admin/home");
 }
 
 // ============================================================

@@ -3,8 +3,9 @@ import { ArrowUpLeft, Mail, MapPin, Phone } from "lucide-react";
 import { Logo } from "@/components/brand/Logo";
 import { SocialIcon } from "./SocialIcon";
 import { SITE, NAV } from "@/lib/constants";
-import { ui, tr } from "@/lib/i18n";
+import { ui } from "@/lib/i18n";
 import type { Locale } from "@/types";
+import type { ContactContent } from "@/lib/queries";
 
 const NAV_KEY: Record<string, string> = {
   "/": "navHome",
@@ -16,16 +17,37 @@ const NAV_KEY: Record<string, string> = {
   "/contact": "navContact",
 };
 
+export interface FooterSettings {
+  footerCtaHeading: string;
+  footerCtaBody: string;
+  footerCtaButtonLabel: string;
+  footerDescription: string;
+  footerCopyright: string;
+}
+
 export function SiteFooter({
   services,
   industries,
   locale,
+  footer,
+  contact,
 }: {
   services: { slug: string; title: string }[];
   industries: { slug: string; title: string }[];
   locale: Locale;
+  footer: FooterSettings;
+  contact: ContactContent;
 }) {
   const t = ui(locale);
+  // The admin-editable Settings fields are Persian-only for now (English/
+  // Arabic content translation is a separate, paused stage) — fall back to
+  // the static UI dictionary's own fa/en/ar copy for non-Persian visitors.
+  const isFa = locale === "fa";
+  const ctaHeading = isFa ? footer.footerCtaHeading : t.footerCtaHeading;
+  const ctaBody = isFa ? footer.footerCtaBody : t.footerCtaBody;
+  const ctaButton = isFa ? footer.footerCtaButtonLabel : t.footerCtaButton;
+  const description = isFa ? footer.footerDescription : SITE.descriptionEn;
+  const copyright = isFa ? footer.footerCopyright : t.footerRights;
   const navLabel = (href: string) => (t as Record<string, string>)[NAV_KEY[href]] ?? href;
   const year =
     locale === "fa"
@@ -39,15 +61,15 @@ export function SiteFooter({
         <div className="mb-16 flex flex-col items-start justify-between gap-6 rounded-3xl border border-card-border bg-surface/50 p-8 md:flex-row md:items-center md:p-12">
           <div>
             <h3 className="font-display text-2xl font-bold text-foreground md:text-3xl">
-              {t.footerCtaHeading}
+              {ctaHeading}
             </h3>
-            <p className="mt-2 text-foreground-muted">{t.footerCtaBody}</p>
+            <p className="mt-2 text-foreground-muted">{ctaBody}</p>
           </div>
           <Link
             href="/contact"
             className="group inline-flex items-center gap-2 rounded-full bg-primary px-7 py-4 font-semibold text-primary-foreground transition-transform hover:scale-[1.03]"
           >
-            {t.footerCtaButton}
+            {ctaButton}
             <ArrowUpLeft className="h-5 w-5 transition-transform group-hover:-translate-x-1 group-hover:-translate-y-1" />
           </Link>
         </div>
@@ -57,10 +79,10 @@ export function SiteFooter({
           <div className="lg:col-span-2">
             <Logo tagline />
             <p className="mt-5 max-w-xs text-sm leading-relaxed text-foreground-muted">
-              {tr(locale, SITE.description, SITE.descriptionEn)}
+              {description}
             </p>
             <div className="mt-6 flex gap-2">
-              {SITE.socials.map((s) => (
+              {contact.socials.map((s) => (
                 <a
                   key={s.platform}
                   href={s.href}
@@ -82,16 +104,16 @@ export function SiteFooter({
             <ul className="flex flex-col gap-3 text-sm text-foreground-muted">
               <li className="flex items-start gap-2.5">
                 <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                {SITE.address}
+                {contact.address}
               </li>
               <li className="flex items-center gap-2.5">
                 <Phone className="h-4 w-4 shrink-0 text-primary" />
-                <span className="ltr-nums">{SITE.phoneDisplay}</span>
+                <span className="ltr-nums">{contact.phoneDisplay}</span>
               </li>
               <li className="flex items-center gap-2.5">
                 <Mail className="h-4 w-4 shrink-0 text-primary" />
-                <a href={`mailto:${SITE.email}`} className="ltr-nums hover:text-primary">
-                  {SITE.email}
+                <a href={`mailto:${contact.email}`} className="ltr-nums hover:text-primary">
+                  {contact.email}
                 </a>
               </li>
             </ul>
@@ -101,7 +123,7 @@ export function SiteFooter({
         {/* bottom */}
         <div className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-card-border pt-7 text-sm text-foreground-faint md:flex-row">
           <p>
-            © {year} {SITE.legalName}. {t.footerRights}
+            © {year} {SITE.legalName}. {copyright}
           </p>
           <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
             {NAV.slice(1).map((n) => (

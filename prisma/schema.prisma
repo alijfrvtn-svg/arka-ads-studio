@@ -260,6 +260,41 @@ model Setting {
   value String // JSON
 }
 
+/// Singleton content for the public homepage (one row, id fixed to "home").
+model HomePage {
+  id                          String   @id @default("home")
+  heroBadge                   String   @default("استودیوی خلاقیت، پروداکشن و دیجیتال مارکتینگ")
+  heroHeadline                String   @default("[]") // JSON string[3] — three stacked hero lines
+  heroDescription              String   @default("آرکا یک پروداکشن‌هاوس خلاق است؛ برندها را با هنر بصری سینمایی، راهکارهای دیجیتال و روایت داده‌محور به سطحی تازه می‌رساند.")
+  heroCtaLabel                 String   @default("شروع پروژه")
+  heroReelLabel                String   @default("تماشای شوریل ۲۰۲۵")
+  trustCaption                 String   @default("اعتماد بیش از ۱۲۰ برند پیشرو")
+  departmentsEyebrow           String   @default("۴ دپارتمان تخصصی")
+  departmentsHeading           String   @default("یک تیم، تمام تخصص‌ها")
+  departmentsHeadingHighlight  String   @default("تمام تخصص‌ها")
+  departmentsDescription       String   @default("از ایده تا اکران؛ همه‌ی آنچه برای ساختن یک برند متمایز لازم است، زیر یک سقف.")
+  departmentsCtaLabel          String   @default("کشف خدمات")
+  featuredEyebrow               String   @default("نمونه‌کارهای منتخب")
+  featuredHeading                String   @default("کارهایی که حرف می‌زنند")
+  featuredHeadingHighlight       String   @default("حرف می‌زنند")
+  featuredDescription             String   @default("هر پروژه، یک داستان است: از چالش تا نتیجه‌ای قابل‌اندازه‌گیری.")
+  featuredCtaLabel                String   @default("تمام پروژه‌ها")
+  workflowEyebrow                  String   @default("فرایند کار")
+  workflowHeading                   String   @default("مسیری شفاف تا تأثیر واقعی")
+  workflowHeadingHighlight          String   @default("تأثیر واقعی")
+  workflowDescription                String   @default("چهار گام روشن که خلاقیت را به نتیجه‌ی تجاری تبدیل می‌کند.")
+  workflowSteps                      String   @default("[]") // JSON [{icon,title,desc}] — 4 steps
+  testimonialsEyebrow                 String   @default("صدای مشتریان")
+  testimonialsHeading                  String   @default("برندهایی که به ما اعتماد کردند")
+  testimonialsHeadingHighlight         String   @default("به ما اعتماد کردند")
+  finalEyebrow                         String   @default("آماده‌اید متمایز شوید؟")
+  finalHeading                          String   @default("بیایید برندی بسازیم که فراموش نشود")
+  finalHeadingHighlight                 String   @default("فراموش نشود")
+  finalDescription                       String   @default("یک ایده کافی است. باقی مسیر را با هم می‌سازیم.")
+  finalCtaLabel                          String   @default("شروع پروژه")
+  updatedAt                              DateTime @updatedAt
+}
+
 /// Singleton content for the public /about page (one row, id fixed to "about").
 model AboutPage {
   id                 String   @id @default("about")

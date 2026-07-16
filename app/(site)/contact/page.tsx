@@ -8,22 +8,11 @@ import { SocialIcon } from "@/components/layout/SocialIcon";
 import { getContactPage } from "@/lib/queries";
 import { buildMetadata } from "@/lib/seo";
 import { getLocale } from "@/lib/i18n";
+import { HighlightedTitle } from "@/components/ui/HighlightedTitle";
 
 export async function generateMetadata(): Promise<Metadata> {
   const c = await getContactPage();
   return buildMetadata({ title: c.metaTitle, path: "/contact", description: c.metaDescription });
-}
-
-function HighlightedTitle({ title, highlight }: { title: string; highlight: string }) {
-  const idx = highlight ? title.indexOf(highlight) : -1;
-  if (idx === -1) return <>{title}</>;
-  return (
-    <>
-      {title.slice(0, idx)}
-      <span className="text-gradient">{highlight}</span>
-      {title.slice(idx + highlight.length)}
-    </>
-  );
 }
 
 export default async function ContactPage() {

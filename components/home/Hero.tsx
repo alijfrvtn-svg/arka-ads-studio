@@ -6,10 +6,17 @@ import { X } from "lucide-react";
 import { EyeOfCreation } from "./EyeOfCreation";
 import { ClassicHero } from "./ClassicHero";
 import { SAMPLE } from "@/lib/media";
+import type { HomeContent } from "@/lib/queries";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
-export function Hero({ stats }: { stats: { label: string; value: number; suffix: string }[] }) {
+export function Hero({
+  stats,
+  content,
+}: {
+  stats: { label: string; value: number; suffix: string }[];
+  content: HomeContent;
+}) {
   const [reel, setReel] = useState(false);
   const openReel = () => setReel(true);
 
@@ -19,10 +26,10 @@ export function Hero({ stats }: { stats: { label: string; value: number; suffix:
           static classic hero instead — the animation is disabled entirely
           below `lg`, not just visually hidden (see EyeOfCreation's matchMedia gate). */}
       <div className="hidden lg:block">
-        <EyeOfCreation onWatchReel={openReel} />
+        <EyeOfCreation content={content} onWatchReel={openReel} />
       </div>
       <div className="lg:hidden">
-        <ClassicHero stats={stats} onWatchReel={openReel} />
+        <ClassicHero stats={stats} content={content} onWatchReel={openReel} />
       </div>
 
       {/* showreel modal (shared by both variants) */}

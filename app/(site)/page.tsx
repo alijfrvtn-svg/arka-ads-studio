@@ -11,28 +11,32 @@ import {
   getFeaturedProjects,
   getFeaturedTestimonials,
   getStats,
+  getHomePage,
+  getContactPage,
 } from "@/lib/queries";
 
 export default async function HomePage() {
-  const [projects, stats, testimonials, clients] = await Promise.all([
+  const [projects, stats, testimonials, clients, content, contact] = await Promise.all([
     getFeaturedProjects(7),
     getStats(),
     getFeaturedTestimonials(),
     getClients(),
+    getHomePage(),
+    getContactPage(),
   ]);
 
   const statData = stats.map((s) => ({ label: s.label, value: s.value, suffix: s.suffix }));
 
   return (
     <>
-      <Hero stats={statData} />
-      <TrustMarquee clients={clients.map((c) => ({ name: c.name, nameEn: c.nameEn }))} />
-      <Departments />
-      <FeaturedWork projects={projects} />
-      <Workflow />
+      <Hero stats={statData} content={content} />
+      <TrustMarquee clients={clients.map((c) => ({ name: c.name, nameEn: c.nameEn }))} caption={content.trustCaption} />
+      <Departments content={content} />
+      <FeaturedWork projects={projects} content={content} />
+      <Workflow content={content} />
       <StatsBar stats={statData} />
-      <Testimonials items={testimonials} />
-      <FinalCTA />
+      <Testimonials items={testimonials} content={content} />
+      <FinalCTA content={content} phone={contact.phone} phoneDisplay={contact.phoneDisplay} />
     </>
   );
 }

@@ -3,8 +3,9 @@ import { db } from "@/lib/db";
 import { PageHeader } from "@/components/admin/ui";
 import { Field, Input, Textarea, Select, Toggle, FormSection } from "@/components/admin/form";
 import { SubmitButton } from "@/components/admin/SubmitButton";
-import { saveSettings, saveStats } from "@/lib/actions";
+import { saveSettings, saveStats, saveFooterSettings } from "@/lib/actions";
 import { parseObj } from "@/lib/utils";
+import { SITE } from "@/lib/constants";
 
 interface SiteSettings {
   heroHeadline: string;
@@ -12,6 +13,11 @@ interface SiteSettings {
   primaryColor: string;
   maintenance: boolean;
   defaultLocale: string;
+  footerCtaHeading: string;
+  footerCtaBody: string;
+  footerCtaButtonLabel: string;
+  footerDescription: string;
+  footerCopyright: string;
 }
 
 export default async function SettingsPage() {
@@ -19,13 +25,23 @@ export default async function SettingsPage() {
     db.setting.findUnique({ where: { key: "site" } }),
     db.stat.findMany({ orderBy: { order: "asc" } }),
   ]);
-  const s = parseObj<SiteSettings>(row?.value, {
+  // Merge (not replace) — the stored blob may only have fields from whichever
+  // form was saved last (general/stats/footer are three independent forms
+  // sharing one JSON row), so a missing key must fall back to its default,
+  // not render blank.
+  const s: SiteSettings = {
     heroHeadline: "طراحی کن. خلق کن. تأثیر بگذار.",
     contactEmail: "hello@arka.studio",
     primaryColor: "#6699ff",
     maintenance: false,
     defaultLocale: "fa",
-  });
+    footerCtaHeading: "ایده‌ای در سر دارید؟",
+    footerCtaBody: "بیایید با هم چیزی بسازیم که به یاد بماند.",
+    footerCtaButtonLabel: "بریف پروژه‌ات را بفرست",
+    footerDescription: SITE.description,
+    footerCopyright: "تمام حقوق محفوظ است.",
+    ...parseObj<Partial<SiteSettings>>(row?.value, {}),
+  };
   const statsText = stats.map((st) => `${st.label} | ${st.value} | ${st.suffix}`).join("\n");
 
   return (
@@ -91,6 +107,19 @@ export default async function SettingsPage() {
           </Field>
           <div className="flex justify-end">
             <SubmitButton>ذخیره آمار</SubmitButton>
+          </div>
+        </FormSection>
+      </form>
+
+      <form action={saveFooterSettings} className="mt-5">
+        <FormSection title="فوتر" description="محتوای ثابت پایین همه‌ی صفحات سایت">
+          <Field label="عنوان نوار دعوت‌به‌اقدام"><Input name="footerCtaHeading" defaultValue={s.footerCtaHeading} /></Field>
+          <Field label="توضیح نوار دعوت‌به‌اقدام"><Textarea name="footerCtaBody" defaultValue={s.footerCtaBody} /></Field>
+          <Field label="متن دکمه نوار دعوت‌به‌اقدام"><Input name="footerCtaButtonLabel" defaultValue={s.footerCtaButtonLabel} /></Field>
+          <Field label="توضیح زیر لوگو"><Textarea name="footerDescription" defaultValue={s.footerDescription} /></Field>
+          <Field label="متن حق‌کپی‌رایت" hint="بعد از © سال و نام شرکت می‌آید"><Input name="footerCopyright" defaultValue={s.footerCopyright} /></Field>
+          <div className="flex justify-end">
+            <SubmitButton>ذخیره فوتر</SubmitButton>
           </div>
         </FormSection>
       </form>
