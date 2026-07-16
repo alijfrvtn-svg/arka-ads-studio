@@ -7,7 +7,7 @@ import { ContactForm } from "@/components/contact/ContactForm";
 import { SocialIcon } from "@/components/layout/SocialIcon";
 import { getContactPage } from "@/lib/queries";
 import { buildMetadata } from "@/lib/seo";
-import { getLocale } from "@/lib/i18n";
+import { getLocale } from "@/lib/get-locale";
 import { HighlightedTitle } from "@/components/ui/HighlightedTitle";
 
 export async function generateMetadata(): Promise<Metadata> {

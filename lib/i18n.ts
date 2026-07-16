@@ -1,21 +1,13 @@
-import { cookies, headers } from "next/headers";
 import type { Locale } from "@/types";
+
+// Framework-agnostic — no `next/headers` import here on purpose. This file is
+// imported from Edge Middleware AND from client components (SiteHeader,
+// ContactForm), neither of which can pull in server-only APIs. The one
+// function that needs `next/headers` (`getLocale`) lives in
+// `lib/get-locale.ts` instead, imported only by server components.
 
 export const LOCALE_COOKIE = "arka_locale";
 export const LOCALES: readonly Locale[] = ["fa", "en", "ar"];
-
-/** Resolve the visitor's locale — set by middleware.ts (header for this request,
- * cookie for the next one). /admin and /portal never get the header, so
- * `getLocale()` there falls through to the cookie (usually absent) → "fa". */
-export async function getLocale(): Promise<Locale> {
-  const h = await headers();
-  const fromHeader = h.get("x-locale");
-  if (fromHeader && (LOCALES as readonly string[]).includes(fromHeader)) return fromHeader as Locale;
-  const store = await cookies();
-  const fromCookie = store.get(LOCALE_COOKIE)?.value;
-  if (fromCookie && (LOCALES as readonly string[]).includes(fromCookie)) return fromCookie as Locale;
-  return "fa";
-}
 
 /** Pick the field for the given locale, falling back to the Persian value if
  * the translation is missing/empty — so partially-translated content never
