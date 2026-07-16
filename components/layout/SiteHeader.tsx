@@ -9,17 +9,33 @@ import { Logo } from "@/components/brand/Logo";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { Button } from "@/components/ui/Button";
 import { Magnetic } from "@/components/fx/Magnetic";
+import { LanguageSwitcher } from "@/components/layout/LanguageSwitcher";
 import { NAV, DEPARTMENTS } from "@/lib/constants";
+import { ui } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
-import type { Department } from "@/types";
+import type { Department, Locale } from "@/types";
+
+const NAV_KEY: Record<string, string> = {
+  "/": "navHome",
+  "/services": "navServices",
+  "/work": "navWork",
+  "/industries": "navIndustries",
+  "/about": "navAbout",
+  "/journal": "navJournal",
+  "/contact": "navContact",
+};
 
 export function SiteHeader({
   services,
   industries,
+  locale,
 }: {
   services: { slug: string; title: string; department: Department }[];
   industries: { slug: string; title: string }[];
+  locale: Locale;
 }) {
+  const t = ui(locale);
+  const navLabel = (href: string) => (t as Record<string, string>)[NAV_KEY[href]] ?? href;
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
@@ -79,7 +95,7 @@ export function SiteHeader({
                         : "text-foreground-muted hover:text-foreground",
                     )}
                   >
-                    {item.label}
+                    {navLabel(item.href)}
                     {hasMega && <ChevronDown className="h-3.5 w-3.5 opacity-60" />}
                   </Link>
                 </div>
@@ -89,11 +105,12 @@ export function SiteHeader({
 
           {/* actions */}
           <div className="flex items-center gap-2">
+            <LanguageSwitcher locale={locale} className="hidden sm:block" />
             <ThemeToggle />
             <div className="hidden md:block">
               <Magnetic strength={0.4}>
                 <Button href="/contact" size="sm" variant="glow" className="gap-1.5">
-                  شروع پروژه
+                  {t.ctaStartProject}
                   <ArrowUpLeft className="h-4 w-4 transition-transform group-hover:-translate-x-0.5 group-hover:-translate-y-0.5" />
                 </Button>
               </Magnetic>
@@ -185,15 +202,18 @@ export function SiteHeader({
                       isActive(item.href) ? "text-primary" : "text-foreground",
                     )}
                   >
-                    {item.label}
-                    {item.desc && (
+                    {navLabel(item.href)}
+                    {item.desc && locale === "fa" && (
                       <span className="text-xs font-normal text-foreground-faint">{item.desc}</span>
                     )}
                   </Link>
                 </motion.div>
               ))}
+              <div className="mt-4 flex justify-center sm:hidden">
+                <LanguageSwitcher locale={locale} />
+              </div>
               <Button href="/contact" size="lg" variant="glow" className="mt-6 w-full">
-                شروع پروژه
+                {t.ctaStartProject}
                 <ArrowUpLeft className="h-5 w-5" />
               </Button>
             </nav>

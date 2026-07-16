@@ -3,15 +3,34 @@ import { ArrowUpLeft, Mail, MapPin, Phone } from "lucide-react";
 import { Logo } from "@/components/brand/Logo";
 import { SocialIcon } from "./SocialIcon";
 import { SITE, NAV } from "@/lib/constants";
+import { ui, tr } from "@/lib/i18n";
+import type { Locale } from "@/types";
+
+const NAV_KEY: Record<string, string> = {
+  "/": "navHome",
+  "/services": "navServices",
+  "/work": "navWork",
+  "/industries": "navIndustries",
+  "/about": "navAbout",
+  "/journal": "navJournal",
+  "/contact": "navContact",
+};
 
 export function SiteFooter({
   services,
   industries,
+  locale,
 }: {
   services: { slug: string; title: string }[];
   industries: { slug: string; title: string }[];
+  locale: Locale;
 }) {
-  const year = new Intl.DateTimeFormat("fa-IR-u-ca-persian", { year: "numeric" }).format(new Date());
+  const t = ui(locale);
+  const navLabel = (href: string) => (t as Record<string, string>)[NAV_KEY[href]] ?? href;
+  const year =
+    locale === "fa"
+      ? new Intl.DateTimeFormat("fa-IR-u-ca-persian", { year: "numeric" }).format(new Date())
+      : new Date().getFullYear();
   return (
     <footer className="relative overflow-hidden border-t border-card-border bg-background-2">
       <div className="pointer-events-none absolute -top-32 right-1/4 h-72 w-72 rounded-full bg-primary/10 blur-[120px]" />
@@ -20,15 +39,15 @@ export function SiteFooter({
         <div className="mb-16 flex flex-col items-start justify-between gap-6 rounded-3xl border border-card-border bg-surface/50 p-8 md:flex-row md:items-center md:p-12">
           <div>
             <h3 className="font-display text-2xl font-bold text-foreground md:text-3xl">
-              ایده‌ای در سر دارید؟
+              {t.footerCtaHeading}
             </h3>
-            <p className="mt-2 text-foreground-muted">بیایید با هم چیزی بسازیم که به یاد بماند.</p>
+            <p className="mt-2 text-foreground-muted">{t.footerCtaBody}</p>
           </div>
           <Link
             href="/contact"
             className="group inline-flex items-center gap-2 rounded-full bg-primary px-7 py-4 font-semibold text-primary-foreground transition-transform hover:scale-[1.03]"
           >
-            بریف پروژه‌ات را بفرست
+            {t.footerCtaButton}
             <ArrowUpLeft className="h-5 w-5 transition-transform group-hover:-translate-x-1 group-hover:-translate-y-1" />
           </Link>
         </div>
@@ -38,7 +57,7 @@ export function SiteFooter({
           <div className="lg:col-span-2">
             <Logo tagline />
             <p className="mt-5 max-w-xs text-sm leading-relaxed text-foreground-muted">
-              {SITE.description}
+              {tr(locale, SITE.description, SITE.descriptionEn)}
             </p>
             <div className="mt-6 flex gap-2">
               {SITE.socials.map((s) => (
@@ -56,10 +75,10 @@ export function SiteFooter({
             </div>
           </div>
 
-          <FooterCol title="خدمات" links={services.slice(0, 6).map((s) => ({ label: s.title, href: `/services/${s.slug}` }))} />
-          <FooterCol title="صنایع" links={industries.slice(0, 6).map((i) => ({ label: i.title, href: `/industries/${i.slug}` }))} />
+          <FooterCol title={t.footerServices} links={services.slice(0, 6).map((s) => ({ label: s.title, href: `/services/${s.slug}` }))} />
+          <FooterCol title={t.footerIndustries} links={industries.slice(0, 6).map((i) => ({ label: i.title, href: `/industries/${i.slug}` }))} />
           <div>
-            <h4 className="mb-4 text-sm font-bold text-foreground">تماس</h4>
+            <h4 className="mb-4 text-sm font-bold text-foreground">{t.footerContact}</h4>
             <ul className="flex flex-col gap-3 text-sm text-foreground-muted">
               <li className="flex items-start gap-2.5">
                 <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
@@ -82,16 +101,16 @@ export function SiteFooter({
         {/* bottom */}
         <div className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-card-border pt-7 text-sm text-foreground-faint md:flex-row">
           <p>
-            © {year} {SITE.legalName}. تمام حقوق محفوظ است.
+            © {year} {SITE.legalName}. {t.footerRights}
           </p>
           <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
             {NAV.slice(1).map((n) => (
               <Link key={n.href} href={n.href} className="hover:text-foreground">
-                {n.label}
+                {navLabel(n.href)}
               </Link>
             ))}
             <Link href="/admin" className="text-primary/80 hover:text-primary">
-              ورود مدیریت
+              {t.footerAdminLogin}
             </Link>
           </div>
         </div>

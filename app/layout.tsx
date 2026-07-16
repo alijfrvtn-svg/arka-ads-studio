@@ -1,9 +1,12 @@
 import type { Metadata, Viewport } from "next";
 import { Vazirmatn, Syne } from "next/font/google";
+import { headers } from "next/headers";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { SITE } from "@/lib/constants";
 import { organizationJsonLd } from "@/lib/seo";
+import { dirOf } from "@/lib/i18n";
+import type { Locale } from "@/types";
 
 const vazir = Vazirmatn({
   subsets: ["arabic", "latin"],
@@ -62,9 +65,15 @@ if(t!=='light'&&t!=='dark'){t=window.matchMedia('(prefers-color-scheme: light)')
 var e=document.documentElement;e.classList.remove('light','dark');e.classList.add(t);e.style.colorScheme=t;}catch(e){document.documentElement.classList.add('dark');}})();
 `;
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  // middleware.ts sets this only for the public site — /admin and /portal
+  // never get it, so they always render fa/rtl regardless of a visitor's
+  // site-language cookie.
+  const h = await headers();
+  const locale = (h.get("x-locale") as Locale) || "fa";
+
   return (
-    <html lang="fa" dir="rtl" suppressHydrationWarning className={`${vazir.variable} ${syne.variable}`}>
+    <html lang={locale} dir={dirOf(locale)} suppressHydrationWarning className={`${vazir.variable} ${syne.variable}`}>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>

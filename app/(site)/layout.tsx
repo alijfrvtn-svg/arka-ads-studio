@@ -2,7 +2,12 @@ import SmoothScroll from "@/components/fx/SmoothScroll";
 import CustomCursor from "@/components/fx/CustomCursor";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
+import { MaintenanceScreen } from "@/components/layout/MaintenanceScreen";
 import { getServices, getIndustries } from "@/lib/queries";
+import { db } from "@/lib/db";
+import { getSessionUser } from "@/lib/auth";
+import { parseObj } from "@/lib/utils";
+import { getLocale, tr } from "@/lib/i18n";
 import type { Department } from "@/types";
 
 // All public pages read live data from the database (projects, services,
@@ -15,9 +20,27 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
   // constants.ts list, so admin edits to Services/Industries never showed up
   // there (and stale slugs could 404) — fetch the live, published rows here
   // once and pass down instead.
-  const [services, industries] = await Promise.all([getServices(), getIndustries()]);
-  const serviceLinks = services.map((s) => ({ slug: s.slug, title: s.title, department: s.department as Department }));
-  const industryLinks = industries.map((i) => ({ slug: i.slug, title: i.title }));
+  const [services, industries, settingRow, sessionUser, locale] = await Promise.all([
+    getServices(),
+    getIndustries(),
+    db.setting.findUnique({ where: { key: "site" } }),
+    getSessionUser(),
+    getLocale(),
+  ]);
+  const serviceLinks = services.map((s) => ({
+    slug: s.slug,
+    title: tr(locale, s.title, s.titleEn, s.titleAr),
+    department: s.department as Department,
+  }));
+  const industryLinks = industries.map((i) => ({ slug: i.slug, title: tr(locale, i.title, i.titleEn, i.titleAr) }));
+
+  // Maintenance mode (toggled in /admin/settings) takes down the public site
+  // for everyone except signed-in CMS staff, who can still preview it to turn
+  // the flag back off.
+  const { maintenance } = parseObj<{ maintenance?: boolean }>(settingRow?.value, {});
+  if (maintenance && (!sessionUser || sessionUser.role === "STAFF")) {
+    return <MaintenanceScreen />;
+  }
 
   return (
     <SmoothScroll>
@@ -25,11 +48,11 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
       <a href="#main" className="skip-link">
         رفتن به محتوا
       </a>
-      <SiteHeader services={serviceLinks} industries={industryLinks} />
+      <SiteHeader services={serviceLinks} industries={industryLinks} locale={locale} />
       <main id="main" className="min-h-screen">
         {children}
       </main>
-      <SiteFooter services={serviceLinks} industries={industryLinks} />
+      <SiteFooter services={serviceLinks} industries={industryLinks} locale={locale} />
     </SmoothScroll>
   );
 }

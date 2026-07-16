@@ -7,6 +7,7 @@ import { ContactForm } from "@/components/contact/ContactForm";
 import { SocialIcon } from "@/components/layout/SocialIcon";
 import { getContactPage } from "@/lib/queries";
 import { buildMetadata } from "@/lib/seo";
+import { getLocale } from "@/lib/i18n";
 
 export async function generateMetadata(): Promise<Metadata> {
   const c = await getContactPage();
@@ -26,7 +27,7 @@ function HighlightedTitle({ title, highlight }: { title: string; highlight: stri
 }
 
 export default async function ContactPage() {
-  const c = await getContactPage();
+  const [c, locale] = await Promise.all([getContactPage(), getLocale()]);
   const bboxLat = 0.03;
   const bboxLng = 0.03;
   const bbox = `${c.mapLng - bboxLng}%2C${c.mapLat - bboxLat}%2C${c.mapLng + bboxLng}%2C${c.mapLat + bboxLat}`;
@@ -45,7 +46,7 @@ export default async function ContactPage() {
           <div className="grid gap-8 lg:grid-cols-[1.2fr_1fr]">
             <Reveal>
               <div className="rounded-2xl border border-card-border bg-surface/50 p-6 md:p-8">
-                <ContactForm serviceOptions={c.serviceOptions} budgetOptions={c.budgetOptions} />
+                <ContactForm serviceOptions={c.serviceOptions} budgetOptions={c.budgetOptions} locale={locale} />
               </div>
             </Reveal>
 
