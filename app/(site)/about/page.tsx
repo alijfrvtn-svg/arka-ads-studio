@@ -110,7 +110,7 @@ export default async function AboutPage() {
                       <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
                     </div>
                     <div className="absolute inset-x-0 bottom-0 p-5">
-                      <h3 className="font-display text-lg font-bold text-white">{tr(locale, m.name, m.nameEn, null)}</h3>
+                      <h3 className="font-display text-lg font-bold text-white">{tr(locale, m.name, m.nameEn, m.nameEn)}</h3>
                       <p className="text-sm text-white/70">{tr(locale, m.role, m.roleEn, m.roleAr)}</p>
                       <div className="mt-3 flex gap-2 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
                         {socials.map((s, k) => (

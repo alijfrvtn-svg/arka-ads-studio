@@ -8,7 +8,7 @@ import { Reveal } from "@/components/fx/Reveal";
 import { VideoPlayer } from "@/components/work/VideoPlayer";
 import { BeforeAfter } from "@/components/work/BeforeAfter";
 import { buildMetadata, creativeWorkJsonLd, breadcrumbJsonLd } from "@/lib/seo";
-import { parseArr, localeNumber } from "@/lib/utils";
+import { parseArr, localeDigits } from "@/lib/utils";
 import { tr, trArr, ui } from "@/lib/i18n";
 import { getLocale } from "@/lib/get-locale";
 import type { Credit, Metric } from "@/types";
@@ -107,8 +107,8 @@ export default async function CaseStudy({ params }: { params: Promise<{ slug: st
       <div className="border-y border-card-border bg-surface/40">
         <Container>
           <div className="grid grid-cols-2 gap-6 py-8 md:grid-cols-4">
-            <Meta icon={Users2} label={ui(locale).metaClient} value={p.client?.name ?? "—"} />
-            <Meta icon={Calendar} label={ui(locale).metaYear} value={localeNumber(locale, p.year)} />
+            <Meta icon={Users2} label={ui(locale).metaClient} value={p.client ? tr(locale, p.client.name, p.client.nameEn, p.client.nameEn) : "—"} />
+            <Meta icon={Calendar} label={ui(locale).metaYear} value={localeDigits(locale, p.year)} />
             <Meta icon={MapPin} label={ui(locale).metaLocation} value={location || "—"} />
             <Meta icon={Tag} label={ui(locale).footerServices} value={p.services.map((s) => tr(locale, s.title, s.titleEn, s.titleAr)).join(locale === "fa" ? "، " : ", ") || "—"} />
           </div>
@@ -148,7 +148,7 @@ export default async function CaseStudy({ params }: { params: Promise<{ slug: st
                   <div className="flex gap-6">
                     <div className="shrink-0">
                       <span className="font-display text-5xl font-extrabold text-outline">
-                        {localeNumber(locale, i + 1).padStart(2, locale === "fa" ? "۰" : "0")}
+                        {localeDigits(locale, i + 1).padStart(2, locale === "fa" ? "۰" : "0")}
                       </span>
                     </div>
                     <div>

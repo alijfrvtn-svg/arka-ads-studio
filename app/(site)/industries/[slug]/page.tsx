@@ -66,7 +66,7 @@ export default async function IndustryPage({ params }: { params: Promise<{ slug:
   const ind = await db.industry.findUnique({
     where: { slug },
     include: {
-      projects: { where: { published: true }, take: 6, include: { client: { select: { name: true } } } },
+      projects: { where: { published: true }, take: 6, include: { client: { select: { name: true, nameEn: true } } } },
     },
   });
   if (!ind) notFound();

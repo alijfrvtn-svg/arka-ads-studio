@@ -33,7 +33,7 @@ export default async function HomePage() {
     id: t.id,
     author: t.author,
     role: tr(locale, t.role ?? "", t.roleEn, t.roleAr) || null,
-    company: t.company,
+    company: tr(locale, t.company ?? "", t.client?.nameEn, t.client?.nameEn) || null,
     avatar: t.avatar,
     quote: tr(locale, t.quote, t.quoteEn, t.quoteAr),
     rating: t.rating,
@@ -42,7 +42,7 @@ export default async function HomePage() {
   return (
     <>
       <Hero stats={statData} content={content} locale={locale} />
-      <TrustMarquee clients={clients.map((c) => ({ name: tr(locale, c.name, c.nameEn, null) }))} caption={content.trustCaption} />
+      <TrustMarquee clients={clients.map((c) => ({ name: tr(locale, c.name, c.nameEn, c.nameEn) }))} caption={content.trustCaption} />
       <Departments content={content} locale={locale} />
       <FeaturedWork projects={projects} content={content} locale={locale} />
       <Workflow content={content} locale={locale} />

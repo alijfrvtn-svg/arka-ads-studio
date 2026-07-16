@@ -14,7 +14,7 @@ export const getFeaturedProjects = (take = 6) =>
   db.project.findMany({
     where: { published: true },
     orderBy: [{ featured: "desc" }, { order: "asc" }],
-    include: { client: { select: { name: true } } },
+    include: { client: { select: { name: true, nameEn: true } } },
     take,
   });
 
@@ -22,13 +22,14 @@ export const getAllProjects = () =>
   db.project.findMany({
     where: { published: true },
     orderBy: [{ featured: "desc" }, { order: "asc" }],
-    include: { client: { select: { name: true } } },
+    include: { client: { select: { name: true, nameEn: true } } },
   });
 
 export const getFeaturedTestimonials = () =>
   db.testimonial.findMany({
     where: { published: true },
     orderBy: [{ featured: "desc" }, { order: "asc" }],
+    include: { client: { select: { nameEn: true } } },
   });
 
 export const getServices = () =>
@@ -122,9 +123,87 @@ const HOME_DEFAULTS: HomeContent = {
   finalCtaLabel: "شروع پروژه",
 };
 
+const HOME_DEFAULTS_EN: HomeContent = {
+  heroBadge: "Creative, Production & Digital Marketing Studio",
+  heroHeadline: ["Design.", "Create.", "Impact."],
+  heroDescription:
+    "ARKA is a creative production house — elevating brands through cinematic visual art, digital solutions, and data-driven storytelling.",
+  heroCtaLabel: "Start a Project",
+  heroReelLabel: "Watch the 2025 Reel",
+  trustCaption: "Trusted by 120+ leading brands",
+  departmentsEyebrow: "4 Specialized Departments",
+  departmentsHeading: "One Team, Every Expertise",
+  departmentsHeadingHighlight: "Every Expertise",
+  departmentsDescription: "From idea to screen — everything needed to build a distinctive brand, under one roof.",
+  departmentsCtaLabel: "Explore Services",
+  featuredEyebrow: "Selected Work",
+  featuredHeading: "Work That Speaks for Itself",
+  featuredHeadingHighlight: "Speaks for Itself",
+  featuredDescription: "Every project is a story: from challenge to a measurable result.",
+  featuredCtaLabel: "All Projects",
+  workflowEyebrow: "Our Process",
+  workflowHeading: "A Clear Path to Real Impact",
+  workflowHeadingHighlight: "Real Impact",
+  workflowDescription: "Four clear steps that turn creativity into business results.",
+  workflowSteps: [
+    { icon: "Target", title: "Discovery & Strategy", desc: "A deep understanding of your brand, market and goals; charting a precise roadmap." },
+    { icon: "Sparkles", title: "Idea & Concept", desc: "Creating the central idea and narrative that sets your brand apart." },
+    { icon: "Clapperboard", title: "Production & Execution", desc: "Professional execution with the highest cinematic and technical standards." },
+    { icon: "TrendingUp", title: "Release & Analysis", desc: "Multi-channel release and continuous data-driven optimization." },
+  ],
+  testimonialsEyebrow: "Client Voices",
+  testimonialsHeading: "Brands That Trusted Us",
+  testimonialsHeadingHighlight: "Trusted Us",
+  finalEyebrow: "Ready to Stand Out?",
+  finalHeading: "Let's Build a Brand That's Unforgettable",
+  finalHeadingHighlight: "Unforgettable",
+  finalDescription: "One idea is enough. We'll build the rest of the journey together.",
+  finalCtaLabel: "Start a Project",
+};
+
+const HOME_DEFAULTS_AR: HomeContent = {
+  heroBadge: "استوديو الإبداع والإنتاج والتسويق الرقمي",
+  heroHeadline: ["صمّم.", "ابتكر.", "أثّر."],
+  heroDescription:
+    "آركا هي دار إنتاج إبداعية؛ ترتقي بالعلامات التجارية من خلال الفن البصري السينمائي والحلول الرقمية والسرد القائم على البيانات.",
+  heroCtaLabel: "ابدأ مشروعك",
+  heroReelLabel: "شاهد عرض 2025",
+  trustCaption: "تثق بنا أكثر من 120 علامة تجارية رائدة",
+  departmentsEyebrow: "4 أقسام متخصصة",
+  departmentsHeading: "فريق واحد، كل الخبرات",
+  departmentsHeadingHighlight: "كل الخبرات",
+  departmentsDescription: "من الفكرة إلى الشاشة؛ كل ما تحتاجه لبناء علامة تجارية متميزة، تحت سقف واحد.",
+  departmentsCtaLabel: "استكشف الخدمات",
+  featuredEyebrow: "أعمال مختارة",
+  featuredHeading: "أعمال تتحدث عن نفسها",
+  featuredHeadingHighlight: "تتحدث عن نفسها",
+  featuredDescription: "كل مشروع قصة: من التحدي إلى نتيجة قابلة للقياس.",
+  featuredCtaLabel: "جميع المشاريع",
+  workflowEyebrow: "عملية العمل",
+  workflowHeading: "مسار واضح نحو تأثير حقيقي",
+  workflowHeadingHighlight: "تأثير حقيقي",
+  workflowDescription: "أربع خطوات واضحة تحوّل الإبداع إلى نتائج تجارية.",
+  workflowSteps: [
+    { icon: "Target", title: "الاكتشاف والاستراتيجية", desc: "فهم عميق لعلامتك التجارية والسوق والأهداف؛ ورسم خارطة طريق دقيقة." },
+    { icon: "Sparkles", title: "الفكرة والمفهوم", desc: "ابتكار الفكرة المحورية والسرد الذي يميز علامتك التجارية." },
+    { icon: "Clapperboard", title: "الإنتاج والتنفيذ", desc: "تنفيذ احترافي بأعلى المعايير السينمائية والتقنية." },
+    { icon: "TrendingUp", title: "الإطلاق والتحليل", desc: "إطلاق متعدد القنوات وتحسين مستمر قائم على البيانات." },
+  ],
+  testimonialsEyebrow: "أصوات العملاء",
+  testimonialsHeading: "علامات تجارية وثقت بنا",
+  testimonialsHeadingHighlight: "وثقت بنا",
+  finalEyebrow: "هل أنت مستعد للتميز؟",
+  finalHeading: "لنبنِ معًا علامة تجارية لا تُنسى",
+  finalHeadingHighlight: "لا تُنسى",
+  finalDescription: "فكرة واحدة تكفي. سنبني بقية الطريق معًا.",
+  finalCtaLabel: "ابدأ مشروعك",
+};
+
+const HOME_DEFAULTS_BY_LOCALE: Record<Locale, HomeContent> = { fa: HOME_DEFAULTS, en: HOME_DEFAULTS_EN, ar: HOME_DEFAULTS_AR };
+
 export async function getHomePage(locale: Locale = "fa"): Promise<HomeContent> {
   const row = await db.homePage.findUnique({ where: { id: "home" } });
-  if (!row) return HOME_DEFAULTS;
+  if (!row) return HOME_DEFAULTS_BY_LOCALE[locale];
   const headline = trArr<string>(locale, row.heroHeadline, row.heroHeadlineEn, row.heroHeadlineAr);
   const steps = trArr<{ icon: string; title: string; desc: string }>(
     locale,
@@ -134,7 +213,7 @@ export async function getHomePage(locale: Locale = "fa"): Promise<HomeContent> {
   );
   return {
     heroBadge: tr(locale, row.heroBadge, row.heroBadgeEn, row.heroBadgeAr),
-    heroHeadline: headline.length ? headline : HOME_DEFAULTS.heroHeadline,
+    heroHeadline: headline.length ? headline : HOME_DEFAULTS_BY_LOCALE[locale].heroHeadline,
     heroDescription: tr(locale, row.heroDescription, row.heroDescriptionEn, row.heroDescriptionAr),
     heroCtaLabel: tr(locale, row.heroCtaLabel, row.heroCtaLabelEn, row.heroCtaLabelAr),
     heroReelLabel: tr(locale, row.heroReelLabel, row.heroReelLabelEn, row.heroReelLabelAr),
@@ -173,7 +252,7 @@ export async function getHomePage(locale: Locale = "fa"): Promise<HomeContent> {
       row.workflowHeadingHighlightAr,
     ),
     workflowDescription: tr(locale, row.workflowDescription, row.workflowDescriptionEn, row.workflowDescriptionAr),
-    workflowSteps: steps.length ? steps : HOME_DEFAULTS.workflowSteps,
+    workflowSteps: steps.length ? steps : HOME_DEFAULTS_BY_LOCALE[locale].workflowSteps,
     testimonialsEyebrow: tr(locale, row.testimonialsEyebrow, row.testimonialsEyebrowEn, row.testimonialsEyebrowAr),
     testimonialsHeading: tr(locale, row.testimonialsHeading, row.testimonialsHeadingEn, row.testimonialsHeadingAr),
     testimonialsHeadingHighlight: tr(
@@ -264,9 +343,93 @@ const ABOUT_DEFAULTS: AboutContent = {
   metaDescription: "آرکا؛ تیمی از ذهن‌های خلاق که برندها را با روایت بصری سینمایی متحول می‌کنند.",
 };
 
+const ABOUT_DEFAULTS_EN: AboutContent = {
+  heroEyebrow: "About ARKA",
+  heroTitle: "The Minds Behind the Magic",
+  heroTitleHighlight: "Magic",
+  heroDescription: "We don't just make content — we craft narratives for brands, create experiences, and make an impact.",
+  storyEyebrow: "Our Story",
+  storyHeading: "A Production House, Not Just an Agency",
+  storyParagraphs: [
+    "ARKA was born in 2017 with the belief that great brands are built through great stories. We're a blend of cinematic art, strategic thinking and data.",
+    "Today, a multidisciplinary team of directors, designers, strategists and marketers has come together under one roof to solve brands' real problems.",
+  ],
+  storyVideo: SAMPLE.reels[0],
+  storyPoster: SAMPLE.bts[0],
+  valuesEyebrow: "Values",
+  valuesHeading: "What Sets Us Apart",
+  values: [
+    { icon: "Target", title: "Strategy-Driven", desc: "Every creative decision is rooted in data and purpose." },
+    { icon: "Gem", title: "Uncompromising Quality", desc: "Cinematic standards in every frame and pixel." },
+    { icon: "Zap", title: "Speed & Agility", desc: "On-time delivery without sacrificing quality." },
+    { icon: "Sparkles", title: "Boundless Creativity", desc: "Ideas that push boundaries." },
+  ],
+  teamEyebrow: "Team",
+  teamHeading: "ARKA's Creative Minds",
+  timelineEyebrow: "Growth Journey",
+  timelineHeading: "ARKA's Journey at a Glance",
+  timeline: [
+    { year: "2017", title: "ARKA is Born", desc: "We started with one camera and one dream." },
+    { year: "2019", title: "First National Campaign", desc: "Our first brand film aired on national television." },
+    { year: "2021", title: "Digital Department", desc: "Adding performance marketing and SEO to our services." },
+    { year: "2023", title: "Creative Awards", desc: "Winning several national and international design awards." },
+    { year: "2025", title: "480+ Projects", desc: "Partnering with 120 brands across 12 different industries." },
+  ],
+  galleryEyebrow: "Behind the Scenes",
+  galleryHeading: "How the Magic Is Made",
+  galleryVideo: SAMPLE.reels[1],
+  galleryPoster: SAMPLE.bts[1],
+  galleryImages: SAMPLE.bts.slice(2, 4),
+  metaTitle: "About Us",
+  metaDescription: "ARKA — a team of creative minds transforming brands through cinematic visual storytelling.",
+};
+
+const ABOUT_DEFAULTS_AR: AboutContent = {
+  heroEyebrow: "عن آركا",
+  heroTitle: "العقول وراء السحر",
+  heroTitleHighlight: "السحر",
+  heroDescription: "نحن لا نصنع المحتوى فقط؛ نصنع روايات للعلامات التجارية، نبتكر تجارب، ونُحدث تأثيرًا.",
+  storyEyebrow: "قصتنا",
+  storyHeading: "دار إنتاج، وليست مجرد وكالة",
+  storyParagraphs: [
+    "وُلدت آركا عام 2017 إيمانًا منا بأن العلامات التجارية العظيمة تُبنى بقصص عظيمة. نحن مزيج من الفن السينمائي والتفكير الاستراتيجي والبيانات.",
+    "اليوم، اجتمع فريق متعدد التخصصات من المخرجين والمصممين والاستراتيجيين والمسوقين تحت سقف واحد لحل المشكلات الحقيقية للعلامات التجارية.",
+  ],
+  storyVideo: SAMPLE.reels[0],
+  storyPoster: SAMPLE.bts[0],
+  valuesEyebrow: "القيم",
+  valuesHeading: "ما يميزنا",
+  values: [
+    { icon: "Target", title: "قائم على الاستراتيجية", desc: "كل قرار إبداعي متجذر في البيانات والهدف." },
+    { icon: "Gem", title: "جودة لا تقبل التنازل", desc: "معايير سينمائية في كل إطار وبكسل." },
+    { icon: "Zap", title: "السرعة والمرونة", desc: "تسليم في الوقت المحدد دون التضحية بالجودة." },
+    { icon: "Sparkles", title: "إبداع بلا حدود", desc: "أفكار تتجاوز الحدود." },
+  ],
+  teamEyebrow: "الفريق",
+  teamHeading: "العقول الإبداعية في آركا",
+  timelineEyebrow: "مسيرة النمو",
+  timelineHeading: "رحلة آركا في لمحة",
+  timeline: [
+    { year: "2017", title: "ميلاد آركا", desc: "بدأنا بكاميرا واحدة وحلم واحد." },
+    { year: "2019", title: "أول حملة وطنية", desc: "أول فيلم لعلامة تجارية يُعرض على التلفزيون الوطني." },
+    { year: "2021", title: "قسم رقمي", desc: "إضافة التسويق بالأداء وتحسين محركات البحث إلى خدماتنا." },
+    { year: "2023", title: "جوائز إبداعية", desc: "الفوز بعدة جوائز تصميم وطنية ودولية." },
+    { year: "2025", title: "أكثر من 480 مشروعًا", desc: "شراكة مع 120 علامة تجارية عبر 12 صناعة مختلفة." },
+  ],
+  galleryEyebrow: "خلف الكواليس",
+  galleryHeading: "كيف يُصنع السحر",
+  galleryVideo: SAMPLE.reels[1],
+  galleryPoster: SAMPLE.bts[1],
+  galleryImages: SAMPLE.bts.slice(2, 4),
+  metaTitle: "من نحن",
+  metaDescription: "آركا؛ فريق من العقول الإبداعية يحوّل العلامات التجارية عبر السرد البصري السينمائي.",
+};
+
+const ABOUT_DEFAULTS_BY_LOCALE: Record<Locale, AboutContent> = { fa: ABOUT_DEFAULTS, en: ABOUT_DEFAULTS_EN, ar: ABOUT_DEFAULTS_AR };
+
 export async function getAboutPage(locale: Locale = "fa"): Promise<AboutContent> {
   const row = await db.aboutPage.findUnique({ where: { id: "about" } });
-  if (!row) return ABOUT_DEFAULTS;
+  if (!row) return ABOUT_DEFAULTS_BY_LOCALE[locale];
   return {
     heroEyebrow: tr(locale, row.heroEyebrow, row.heroEyebrowEn, row.heroEyebrowAr),
     heroTitle: tr(locale, row.heroTitle, row.heroTitleEn, row.heroTitleAr),
@@ -275,8 +438,8 @@ export async function getAboutPage(locale: Locale = "fa"): Promise<AboutContent>
     storyEyebrow: tr(locale, row.storyEyebrow, row.storyEyebrowEn, row.storyEyebrowAr),
     storyHeading: tr(locale, row.storyHeading, row.storyHeadingEn, row.storyHeadingAr),
     storyParagraphs: trArr<string>(locale, row.storyParagraphs, row.storyParagraphsEn, row.storyParagraphsAr),
-    storyVideo: row.storyVideo || ABOUT_DEFAULTS.storyVideo,
-    storyPoster: row.storyPoster || ABOUT_DEFAULTS.storyPoster,
+    storyVideo: row.storyVideo || ABOUT_DEFAULTS_BY_LOCALE[locale].storyVideo,
+    storyPoster: row.storyPoster || ABOUT_DEFAULTS_BY_LOCALE[locale].storyPoster,
     valuesEyebrow: tr(locale, row.valuesEyebrow, row.valuesEyebrowEn, row.valuesEyebrowAr),
     valuesHeading: tr(locale, row.valuesHeading, row.valuesHeadingEn, row.valuesHeadingAr),
     values: trArr(locale, row.values, row.valuesEn, row.valuesAr),
@@ -287,16 +450,13 @@ export async function getAboutPage(locale: Locale = "fa"): Promise<AboutContent>
     timeline: trArr(locale, row.timeline, row.timelineEn, row.timelineAr),
     galleryEyebrow: tr(locale, row.galleryEyebrow, row.galleryEyebrowEn, row.galleryEyebrowAr),
     galleryHeading: tr(locale, row.galleryHeading, row.galleryHeadingEn, row.galleryHeadingAr),
-    galleryVideo: row.galleryVideo || ABOUT_DEFAULTS.galleryVideo,
-    galleryPoster: row.galleryPoster || ABOUT_DEFAULTS.galleryPoster,
+    galleryVideo: row.galleryVideo || ABOUT_DEFAULTS_BY_LOCALE[locale].galleryVideo,
+    galleryPoster: row.galleryPoster || ABOUT_DEFAULTS_BY_LOCALE[locale].galleryPoster,
     galleryImages: parseArr<string>(row.galleryImages),
-    metaTitle: tr(locale, row.metaTitle || ABOUT_DEFAULTS.metaTitle, row.metaTitleEn, row.metaTitleAr),
-    metaDescription: tr(
-      locale,
-      row.metaDescription || ABOUT_DEFAULTS.metaDescription,
-      row.metaDescriptionEn,
-      row.metaDescriptionAr,
-    ),
+    metaTitle: row.metaTitle ? tr(locale, row.metaTitle, row.metaTitleEn, row.metaTitleAr) : ABOUT_DEFAULTS_BY_LOCALE[locale].metaTitle,
+    metaDescription: row.metaDescription
+      ? tr(locale, row.metaDescription, row.metaDescriptionEn, row.metaDescriptionAr)
+      : ABOUT_DEFAULTS_BY_LOCALE[locale].metaDescription,
   };
 }
 
@@ -347,9 +507,61 @@ const CONTACT_DEFAULTS: ContactContent = {
   metaDescription: "بریف پروژه‌تان را بفرستید یا با تیم آرکا در تهران تماس بگیرید.",
 };
 
+const CONTACT_DEFAULTS_EN: ContactContent = {
+  heroEyebrow: "Contact",
+  heroTitle: "Let's Get Started",
+  heroTitleHighlight: "Get Started",
+  heroDescription: "Got an idea in mind? Fill out the form or reach out to us directly.",
+  address: "Arka Tower, Valiasr St, Tehran, Iran, 12th floor",
+  phone: "+982188000000",
+  phoneDisplay: "021 8800 0000",
+  email: "hello@arka.studio",
+  officeHours: "Saturday to Wednesday, 9 AM–6 PM",
+  mapLat: 35.7448,
+  mapLng: 51.4101,
+  socials: [
+    { platform: "instagram", href: "https://instagram.com/arka.studio", label: "Instagram" },
+    { platform: "linkedin", href: "https://linkedin.com/company/arka-studio", label: "LinkedIn" },
+    { platform: "youtube", href: "https://youtube.com/@arka.studio", label: "YouTube" },
+    { platform: "aparat", href: "https://aparat.com/arka.studio", label: "Aparat" },
+    { platform: "telegram", href: "https://t.me/arka_studio", label: "Telegram" },
+  ],
+  serviceOptions: ["Film & Ad", "Photography", "Branding", "Web Design", "Digital Marketing", "Other"],
+  budgetOptions: ["Under 50M Toman", "50M–150M Toman", "150M–300M Toman", "Over 300M Toman"],
+  metaTitle: "Contact Us",
+  metaDescription: "Send us your project brief or contact the ARKA team in Tehran.",
+};
+
+const CONTACT_DEFAULTS_AR: ContactContent = {
+  heroEyebrow: "تواصل",
+  heroTitle: "لنبدأ",
+  heroTitleHighlight: "نبدأ",
+  heroDescription: "لديك فكرة في ذهنك؟ املأ النموذج أو تواصل معنا مباشرة.",
+  address: "برج آركا، شارع وليعصر، طهران، إيران، الطابق 12",
+  phone: "+982188000000",
+  phoneDisplay: "021 8800 0000",
+  email: "hello@arka.studio",
+  officeHours: "السبت إلى الأربعاء، 9 صباحًا حتى 6 مساءً",
+  mapLat: 35.7448,
+  mapLng: 51.4101,
+  socials: [
+    { platform: "instagram", href: "https://instagram.com/arka.studio", label: "انستغرام" },
+    { platform: "linkedin", href: "https://linkedin.com/company/arka-studio", label: "لينكد إن" },
+    { platform: "youtube", href: "https://youtube.com/@arka.studio", label: "يوتيوب" },
+    { platform: "aparat", href: "https://aparat.com/arka.studio", label: "آبارات" },
+    { platform: "telegram", href: "https://t.me/arka_studio", label: "تيليجرام" },
+  ],
+  serviceOptions: ["فيلم وإعلان", "التصوير", "العلامة التجارية", "تصميم المواقع", "التسويق الرقمي", "أخرى"],
+  budgetOptions: ["أقل من 50 مليون تومان", "50 إلى 150 مليون تومان", "150 إلى 300 مليون تومان", "أكثر من 300 مليون تومان"],
+  metaTitle: "تواصل معنا",
+  metaDescription: "أرسل لنا ملخص مشروعك أو تواصل مع فريق آركا في طهران.",
+};
+
+const CONTACT_DEFAULTS_BY_LOCALE: Record<Locale, ContactContent> = { fa: CONTACT_DEFAULTS, en: CONTACT_DEFAULTS_EN, ar: CONTACT_DEFAULTS_AR };
+
 export async function getContactPage(locale: Locale = "fa"): Promise<ContactContent> {
   const row = await db.contactPage.findUnique({ where: { id: "contact" } });
-  if (!row) return CONTACT_DEFAULTS;
+  if (!row) return CONTACT_DEFAULTS_BY_LOCALE[locale];
   return {
     heroEyebrow: tr(locale, row.heroEyebrow, row.heroEyebrowEn, row.heroEyebrowAr),
     heroTitle: tr(locale, row.heroTitle, row.heroTitleEn, row.heroTitleAr),
@@ -365,12 +577,9 @@ export async function getContactPage(locale: Locale = "fa"): Promise<ContactCont
     socials: trArr(locale, row.socials, row.socialsEn, row.socialsAr),
     serviceOptions: trArr<string>(locale, row.serviceOptions, row.serviceOptionsEn, row.serviceOptionsAr),
     budgetOptions: trArr<string>(locale, row.budgetOptions, row.budgetOptionsEn, row.budgetOptionsAr),
-    metaTitle: tr(locale, row.metaTitle || CONTACT_DEFAULTS.metaTitle, row.metaTitleEn, row.metaTitleAr),
-    metaDescription: tr(
-      locale,
-      row.metaDescription || CONTACT_DEFAULTS.metaDescription,
-      row.metaDescriptionEn,
-      row.metaDescriptionAr,
-    ),
+    metaTitle: row.metaTitle ? tr(locale, row.metaTitle, row.metaTitleEn, row.metaTitleAr) : CONTACT_DEFAULTS_BY_LOCALE[locale].metaTitle,
+    metaDescription: row.metaDescription
+      ? tr(locale, row.metaDescription, row.metaDescriptionEn, row.metaDescriptionAr)
+      : CONTACT_DEFAULTS_BY_LOCALE[locale].metaDescription,
   };
 }

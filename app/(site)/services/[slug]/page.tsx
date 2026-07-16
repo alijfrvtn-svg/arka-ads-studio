@@ -43,7 +43,7 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
       projects: {
         where: { published: true },
         take: 3,
-        include: { client: { select: { name: true } } },
+        include: { client: { select: { name: true, nameEn: true } } },
       },
     },
   });

@@ -435,7 +435,7 @@ export async function saveService(fd: FormData) {
           price: price || "",
           unit: unit || "",
           features: (featuresRaw || "").split(";").map((f) => f.trim()).filter(Boolean),
-          featured: /^(بله|true|yes|1)$/i.test((featuredRaw || "").trim()),
+          featured: /^(بله|نعم|true|yes|1)$/i.test((featuredRaw || "").trim()),
         };
       }),
     );

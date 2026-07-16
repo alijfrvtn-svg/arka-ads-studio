@@ -19,7 +19,7 @@ interface CardProject {
   tags?: string;
   tagsEn?: string | null;
   tagsAr?: string | null;
-  client?: { name: string } | null;
+  client?: { name: string; nameEn?: string | null } | null;
 }
 
 export function ProjectCard({
@@ -74,7 +74,7 @@ export function ProjectCard({
 
       <div className="absolute inset-x-0 bottom-0 p-5">
         {project.client?.name && (
-          <p className="mb-1 text-xs text-white/60">{project.client.name}</p>
+          <p className="mb-1 text-xs text-white/60">{tr(locale, project.client.name, project.client.nameEn, project.client.nameEn)}</p>
         )}
         <div className="flex items-end justify-between gap-3">
           <h3 className="font-display text-xl font-bold text-white">{title}</h3>

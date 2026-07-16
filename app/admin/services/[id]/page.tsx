@@ -10,9 +10,9 @@ import { DEPARTMENTS } from "@/lib/constants";
 import { parseArr } from "@/lib/utils";
 import type { PricingTier } from "@/types";
 
-function pricingText(json: string | null | undefined) {
+function pricingText(json: string | null | undefined, yes = "بله", no = "خیر") {
   return parseArr<PricingTier>(json)
-    .map((t) => `${t.name} | ${t.price} | ${t.unit ?? ""} | ${(t.features ?? []).join(";")} | ${t.featured ? "بله" : "خیر"}`)
+    .map((t) => `${t.name} | ${t.price} | ${t.unit ?? ""} | ${(t.features ?? []).join(";")} | ${t.featured ? yes : no}`)
     .join("\n");
 }
 
@@ -25,10 +25,14 @@ export default async function ServiceForm({ params }: { params: Promise<{ id: st
   const featuresEn = parseArr<string>(s?.featuresEn).join("\n");
   const featuresAr = parseArr<string>(s?.featuresAr).join("\n");
   const pricing = pricingText(s?.pricing);
-  const pricingEn = pricingText(s?.pricingEn);
-  const pricingAr = pricingText(s?.pricingAr);
+  const pricingEn = pricingText(s?.pricingEn, "yes", "no");
+  const pricingAr = pricingText(s?.pricingAr, "نعم", "لا");
   const pricingHint =
     "هر خط یک پلن: نام | قیمت | واحد | ویژگی۱;ویژگی۲;ویژگی۳ | بله/خیر (پیشنهادی) — مثال: حرفه‌ای | ۲۵,۰۰۰,۰۰۰ | تومان | استراتژی اختصاصی;سه راند بازنگری | بله";
+  const pricingHintEn =
+    "One plan per line: name | price | unit | feature1;feature2;feature3 | yes/no (recommended) — e.g. Professional | 25,000,000 | Toman | Dedicated strategy;Three revision rounds | yes";
+  const pricingHintAr =
+    "كل سطر باقة واحدة: الاسم | السعر | الوحدة | ميزة1;ميزة2;ميزة3 | نعم/لا (موصى به) — مثال: الاحترافية | 25,000,000 | تومان | استراتيجية مخصصة;ثلاث جولات مراجعة | نعم";
 
   return (
     <div className="mx-auto max-w-3xl">
@@ -103,12 +107,12 @@ export default async function ServiceForm({ params }: { params: Promise<{ id: st
         </FormSection>
 
         <FormSection title="پلن‌های قیمت‌گذاری" description="همان پلن‌هایی که در صفحه‌ی این سرویس با دکمه‌ی «انتخاب پلن» نمایش داده می‌شوند">
-          <Field label="پلن‌ها" hint={pricingHint}>
+          <Field label="پلن‌ها">
             <LangTabs
               tabs={[
-                { locale: "fa", content: <Textarea name="pricing" defaultValue={pricing} className="min-h-32" dir="rtl" /> },
-                { locale: "en", content: <Textarea name="pricingEn" defaultValue={pricingEn} className="min-h-32" dir="ltr" /> },
-                { locale: "ar", content: <Textarea name="pricingAr" defaultValue={pricingAr} className="min-h-32" dir="rtl" /> },
+                { locale: "fa", content: <Field hint={pricingHint}><Textarea name="pricing" defaultValue={pricing} className="min-h-32" dir="rtl" /></Field> },
+                { locale: "en", content: <Field hint={pricingHintEn}><Textarea name="pricingEn" defaultValue={pricingEn} className="min-h-32" dir="ltr" /></Field> },
+                { locale: "ar", content: <Field hint={pricingHintAr}><Textarea name="pricingAr" defaultValue={pricingAr} className="min-h-32" dir="rtl" /></Field> },
               ]}
             />
           </Field>
