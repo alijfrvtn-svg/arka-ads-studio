@@ -2,10 +2,11 @@ import { Section, Container, SectionHeading } from "@/components/ui/Section";
 import { Reveal } from "@/components/fx/Reveal";
 import { Icon } from "@/components/ui/Icon";
 import { HighlightedTitle } from "@/components/ui/HighlightedTitle";
-import { toFa } from "@/lib/utils";
+import { localeDigits } from "@/lib/utils";
 import type { HomeContent } from "@/lib/queries";
+import type { Locale } from "@/types";
 
-export function Workflow({ content }: { content: HomeContent }) {
+export function Workflow({ content, locale = "fa" }: { content: HomeContent; locale?: Locale }) {
   return (
     <Section id="process">
       <Container>
@@ -25,7 +26,7 @@ export function Workflow({ content }: { content: HomeContent }) {
                 <div className="relative z-10 mb-6 grid h-18 w-18 place-items-center rounded-2xl border border-card-border bg-surface p-5 text-primary">
                   <Icon name={s.icon} className="h-7 w-7" />
                   <span className="absolute -right-2 -top-2 grid h-7 w-7 place-items-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
-                    {toFa(String(i + 1).padStart(2, "0"))}
+                    {localeDigits(locale, String(i + 1).padStart(2, "0"))}
                   </span>
                 </div>
                 <h3 className="font-display text-lg font-bold text-foreground">{s.title}</h3>

@@ -2,21 +2,24 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useInView } from "framer-motion";
-import { toFa } from "@/lib/utils";
+import { localeNumber } from "@/lib/utils";
+import type { Locale } from "@/types";
 
-/** Count-up animation with Persian digits, triggered when scrolled into view. */
+/** Count-up animation, triggered when scrolled into view — digits follow the active locale. */
 export function Counter({
   value,
   suffix = "",
   prefix = "",
   duration = 1900,
   className,
+  locale = "fa",
 }: {
   value: number;
   suffix?: string;
   prefix?: string;
   duration?: number;
   className?: string;
+  locale?: Locale;
 }) {
   const ref = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true, margin: "-60px" });
@@ -40,7 +43,7 @@ export function Counter({
   return (
     <span ref={ref} className={className}>
       {prefix}
-      {toFa(n)}
+      {localeNumber(locale, n)}
       {suffix}
     </span>
   );

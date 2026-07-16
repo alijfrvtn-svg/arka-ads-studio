@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { ArrowRight } from "lucide-react";
 import { db } from "@/lib/db";
 import { Field, Input, Textarea, Toggle, FormSection } from "@/components/admin/form";
+import { LangTabs } from "@/components/admin/LangTabs";
 import { SubmitButton } from "@/components/admin/SubmitButton";
 import { saveTeamMember } from "@/lib/actions";
 import { parseArr } from "@/lib/utils";
@@ -33,8 +34,24 @@ export default async function TeamMemberForm({ params }: { params: Promise<{ id:
             <Field label="نام" required><Input name="name" defaultValue={m?.name} required /></Field>
             <Field label="نام انگلیسی"><Input name="nameEn" defaultValue={m?.nameEn ?? ""} dir="ltr" className="text-left" /></Field>
           </div>
-          <Field label="سمت" required><Input name="role" defaultValue={m?.role} required /></Field>
-          <Field label="بیوگرافی"><Textarea name="bio" defaultValue={m?.bio ?? ""} /></Field>
+          <Field label="سمت">
+            <LangTabs
+              tabs={[
+                { locale: "fa", content: <Input name="role" defaultValue={m?.role} required /> },
+                { locale: "en", content: <Input name="roleEn" defaultValue={m?.roleEn ?? ""} dir="ltr" className="text-left" /> },
+                { locale: "ar", content: <Input name="roleAr" defaultValue={m?.roleAr ?? ""} dir="rtl" /> },
+              ]}
+            />
+          </Field>
+          <Field label="بیوگرافی">
+            <LangTabs
+              tabs={[
+                { locale: "fa", content: <Textarea name="bio" defaultValue={m?.bio ?? ""} /> },
+                { locale: "en", content: <Textarea name="bioEn" defaultValue={m?.bioEn ?? ""} dir="ltr" /> },
+                { locale: "ar", content: <Textarea name="bioAr" defaultValue={m?.bioAr ?? ""} dir="rtl" /> },
+              ]}
+            />
+          </Field>
           <Field label="آواتار (URL)"><Input name="avatar" defaultValue={m?.avatar ?? ""} dir="ltr" className="text-left" placeholder="https://…" /></Field>
           <Field label="شبکه‌های اجتماعی" hint="هر خط: پلتفرم | لینک — مثال: instagram | https://instagram.com/...">
             <Textarea name="socials" defaultValue={socials} dir="ltr" className="text-left" />

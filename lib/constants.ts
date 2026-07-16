@@ -49,7 +49,10 @@ export interface DepartmentDef {
   key: Department;
   title: string;
   titleEn: string;
+  titleAr: string;
   desc: string;
+  descEn: string;
+  descAr: string;
   icon: string;
   accent: string;
 }
@@ -59,7 +62,10 @@ export const DEPARTMENTS: DepartmentDef[] = [
     key: "FILM",
     title: "فیلم و پروداکشن",
     titleEn: "Film & Production",
+    titleAr: "الأفلام والإنتاج",
     desc: "تیزر تبلیغاتی، فیلم صنعتی، موشن‌گرافیک و CGI سینمایی.",
+    descEn: "Ad films, industrial documentaries, motion graphics and cinematic CGI.",
+    descAr: "أفلام إعلانية، أفلام صناعية، موشن غرافيك ومؤثرات CGI سينمائية.",
     icon: "Clapperboard",
     accent: "#6699ff",
   },
@@ -67,7 +73,10 @@ export const DEPARTMENTS: DepartmentDef[] = [
     key: "DIGITAL",
     title: "دیجیتال مارکتینگ",
     titleEn: "Digital Marketing",
+    titleAr: "التسويق الرقمي",
     desc: "پرفورمنس، سئو، کمپین داده‌محور و رشد پایدار برند.",
+    descEn: "Performance marketing, SEO, data-driven campaigns and sustainable brand growth.",
+    descAr: "تسويق الأداء، تحسين محركات البحث، حملات قائمة على البيانات ونمو مستدام للعلامة.",
     icon: "TrendingUp",
     accent: "#a6c9ff",
   },
@@ -75,7 +84,10 @@ export const DEPARTMENTS: DepartmentDef[] = [
     key: "DESIGN",
     title: "برندینگ و طراحی",
     titleEn: "Branding & Design",
+    titleAr: "العلامة التجارية والتصميم",
     desc: "هویت بصری، طراحی وب‌سایت و تجربه کاربری لوکس.",
+    descEn: "Visual identity, website design and a luxury user experience.",
+    descAr: "هوية بصرية، تصميم مواقع وتجربة مستخدم فاخرة.",
     icon: "Palette",
     accent: "#7aa6ff",
   },
@@ -83,13 +95,16 @@ export const DEPARTMENTS: DepartmentDef[] = [
     key: "STRATEGY",
     title: "استراتژی و محتوا",
     titleEn: "Strategy & Content",
+    titleAr: "الاستراتيجية والمحتوى",
     desc: "پوزیشنینگ، استوری‌تلینگ برند و تولید محتوای هدفمند.",
+    descEn: "Positioning, brand storytelling and purposeful content production.",
+    descAr: "تحديد الموقع التنافسي، سرد قصة العلامة وإنتاج محتوى هادف.",
     icon: "Target",
     accent: "#d3ebfe",
   },
 ];
 
-/** Top-level portfolio filter categories. */
+/** Top-level portfolio filter categories (Persian is canonical — matches `Project.category`). */
 export const WORK_CATEGORIES = [
   "همه",
   "فیلم تبلیغاتی",
@@ -99,6 +114,17 @@ export const WORK_CATEGORIES = [
   "عکاسی",
   "موشن‌گرافیک",
 ] as const;
+
+/** en/ar labels for `WORK_CATEGORIES`, keyed by the canonical Persian value. */
+export const WORK_CATEGORY_LABELS: Record<string, { en: string; ar: string }> = {
+  "همه": { en: "All", ar: "الكل" },
+  "فیلم تبلیغاتی": { en: "Ad Film", ar: "فيلم إعلاني" },
+  "برندینگ": { en: "Branding", ar: "العلامة التجارية" },
+  "طراحی وب": { en: "Web Design", ar: "تصميم المواقع" },
+  "دیجیتال مارکتینگ": { en: "Digital Marketing", ar: "التسويق الرقمي" },
+  "عکاسی": { en: "Photography", ar: "التصوير" },
+  "موشن‌گرافیک": { en: "Motion Graphics", ar: "الموشن غرافيك" },
+};
 
 // ————— RBAC —————
 

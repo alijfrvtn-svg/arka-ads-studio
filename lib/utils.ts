@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import type { Locale } from "@/types";
 
 /** Merge Tailwind classes with conflict resolution. */
 export function cn(...inputs: ClassValue[]) {
@@ -74,6 +75,27 @@ export function readingTime(text: string): number {
 export function truncate(str: string, n: number): string {
   if (str.length <= n) return str;
   return str.slice(0, str.lastIndexOf(" ", n)).trim() + "…";
+}
+
+/** Locale-aware grouped number: Persian digits for fa, Western digits for en/ar. */
+export function localeNumber(locale: Locale, n: number): string {
+  return locale === "fa" ? faNumber(n) : new Intl.NumberFormat("en-US").format(n);
+}
+
+/** Locale-aware digit conversion: Persian digits for fa, left as Western digits otherwise. */
+export function localeDigits(locale: Locale, input: string | number): string {
+  return locale === "fa" ? toFa(input) : String(input);
+}
+
+/** Locale-aware date: Jalali calendar for fa, Gregorian for en/ar. */
+export function localeDate(
+  locale: Locale,
+  date: Date | string | number,
+  opts: Intl.DateTimeFormatOptions = { year: "numeric", month: "long", day: "numeric" },
+): string {
+  if (locale === "fa") return faDate(date, opts);
+  const d = typeof date === "object" ? date : new Date(date);
+  return new Intl.DateTimeFormat(locale === "ar" ? "ar-SA" : "en-US", opts).format(d);
 }
 
 /** Relative "x ago" in Persian for the CRM/admin. */

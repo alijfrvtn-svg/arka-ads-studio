@@ -6,7 +6,12 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ChevronLeft, ChevronRight, Quote, Star } from "lucide-react";
 import { Section, Container, SectionHeading } from "@/components/ui/Section";
 import { HighlightedTitle } from "@/components/ui/HighlightedTitle";
+import { ui } from "@/lib/i18n";
+import { localeDigits } from "@/lib/utils";
 import type { HomeContent } from "@/lib/queries";
+import type { Locale } from "@/types";
+
+const REVIEW_WORD: Record<Locale, string> = { fa: "نظر", en: "Review", ar: "رأي" };
 
 interface T {
   id: string;
@@ -18,7 +23,7 @@ interface T {
   rating: number;
 }
 
-export function Testimonials({ items, content }: { items: T[]; content: HomeContent }) {
+export function Testimonials({ items, content, locale = "fa" }: { items: T[]; content: HomeContent; locale?: Locale }) {
   const [i, setI] = useState(0);
   const n = items.length;
   const go = useCallback((d: number) => setI((p) => (p + d + n) % n), [n]);
@@ -87,7 +92,7 @@ export function Testimonials({ items, content }: { items: T[]; content: HomeCont
           <div className="mt-10 flex items-center justify-center gap-4">
             <button
               onClick={() => go(-1)}
-              aria-label="قبلی"
+              aria-label={ui(locale).testimonialPrev}
               className="grid h-11 w-11 place-items-center rounded-full border border-card-border text-foreground transition-colors hover:border-primary hover:text-primary"
             >
               <ChevronRight className="h-5 w-5" />
@@ -97,14 +102,14 @@ export function Testimonials({ items, content }: { items: T[]; content: HomeCont
                 <button
                   key={k}
                   onClick={() => setI(k)}
-                  aria-label={`نظر ${k + 1}`}
+                  aria-label={`${REVIEW_WORD[locale]} ${localeDigits(locale, k + 1)}`}
                   className={`h-2 rounded-full transition-all ${k === i ? "w-6 bg-primary" : "w-2 bg-card-border"}`}
                 />
               ))}
             </div>
             <button
               onClick={() => go(1)}
-              aria-label="بعدی"
+              aria-label={ui(locale).testimonialNext}
               className="grid h-11 w-11 place-items-center rounded-full border border-card-border text-foreground transition-colors hover:border-primary hover:text-primary"
             >
               <ChevronLeft className="h-5 w-5" />

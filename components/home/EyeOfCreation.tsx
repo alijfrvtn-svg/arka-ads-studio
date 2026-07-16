@@ -6,7 +6,9 @@ import { ArrowUpLeft, Play } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Magnetic } from "@/components/fx/Magnetic";
 import { useTheme } from "@/components/theme/ThemeProvider";
+import { ui } from "@/lib/i18n";
 import type { HomeContent } from "@/lib/queries";
+import type { Locale } from "@/types";
 
 const DESKTOP_QUERY = "(min-width: 1024px)";
 
@@ -351,11 +353,13 @@ export function EyeOfCreation({
   showScrollHint = true,
   content,
   onWatchReel,
+  locale = "fa",
 }: {
   length?: Length;
   showScrollHint?: boolean;
   content: HomeContent;
   onWatchReel?: () => void;
+  locale?: Locale;
 }) {
   const scaffoldRef = useRef<HTMLDivElement>(null);
   const [progress, setProgress] = useState(0);
@@ -594,7 +598,7 @@ export function EyeOfCreation({
         {/* scroll hint */}
         <div style={v.hintStyle} hidden={v.hideHint}>
           <span style={{ fontFamily: FONT_DISPLAY, letterSpacing: "0.5em", fontSize: 11, color: v.stage.hintColor, textTransform: "uppercase" }}>
-            برای ورود اسکرول کن
+            {ui(locale).scrollToEnterHint}
           </span>
           <div style={{ width: 1, height: 34, margin: "14px auto 0", background: "linear-gradient(180deg, rgba(166,201,255,0.8), transparent)" }} />
         </div>

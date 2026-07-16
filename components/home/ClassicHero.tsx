@@ -5,8 +5,10 @@ import { ArrowUpLeft, Play } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Magnetic } from "@/components/fx/Magnetic";
 import { SAMPLE } from "@/lib/media";
-import { toFa } from "@/lib/utils";
+import { localeNumber } from "@/lib/utils";
+import { ui } from "@/lib/i18n";
 import type { HomeContent } from "@/lib/queries";
+import type { Locale } from "@/types";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -17,10 +19,12 @@ export function ClassicHero({
   stats,
   content,
   onWatchReel,
+  locale = "fa",
 }: {
   stats: { label: string; value: number; suffix: string }[];
   content: HomeContent;
   onWatchReel: () => void;
+  locale?: Locale;
 }) {
   return (
     <section className="relative flex min-h-[100svh] items-center overflow-hidden">
@@ -111,7 +115,7 @@ export function ClassicHero({
           {stats.slice(0, 4).map((s) => (
             <div key={s.label}>
               <div className="font-display text-2xl font-bold text-foreground md:text-3xl">
-                {toFa(s.value)}
+                {localeNumber(locale, s.value)}
                 {s.suffix}
               </div>
               <div className="mt-1 text-xs text-foreground-muted">{s.label}</div>
@@ -122,7 +126,7 @@ export function ClassicHero({
 
       {/* scroll cue */}
       <div className="absolute bottom-8 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-2 md:flex">
-        <span className="text-[10px] uppercase tracking-[0.3em] text-foreground-faint">اسکرول</span>
+        <span className="text-[10px] uppercase tracking-[0.3em] text-foreground-faint">{ui(locale).scrollHint}</span>
         <span className="h-10 w-px overflow-hidden bg-card-border">
           <span className="block h-full w-full animate-scroll-line bg-primary" />
         </span>

@@ -2,6 +2,7 @@ import { Globe, ShieldAlert } from "lucide-react";
 import { db } from "@/lib/db";
 import { PageHeader } from "@/components/admin/ui";
 import { Field, Input, Textarea, Select, Toggle, FormSection } from "@/components/admin/form";
+import { LangTabs } from "@/components/admin/LangTabs";
 import { SubmitButton } from "@/components/admin/SubmitButton";
 import { saveSettings, saveStats, saveFooterSettings } from "@/lib/actions";
 import { parseObj } from "@/lib/utils";
@@ -43,6 +44,8 @@ export default async function SettingsPage() {
     ...parseObj<Partial<SiteSettings>>(row?.value, {}),
   };
   const statsText = stats.map((st) => `${st.label} | ${st.value} | ${st.suffix}`).join("\n");
+  const statsTextEn = stats.map((st) => `${st.labelEn ?? ""} | ${st.value} | ${st.suffix}`).join("\n");
+  const statsTextAr = stats.map((st) => `${st.labelAr ?? ""} | ${st.value} | ${st.suffix}`).join("\n");
 
   return (
     <div className="mx-auto max-w-3xl">
@@ -101,9 +104,15 @@ export default async function SettingsPage() {
         >
           <Field
             label="آمار"
-            hint="هر خط یک آیتم: برچسب | عدد | پسوند — مثال: پروژه موفق | 480 | + — ترتیب خطوط، ترتیب نمایش است"
+            hint="هر خط یک آیتم: برچسب | عدد | پسوند — مثال: پروژه موفق | 480 | + — ترتیب خطوط، ترتیب نمایش است (فقط برچسب بین زبان‌ها فرق می‌کند؛ عدد و پسوند از ستون فارسی خوانده می‌شود)"
           >
-            <Textarea name="stats" defaultValue={statsText} className="min-h-32" />
+            <LangTabs
+              tabs={[
+                { locale: "fa", content: <Textarea name="stats" defaultValue={statsText} className="min-h-32" /> },
+                { locale: "en", content: <Textarea name="statsEn" defaultValue={statsTextEn} className="min-h-32" dir="ltr" /> },
+                { locale: "ar", content: <Textarea name="statsAr" defaultValue={statsTextAr} className="min-h-32" dir="rtl" /> },
+              ]}
+            />
           </Field>
           <div className="flex justify-end">
             <SubmitButton>ذخیره آمار</SubmitButton>

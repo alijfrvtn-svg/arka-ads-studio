@@ -44,32 +44,68 @@ export interface ProjectInput {
   slug: string;
   title: string;
   titleEn?: string;
+  titleAr?: string;
   subtitle?: string;
+  subtitleEn?: string;
+  subtitleAr?: string;
   category: string;
+  categoryEn?: string;
+  categoryAr?: string;
   cover: string;
   poster?: string;
   heroVideo?: string;
   gallery: string[];
   year: number;
   location?: string;
+  locationEn?: string;
+  locationAr?: string;
   accent: string;
   featured: boolean;
   published: boolean;
   tags: string[];
+  tagsEn?: string[];
+  tagsAr?: string[];
   goal?: string;
+  goalEn?: string;
+  goalAr?: string;
   problem?: string;
+  problemEn?: string;
+  problemAr?: string;
   idea?: string;
+  ideaEn?: string;
+  ideaAr?: string;
   production?: string;
+  productionEn?: string;
+  productionAr?: string;
   marketing?: string;
+  marketingEn?: string;
+  marketingAr?: string;
   result?: string;
+  resultEn?: string;
+  resultAr?: string;
   metrics: Metric[];
+  metricsEn?: Metric[];
+  metricsAr?: Metric[];
   beforeImage?: string;
   afterImage?: string;
   credits: Credit[];
+  creditsEn?: Credit[];
+  creditsAr?: Credit[];
   clientId?: string;
   serviceSlugs: string[];
   industrySlugs: string[];
-  seo: { metaTitle?: string; metaDescription?: string; ogImage?: string; keywords: string[] };
+  seo: {
+    metaTitle?: string;
+    metaTitleEn?: string;
+    metaTitleAr?: string;
+    metaDescription?: string;
+    metaDescriptionEn?: string;
+    metaDescriptionAr?: string;
+    ogImage?: string;
+    keywords: string[];
+    keywordsEn?: string[];
+    keywordsAr?: string[];
+  };
 }
 
 export async function saveProject(input: ProjectInput) {
@@ -79,34 +115,65 @@ export async function saveProject(input: ProjectInput) {
     slug,
     title: input.title,
     titleEn: input.titleEn || null,
+    titleAr: input.titleAr || null,
     subtitle: input.subtitle || null,
+    subtitleEn: input.subtitleEn || null,
+    subtitleAr: input.subtitleAr || null,
     category: input.category,
+    categoryEn: input.categoryEn || null,
+    categoryAr: input.categoryAr || null,
     cover: input.cover,
     poster: input.poster || null,
     heroVideo: input.heroVideo || null,
     gallery: J(input.gallery),
     year: input.year,
     location: input.location || null,
+    locationEn: input.locationEn || null,
+    locationAr: input.locationAr || null,
     accent: input.accent,
     featured: input.featured,
     published: input.published,
     tags: J(input.tags),
+    tagsEn: input.tagsEn ? J(input.tagsEn) : null,
+    tagsAr: input.tagsAr ? J(input.tagsAr) : null,
     goal: input.goal || null,
+    goalEn: input.goalEn || null,
+    goalAr: input.goalAr || null,
     problem: input.problem || null,
+    problemEn: input.problemEn || null,
+    problemAr: input.problemAr || null,
     idea: input.idea || null,
+    ideaEn: input.ideaEn || null,
+    ideaAr: input.ideaAr || null,
     production: input.production || null,
+    productionEn: input.productionEn || null,
+    productionAr: input.productionAr || null,
     marketing: input.marketing || null,
+    marketingEn: input.marketingEn || null,
+    marketingAr: input.marketingAr || null,
     result: input.result || null,
+    resultEn: input.resultEn || null,
+    resultAr: input.resultAr || null,
     metrics: J(input.metrics),
+    metricsEn: input.metricsEn ? J(input.metricsEn) : null,
+    metricsAr: input.metricsAr ? J(input.metricsAr) : null,
     beforeImage: input.beforeImage || null,
     afterImage: input.afterImage || null,
     credits: J(input.credits),
+    creditsEn: input.creditsEn ? J(input.creditsEn) : null,
+    creditsAr: input.creditsAr ? J(input.creditsAr) : null,
   };
   const seoData = {
     metaTitle: input.seo.metaTitle || null,
+    metaTitleEn: input.seo.metaTitleEn || null,
+    metaTitleAr: input.seo.metaTitleAr || null,
     metaDescription: input.seo.metaDescription || null,
+    metaDescriptionEn: input.seo.metaDescriptionEn || null,
+    metaDescriptionAr: input.seo.metaDescriptionAr || null,
     ogImage: input.seo.ogImage || null,
     keywords: J(input.seo.keywords),
+    keywordsEn: input.seo.keywordsEn ? J(input.seo.keywordsEn) : null,
+    keywordsAr: input.seo.keywordsAr ? J(input.seo.keywordsAr) : null,
   };
 
   let id = input.id;
@@ -166,18 +233,34 @@ export interface PostInput {
   id?: string;
   slug: string;
   title: string;
+  titleEn?: string;
+  titleAr?: string;
   excerpt: string;
+  excerptEn?: string;
+  excerptAr?: string;
   cover: string;
   content: string;
+  contentEn?: string;
+  contentAr?: string;
   category: string;
+  categoryEn?: string;
+  categoryAr?: string;
   tags: string[];
+  tagsEn?: string[];
+  tagsAr?: string[];
   featured: boolean;
   published: boolean;
   readingMinutes: number;
   metaTitle?: string;
+  metaTitleEn?: string;
+  metaTitleAr?: string;
   metaDescription?: string;
+  metaDescriptionEn?: string;
+  metaDescriptionAr?: string;
   ogImage?: string;
   keywords: string[];
+  keywordsEn?: string[];
+  keywordsAr?: string[];
 }
 
 export async function savePost(input: PostInput) {
@@ -186,18 +269,34 @@ export async function savePost(input: PostInput) {
   const data = {
     slug,
     title: input.title,
+    titleEn: input.titleEn || null,
+    titleAr: input.titleAr || null,
     excerpt: input.excerpt,
+    excerptEn: input.excerptEn || null,
+    excerptAr: input.excerptAr || null,
     cover: input.cover,
     content: input.content,
+    contentEn: input.contentEn || null,
+    contentAr: input.contentAr || null,
     category: input.category,
+    categoryEn: input.categoryEn || null,
+    categoryAr: input.categoryAr || null,
     tags: J(input.tags),
+    tagsEn: input.tagsEn ? J(input.tagsEn) : null,
+    tagsAr: input.tagsAr ? J(input.tagsAr) : null,
     featured: input.featured,
     published: input.published,
     readingMinutes: input.readingMinutes,
     metaTitle: input.metaTitle || null,
+    metaTitleEn: input.metaTitleEn || null,
+    metaTitleAr: input.metaTitleAr || null,
     metaDescription: input.metaDescription || null,
+    metaDescriptionEn: input.metaDescriptionEn || null,
+    metaDescriptionAr: input.metaDescriptionAr || null,
     ogImage: input.ogImage || null,
     keywords: J(input.keywords),
+    keywordsEn: input.keywordsEn ? J(input.keywordsEn) : null,
+    keywordsAr: input.keywordsAr ? J(input.keywordsAr) : null,
   };
   let id = input.id;
   if (id) {
@@ -292,9 +391,13 @@ export async function saveTestimonial(fd: FormData) {
   const data = {
     author: S(fd, "author"),
     role: S(fd, "role") || null,
+    roleEn: S(fd, "roleEn") || null,
+    roleAr: S(fd, "roleAr") || null,
     company: S(fd, "company") || null,
     avatar: S(fd, "avatar") || null,
     quote: S(fd, "quote"),
+    quoteEn: S(fd, "quoteEn") || null,
+    quoteAr: S(fd, "quoteAr") || null,
     rating: N(fd, "rating", 5),
     featured: B(fd, "featured"),
     published: B(fd, "published"),
@@ -323,21 +426,9 @@ export async function saveService(fd: FormData) {
       .split("\n")
       .map((l) => l.trim())
       .filter(Boolean);
-  const data = {
-    slug: slugify(S(fd, "slug") || S(fd, "title")),
-    title: S(fd, "title"),
-    titleEn: S(fd, "titleEn") || null,
-    titleAr: S(fd, "titleAr") || null,
-    tagline: S(fd, "tagline") || null,
-    excerpt: S(fd, "excerpt"),
-    description: S(fd, "description"),
-    department: S(fd, "department", "FILM"),
-    icon: S(fd, "icon", "Sparkles"),
-    cover: S(fd, "cover") || null,
-    priceFrom: N(fd, "priceFrom") || null,
-    features: J(parseLines("features")),
-    pricing: J(
-      parseLines("pricing").map((line) => {
+  const parsePricing = (k: string) =>
+    J(
+      parseLines(k).map((line) => {
         const [name, price, unit, featuresRaw, featuredRaw] = line.split("|").map((p) => p.trim());
         return {
           name: name || "",
@@ -347,10 +438,38 @@ export async function saveService(fd: FormData) {
           featured: /^(بله|true|yes|1)$/i.test((featuredRaw || "").trim()),
         };
       }),
-    ),
+    );
+  const data = {
+    slug: slugify(S(fd, "slug") || S(fd, "title")),
+    title: S(fd, "title"),
+    titleEn: S(fd, "titleEn") || null,
+    titleAr: S(fd, "titleAr") || null,
+    tagline: S(fd, "tagline") || null,
+    taglineEn: S(fd, "taglineEn") || null,
+    taglineAr: S(fd, "taglineAr") || null,
+    excerpt: S(fd, "excerpt"),
+    excerptEn: S(fd, "excerptEn") || null,
+    excerptAr: S(fd, "excerptAr") || null,
+    description: S(fd, "description"),
+    descriptionEn: S(fd, "descriptionEn") || null,
+    descriptionAr: S(fd, "descriptionAr") || null,
+    department: S(fd, "department", "FILM"),
+    icon: S(fd, "icon", "Sparkles"),
+    cover: S(fd, "cover") || null,
+    priceFrom: N(fd, "priceFrom") || null,
+    features: J(parseLines("features")),
+    featuresEn: parseLines("featuresEn").length ? J(parseLines("featuresEn")) : null,
+    featuresAr: parseLines("featuresAr").length ? J(parseLines("featuresAr")) : null,
+    pricing: parsePricing("pricing"),
+    pricingEn: parseLines("pricingEn").length ? parsePricing("pricingEn") : null,
+    pricingAr: parseLines("pricingAr").length ? parsePricing("pricingAr") : null,
     published: B(fd, "published"),
     metaTitle: S(fd, "metaTitle") || null,
+    metaTitleEn: S(fd, "metaTitleEn") || null,
+    metaTitleAr: S(fd, "metaTitleAr") || null,
     metaDescription: S(fd, "metaDescription") || null,
+    metaDescriptionEn: S(fd, "metaDescriptionEn") || null,
+    metaDescriptionAr: S(fd, "metaDescriptionAr") || null,
   };
   if (id) await db.service.update({ where: { id }, data });
   else await db.service.create({ data });
@@ -375,8 +494,13 @@ export async function saveIndustry(fd: FormData) {
     slug: slugify(S(fd, "slug") || S(fd, "title")),
     title: S(fd, "title"),
     titleEn: S(fd, "titleEn") || null,
+    titleAr: S(fd, "titleAr") || null,
     excerpt: S(fd, "excerpt"),
+    excerptEn: S(fd, "excerptEn") || null,
+    excerptAr: S(fd, "excerptAr") || null,
     description: S(fd, "description"),
+    descriptionEn: S(fd, "descriptionEn") || null,
+    descriptionAr: S(fd, "descriptionAr") || null,
     icon: S(fd, "icon", "Building2"),
     cover: S(fd, "cover") || null,
     heroVideo: S(fd, "heroVideo") || null,
@@ -497,11 +621,15 @@ export async function saveFooterSettings(fd: FormData) {
 export async function saveStats(fd: FormData) {
   await requirePermission("settings.manage");
   const rows = PL(fd, "stats", ["label", "value", "suffix"]);
+  const rowsEn = PL(fd, "statsEn", ["label", "value", "suffix"]);
+  const rowsAr = PL(fd, "statsAr", ["label", "value", "suffix"]);
   await db.$transaction([
     db.stat.deleteMany({}),
     db.stat.createMany({
       data: rows.map((r, i) => ({
         label: r.label,
+        labelEn: rowsEn[i]?.label || null,
+        labelAr: rowsAr[i]?.label || null,
         value: Number(r.value) || 0,
         suffix: r.suffix || "+",
         order: i,
@@ -565,34 +693,92 @@ export async function saveHomePage(fd: FormData) {
   await requirePermission("home.manage");
   const data = {
     heroBadge: S(fd, "heroBadge"),
+    heroBadgeEn: S(fd, "heroBadgeEn") || null,
+    heroBadgeAr: S(fd, "heroBadgeAr") || null,
     heroHeadline: J(L(fd, "heroHeadline")),
+    heroHeadlineEn: J(L(fd, "heroHeadlineEn")),
+    heroHeadlineAr: J(L(fd, "heroHeadlineAr")),
     heroDescription: S(fd, "heroDescription"),
+    heroDescriptionEn: S(fd, "heroDescriptionEn") || null,
+    heroDescriptionAr: S(fd, "heroDescriptionAr") || null,
     heroCtaLabel: S(fd, "heroCtaLabel"),
+    heroCtaLabelEn: S(fd, "heroCtaLabelEn") || null,
+    heroCtaLabelAr: S(fd, "heroCtaLabelAr") || null,
     heroReelLabel: S(fd, "heroReelLabel"),
+    heroReelLabelEn: S(fd, "heroReelLabelEn") || null,
+    heroReelLabelAr: S(fd, "heroReelLabelAr") || null,
     trustCaption: S(fd, "trustCaption"),
+    trustCaptionEn: S(fd, "trustCaptionEn") || null,
+    trustCaptionAr: S(fd, "trustCaptionAr") || null,
     departmentsEyebrow: S(fd, "departmentsEyebrow"),
+    departmentsEyebrowEn: S(fd, "departmentsEyebrowEn") || null,
+    departmentsEyebrowAr: S(fd, "departmentsEyebrowAr") || null,
     departmentsHeading: S(fd, "departmentsHeading"),
+    departmentsHeadingEn: S(fd, "departmentsHeadingEn") || null,
+    departmentsHeadingAr: S(fd, "departmentsHeadingAr") || null,
     departmentsHeadingHighlight: S(fd, "departmentsHeadingHighlight"),
+    departmentsHeadingHighlightEn: S(fd, "departmentsHeadingHighlightEn") || null,
+    departmentsHeadingHighlightAr: S(fd, "departmentsHeadingHighlightAr") || null,
     departmentsDescription: S(fd, "departmentsDescription"),
+    departmentsDescriptionEn: S(fd, "departmentsDescriptionEn") || null,
+    departmentsDescriptionAr: S(fd, "departmentsDescriptionAr") || null,
     departmentsCtaLabel: S(fd, "departmentsCtaLabel"),
+    departmentsCtaLabelEn: S(fd, "departmentsCtaLabelEn") || null,
+    departmentsCtaLabelAr: S(fd, "departmentsCtaLabelAr") || null,
     featuredEyebrow: S(fd, "featuredEyebrow"),
+    featuredEyebrowEn: S(fd, "featuredEyebrowEn") || null,
+    featuredEyebrowAr: S(fd, "featuredEyebrowAr") || null,
     featuredHeading: S(fd, "featuredHeading"),
+    featuredHeadingEn: S(fd, "featuredHeadingEn") || null,
+    featuredHeadingAr: S(fd, "featuredHeadingAr") || null,
     featuredHeadingHighlight: S(fd, "featuredHeadingHighlight"),
+    featuredHeadingHighlightEn: S(fd, "featuredHeadingHighlightEn") || null,
+    featuredHeadingHighlightAr: S(fd, "featuredHeadingHighlightAr") || null,
     featuredDescription: S(fd, "featuredDescription"),
+    featuredDescriptionEn: S(fd, "featuredDescriptionEn") || null,
+    featuredDescriptionAr: S(fd, "featuredDescriptionAr") || null,
     featuredCtaLabel: S(fd, "featuredCtaLabel"),
+    featuredCtaLabelEn: S(fd, "featuredCtaLabelEn") || null,
+    featuredCtaLabelAr: S(fd, "featuredCtaLabelAr") || null,
     workflowEyebrow: S(fd, "workflowEyebrow"),
+    workflowEyebrowEn: S(fd, "workflowEyebrowEn") || null,
+    workflowEyebrowAr: S(fd, "workflowEyebrowAr") || null,
     workflowHeading: S(fd, "workflowHeading"),
+    workflowHeadingEn: S(fd, "workflowHeadingEn") || null,
+    workflowHeadingAr: S(fd, "workflowHeadingAr") || null,
     workflowHeadingHighlight: S(fd, "workflowHeadingHighlight"),
+    workflowHeadingHighlightEn: S(fd, "workflowHeadingHighlightEn") || null,
+    workflowHeadingHighlightAr: S(fd, "workflowHeadingHighlightAr") || null,
     workflowDescription: S(fd, "workflowDescription"),
+    workflowDescriptionEn: S(fd, "workflowDescriptionEn") || null,
+    workflowDescriptionAr: S(fd, "workflowDescriptionAr") || null,
     workflowSteps: J(PL(fd, "workflowSteps", ["icon", "title", "desc"])),
+    workflowStepsEn: J(PL(fd, "workflowStepsEn", ["icon", "title", "desc"])),
+    workflowStepsAr: J(PL(fd, "workflowStepsAr", ["icon", "title", "desc"])),
     testimonialsEyebrow: S(fd, "testimonialsEyebrow"),
+    testimonialsEyebrowEn: S(fd, "testimonialsEyebrowEn") || null,
+    testimonialsEyebrowAr: S(fd, "testimonialsEyebrowAr") || null,
     testimonialsHeading: S(fd, "testimonialsHeading"),
+    testimonialsHeadingEn: S(fd, "testimonialsHeadingEn") || null,
+    testimonialsHeadingAr: S(fd, "testimonialsHeadingAr") || null,
     testimonialsHeadingHighlight: S(fd, "testimonialsHeadingHighlight"),
+    testimonialsHeadingHighlightEn: S(fd, "testimonialsHeadingHighlightEn") || null,
+    testimonialsHeadingHighlightAr: S(fd, "testimonialsHeadingHighlightAr") || null,
     finalEyebrow: S(fd, "finalEyebrow"),
+    finalEyebrowEn: S(fd, "finalEyebrowEn") || null,
+    finalEyebrowAr: S(fd, "finalEyebrowAr") || null,
     finalHeading: S(fd, "finalHeading"),
+    finalHeadingEn: S(fd, "finalHeadingEn") || null,
+    finalHeadingAr: S(fd, "finalHeadingAr") || null,
     finalHeadingHighlight: S(fd, "finalHeadingHighlight"),
+    finalHeadingHighlightEn: S(fd, "finalHeadingHighlightEn") || null,
+    finalHeadingHighlightAr: S(fd, "finalHeadingHighlightAr") || null,
     finalDescription: S(fd, "finalDescription"),
+    finalDescriptionEn: S(fd, "finalDescriptionEn") || null,
+    finalDescriptionAr: S(fd, "finalDescriptionAr") || null,
     finalCtaLabel: S(fd, "finalCtaLabel"),
+    finalCtaLabelEn: S(fd, "finalCtaLabelEn") || null,
+    finalCtaLabelAr: S(fd, "finalCtaLabelAr") || null,
   };
   await db.homePage.upsert({ where: { id: "home" }, create: { id: "home", ...data }, update: data });
   revalidateSite("/admin/home", "/");
@@ -606,29 +792,67 @@ export async function saveAboutPage(fd: FormData) {
   await requirePermission("about.manage");
   const data = {
     heroEyebrow: S(fd, "heroEyebrow"),
+    heroEyebrowEn: S(fd, "heroEyebrowEn") || null,
+    heroEyebrowAr: S(fd, "heroEyebrowAr") || null,
     heroTitle: S(fd, "heroTitle"),
+    heroTitleEn: S(fd, "heroTitleEn") || null,
+    heroTitleAr: S(fd, "heroTitleAr") || null,
     heroTitleHighlight: S(fd, "heroTitleHighlight"),
+    heroTitleHighlightEn: S(fd, "heroTitleHighlightEn") || null,
+    heroTitleHighlightAr: S(fd, "heroTitleHighlightAr") || null,
     heroDescription: S(fd, "heroDescription"),
+    heroDescriptionEn: S(fd, "heroDescriptionEn") || null,
+    heroDescriptionAr: S(fd, "heroDescriptionAr") || null,
     storyEyebrow: S(fd, "storyEyebrow"),
+    storyEyebrowEn: S(fd, "storyEyebrowEn") || null,
+    storyEyebrowAr: S(fd, "storyEyebrowAr") || null,
     storyHeading: S(fd, "storyHeading"),
+    storyHeadingEn: S(fd, "storyHeadingEn") || null,
+    storyHeadingAr: S(fd, "storyHeadingAr") || null,
     storyParagraphs: J(L(fd, "storyParagraphs")),
+    storyParagraphsEn: J(L(fd, "storyParagraphsEn")),
+    storyParagraphsAr: J(L(fd, "storyParagraphsAr")),
     storyVideo: S(fd, "storyVideo") || null,
     storyPoster: S(fd, "storyPoster") || null,
     valuesEyebrow: S(fd, "valuesEyebrow"),
+    valuesEyebrowEn: S(fd, "valuesEyebrowEn") || null,
+    valuesEyebrowAr: S(fd, "valuesEyebrowAr") || null,
     valuesHeading: S(fd, "valuesHeading"),
+    valuesHeadingEn: S(fd, "valuesHeadingEn") || null,
+    valuesHeadingAr: S(fd, "valuesHeadingAr") || null,
     values: J(PL(fd, "values", ["icon", "title", "desc"])),
+    valuesEn: J(PL(fd, "valuesEn", ["icon", "title", "desc"])),
+    valuesAr: J(PL(fd, "valuesAr", ["icon", "title", "desc"])),
     teamEyebrow: S(fd, "teamEyebrow"),
+    teamEyebrowEn: S(fd, "teamEyebrowEn") || null,
+    teamEyebrowAr: S(fd, "teamEyebrowAr") || null,
     teamHeading: S(fd, "teamHeading"),
+    teamHeadingEn: S(fd, "teamHeadingEn") || null,
+    teamHeadingAr: S(fd, "teamHeadingAr") || null,
     timelineEyebrow: S(fd, "timelineEyebrow"),
+    timelineEyebrowEn: S(fd, "timelineEyebrowEn") || null,
+    timelineEyebrowAr: S(fd, "timelineEyebrowAr") || null,
     timelineHeading: S(fd, "timelineHeading"),
+    timelineHeadingEn: S(fd, "timelineHeadingEn") || null,
+    timelineHeadingAr: S(fd, "timelineHeadingAr") || null,
     timeline: J(PL(fd, "timeline", ["year", "title", "desc"])),
+    timelineEn: J(PL(fd, "timelineEn", ["year", "title", "desc"])),
+    timelineAr: J(PL(fd, "timelineAr", ["year", "title", "desc"])),
     galleryEyebrow: S(fd, "galleryEyebrow"),
+    galleryEyebrowEn: S(fd, "galleryEyebrowEn") || null,
+    galleryEyebrowAr: S(fd, "galleryEyebrowAr") || null,
     galleryHeading: S(fd, "galleryHeading"),
+    galleryHeadingEn: S(fd, "galleryHeadingEn") || null,
+    galleryHeadingAr: S(fd, "galleryHeadingAr") || null,
     galleryVideo: S(fd, "galleryVideo") || null,
     galleryPoster: S(fd, "galleryPoster") || null,
     galleryImages: J(L(fd, "galleryImages")),
     metaTitle: S(fd, "metaTitle") || null,
+    metaTitleEn: S(fd, "metaTitleEn") || null,
+    metaTitleAr: S(fd, "metaTitleAr") || null,
     metaDescription: S(fd, "metaDescription") || null,
+    metaDescriptionEn: S(fd, "metaDescriptionEn") || null,
+    metaDescriptionAr: S(fd, "metaDescriptionAr") || null,
   };
   await db.aboutPage.upsert({ where: { id: "about" }, create: { id: "about", ...data }, update: data });
   revalidateSite("/admin/about", "/about");
@@ -642,21 +866,45 @@ export async function saveContactPage(fd: FormData) {
   await requirePermission("contact.manage");
   const data = {
     heroEyebrow: S(fd, "heroEyebrow"),
+    heroEyebrowEn: S(fd, "heroEyebrowEn") || null,
+    heroEyebrowAr: S(fd, "heroEyebrowAr") || null,
     heroTitle: S(fd, "heroTitle"),
+    heroTitleEn: S(fd, "heroTitleEn") || null,
+    heroTitleAr: S(fd, "heroTitleAr") || null,
     heroTitleHighlight: S(fd, "heroTitleHighlight"),
+    heroTitleHighlightEn: S(fd, "heroTitleHighlightEn") || null,
+    heroTitleHighlightAr: S(fd, "heroTitleHighlightAr") || null,
     heroDescription: S(fd, "heroDescription"),
+    heroDescriptionEn: S(fd, "heroDescriptionEn") || null,
+    heroDescriptionAr: S(fd, "heroDescriptionAr") || null,
     address: S(fd, "address"),
+    addressEn: S(fd, "addressEn") || null,
+    addressAr: S(fd, "addressAr") || null,
     phone: S(fd, "phone"),
     phoneDisplay: S(fd, "phoneDisplay"),
+    phoneDisplayEn: S(fd, "phoneDisplayEn") || null,
+    phoneDisplayAr: S(fd, "phoneDisplayAr") || null,
     email: S(fd, "email"),
     officeHours: S(fd, "officeHours"),
+    officeHoursEn: S(fd, "officeHoursEn") || null,
+    officeHoursAr: S(fd, "officeHoursAr") || null,
     mapLat: N(fd, "mapLat", 35.7448),
     mapLng: N(fd, "mapLng", 51.4101),
     socials: J(PL(fd, "socials", ["platform", "href", "label"])),
+    socialsEn: J(PL(fd, "socialsEn", ["platform", "href", "label"])),
+    socialsAr: J(PL(fd, "socialsAr", ["platform", "href", "label"])),
     serviceOptions: J(L(fd, "serviceOptions")),
+    serviceOptionsEn: J(L(fd, "serviceOptionsEn")),
+    serviceOptionsAr: J(L(fd, "serviceOptionsAr")),
     budgetOptions: J(L(fd, "budgetOptions")),
+    budgetOptionsEn: J(L(fd, "budgetOptionsEn")),
+    budgetOptionsAr: J(L(fd, "budgetOptionsAr")),
     metaTitle: S(fd, "metaTitle") || null,
+    metaTitleEn: S(fd, "metaTitleEn") || null,
+    metaTitleAr: S(fd, "metaTitleAr") || null,
     metaDescription: S(fd, "metaDescription") || null,
+    metaDescriptionEn: S(fd, "metaDescriptionEn") || null,
+    metaDescriptionAr: S(fd, "metaDescriptionAr") || null,
   };
   await db.contactPage.upsert({ where: { id: "contact" }, create: { id: "contact", ...data }, update: data });
   revalidateSite("/admin/contact", "/contact");
@@ -673,7 +921,11 @@ export async function saveTeamMember(fd: FormData) {
     name: S(fd, "name"),
     nameEn: S(fd, "nameEn") || null,
     role: S(fd, "role"),
+    roleEn: S(fd, "roleEn") || null,
+    roleAr: S(fd, "roleAr") || null,
     bio: S(fd, "bio") || null,
+    bioEn: S(fd, "bioEn") || null,
+    bioAr: S(fd, "bioAr") || null,
     avatar: S(fd, "avatar") || null,
     socials: J(PL(fd, "socials", ["platform", "href"])),
     order: N(fd, "order"),

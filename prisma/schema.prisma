@@ -52,137 +52,217 @@ model Client {
 
 /// Core service offerings, each with its own landing page.
 model Service {
-  id              String    @id @default(cuid())
-  slug            String    @unique
-  title           String
-  titleEn         String?
-  titleAr         String?
-  tagline         String?
-  excerpt         String
-  description     String
-  department      String    @default("FILM") // FILM | DIGITAL | DESIGN | STRATEGY
-  icon            String    @default("Clapperboard")
-  cover           String?
-  heroVideo       String?
-  priceFrom       Int?
-  priceUnit       String?   @default("تومان")
-  features        String    @default("[]") // JSON string[]
-  workflow        String    @default("[]") // JSON [{step,title,desc}]
-  faqs            String    @default("[]") // JSON [{q,a}]
-  pricing         String    @default("[]") // JSON [{name,price,unit,features[],featured}]
-  order           Int       @default(0)
-  published       Boolean   @default(true)
-  metaTitle       String?
-  metaDescription String?
-  ogImage         String?
-  keywords        String    @default("[]")
-  projects        Project[] @relation("ProjectServices")
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  id                String    @id @default(cuid())
+  slug              String    @unique
+  title             String
+  titleEn           String?
+  titleAr           String?
+  tagline           String?
+  taglineEn         String?
+  taglineAr         String?
+  excerpt           String
+  excerptEn         String?
+  excerptAr         String?
+  description       String
+  descriptionEn     String?
+  descriptionAr     String?
+  department        String    @default("FILM") // FILM | DIGITAL | DESIGN | STRATEGY
+  icon              String    @default("Clapperboard")
+  cover             String?
+  heroVideo         String?
+  priceFrom         Int?
+  priceUnit         String?   @default("تومان")
+  priceUnitEn       String?
+  priceUnitAr       String?
+  features          String    @default("[]") // JSON string[]
+  featuresEn        String? // JSON string[]
+  featuresAr        String? // JSON string[]
+  workflow          String    @default("[]") // JSON [{step,title,desc}]
+  workflowEn        String? // JSON [{step,title,desc}]
+  workflowAr        String? // JSON [{step,title,desc}]
+  faqs              String    @default("[]") // JSON [{q,a}]
+  faqsEn            String? // JSON [{q,a}]
+  faqsAr            String? // JSON [{q,a}]
+  pricing           String    @default("[]") // JSON [{name,price,unit,features[],featured}]
+  pricingEn         String? // JSON [{name,price,unit,features[],featured}]
+  pricingAr         String? // JSON [{name,price,unit,features[],featured}]
+  order             Int       @default(0)
+  published         Boolean   @default(true)
+  metaTitle         String?
+  metaTitleEn       String?
+  metaTitleAr       String?
+  metaDescription   String?
+  metaDescriptionEn String?
+  metaDescriptionAr String?
+  ogImage           String?
+  keywords          String    @default("[]")
+  keywordsEn        String?
+  keywordsAr        String?
+  projects          Project[] @relation("ProjectServices")
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
 }
 
 /// Industry verticals, each a dedicated landing page with a hover hero video.
 model Industry {
-  id              String    @id @default(cuid())
-  slug            String    @unique
-  title           String
-  titleEn         String?
-  titleAr         String?
-  excerpt         String
-  description     String
-  icon            String    @default("Building2")
-  cover           String?
-  heroVideo       String? // hover-to-play background video
-  approach        String    @default("[]") // JSON string[]
-  order           Int       @default(0)
-  published       Boolean   @default(true)
-  metaTitle       String?
-  metaDescription String?
-  ogImage         String?
-  keywords        String    @default("[]")
-  projects        Project[] @relation("ProjectIndustries")
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  id                String    @id @default(cuid())
+  slug              String    @unique
+  title             String
+  titleEn           String?
+  titleAr           String?
+  excerpt           String
+  excerptEn         String?
+  excerptAr         String?
+  description       String
+  descriptionEn     String?
+  descriptionAr     String?
+  icon              String    @default("Building2")
+  cover             String?
+  heroVideo         String? // hover-to-play background video
+  approach          String    @default("[]") // JSON string[]
+  approachEn        String? // JSON string[]
+  approachAr        String? // JSON string[]
+  order             Int       @default(0)
+  published         Boolean   @default(true)
+  metaTitle         String?
+  metaTitleEn       String?
+  metaTitleAr       String?
+  metaDescription   String?
+  metaDescriptionEn String?
+  metaDescriptionAr String?
+  ogImage           String?
+  keywords          String    @default("[]")
+  keywordsEn        String?
+  keywordsAr        String?
+  projects          Project[] @relation("ProjectIndustries")
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
 }
 
 /// Portfolio project / case study — the core content type.
 model Project {
-  id          String     @id @default(cuid())
-  slug        String     @unique
-  title       String
-  titleEn     String?
-  subtitle    String?
-  clientId    String?
-  client      Client?    @relation(fields: [clientId], references: [id], onDelete: SetNull)
-  category    String     @default("Film")
-  cover       String
-  poster      String?
-  heroVideo   String?
-  gallery     String     @default("[]") // JSON string[]
-  year        Int        @default(2025)
-  location    String?
-  accent      String     @default("#6699ff")
-  featured    Boolean    @default(false)
-  published   Boolean    @default(true)
-  order       Int        @default(0)
-  tags        String     @default("[]") // JSON string[]
+  id           String     @id @default(cuid())
+  slug         String     @unique
+  title        String
+  titleEn      String?
+  titleAr      String?
+  subtitle     String?
+  subtitleEn   String?
+  subtitleAr   String?
+  clientId     String?
+  client       Client?    @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  category     String     @default("Film")
+  categoryEn   String?
+  categoryAr   String?
+  cover        String
+  poster       String?
+  heroVideo    String?
+  gallery      String     @default("[]") // JSON string[]
+  year         Int        @default(2025)
+  location     String?
+  locationEn   String?
+  locationAr   String?
+  accent       String     @default("#6699ff")
+  featured     Boolean    @default(false)
+  published    Boolean    @default(true)
+  order        Int        @default(0)
+  tags         String     @default("[]") // JSON string[]
+  tagsEn       String? // JSON string[]
+  tagsAr       String? // JSON string[]
   // storytelling framework: Goal → Problem → Idea → Production → Marketing → Result
-  goal        String?
-  problem     String?
-  idea        String?
-  production  String?
-  marketing   String?
-  result      String?
-  metrics     String     @default("[]") // JSON [{label,value,suffix}]
-  beforeImage String?
-  afterImage  String?
-  credits     String     @default("[]") // JSON [{role,name}]
-  views       Int        @default(0)
-  services    Service[]  @relation("ProjectServices")
-  industries  Industry[] @relation("ProjectIndustries")
-  seo         Seo? // 1:1
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-  publishedAt DateTime   @default(now())
+  goal         String?
+  goalEn       String?
+  goalAr       String?
+  problem      String?
+  problemEn    String?
+  problemAr    String?
+  idea         String?
+  ideaEn       String?
+  ideaAr       String?
+  production   String?
+  productionEn String?
+  productionAr String?
+  marketing    String?
+  marketingEn  String?
+  marketingAr  String?
+  result       String?
+  resultEn     String?
+  resultAr     String?
+  metrics      String     @default("[]") // JSON [{label,value,suffix}]
+  metricsEn    String? // JSON [{label,value,suffix}]
+  metricsAr    String? // JSON [{label,value,suffix}]
+  beforeImage  String?
+  afterImage   String?
+  credits      String     @default("[]") // JSON [{role,name}]
+  creditsEn    String? // JSON [{role,name}]
+  creditsAr    String? // JSON [{role,name}]
+  views        Int        @default(0)
+  services     Service[]  @relation("ProjectServices")
+  industries   Industry[] @relation("ProjectIndustries")
+  seo          Seo? // 1:1
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  publishedAt  DateTime   @default(now())
 }
 
 /// 1:1 SEO record attached to a project.
 model Seo {
-  id              String  @id @default(cuid())
-  projectId       String  @unique
-  project         Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  metaTitle       String?
-  metaDescription String?
-  ogImage         String?
-  canonical       String?
-  keywords        String  @default("[]")
-  noindex         Boolean @default(false)
+  id                String  @id @default(cuid())
+  projectId         String  @unique
+  project           Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  metaTitle         String?
+  metaTitleEn       String?
+  metaTitleAr       String?
+  metaDescription   String?
+  metaDescriptionEn String?
+  metaDescriptionAr String?
+  ogImage           String?
+  canonical         String?
+  keywords          String  @default("[]")
+  keywordsEn        String?
+  keywordsAr        String?
+  noindex           Boolean @default(false)
 }
 
 /// Blog / Journal editorial posts.
 model Post {
-  id              String   @id @default(cuid())
-  slug            String   @unique
-  title           String
-  titleEn         String?
-  excerpt         String
-  cover           String
-  content         String // markdown
-  category        String   @default("Insights")
-  tags            String   @default("[]")
-  authorId        String?
-  author          User?    @relation(fields: [authorId], references: [id], onDelete: SetNull)
-  readingMinutes  Int      @default(5)
-  featured        Boolean  @default(false)
-  published       Boolean  @default(true)
-  views           Int      @default(0)
-  metaTitle       String?
-  metaDescription String?
-  ogImage         String?
-  keywords        String   @default("[]")
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  publishedAt     DateTime @default(now())
+  id                String   @id @default(cuid())
+  slug              String   @unique
+  title             String
+  titleEn           String?
+  titleAr           String?
+  excerpt           String
+  excerptEn         String?
+  excerptAr         String?
+  cover             String
+  content           String // markdown
+  contentEn         String? // markdown
+  contentAr         String? // markdown
+  category          String   @default("Insights")
+  categoryEn        String?
+  categoryAr        String?
+  tags              String   @default("[]")
+  tagsEn            String?
+  tagsAr            String?
+  authorId          String?
+  author            User?    @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  readingMinutes    Int      @default(5)
+  featured          Boolean  @default(false)
+  published         Boolean  @default(true)
+  views             Int      @default(0)
+  metaTitle         String?
+  metaTitleEn       String?
+  metaTitleAr       String?
+  metaDescription   String?
+  metaDescriptionEn String?
+  metaDescriptionAr String?
+  ogImage           String?
+  keywords          String   @default("[]")
+  keywordsEn        String?
+  keywordsAr        String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  publishedAt       DateTime @default(now())
 }
 
 /// Media library asset (S3/CDN URL in prod; sample CDN links in dev).
@@ -204,9 +284,13 @@ model Testimonial {
   id        String   @id @default(cuid())
   author    String
   role      String?
+  roleEn    String?
+  roleAr    String?
   company   String?
   avatar    String?
   quote     String
+  quoteEn   String?
+  quoteAr   String?
   rating    Int      @default(5)
   clientId  String?
   client    Client?  @relation(fields: [clientId], references: [id], onDelete: SetNull)
@@ -234,11 +318,13 @@ model Lead {
 
 /// Editable homepage statistic counters.
 model Stat {
-  id     String @id @default(cuid())
-  label  String
-  value  Int
-  suffix String @default("+")
-  order  Int    @default(0)
+  id      String  @id @default(cuid())
+  label   String
+  labelEn String?
+  labelAr String?
+  value   Int
+  suffix  String  @default("+")
+  order   Int     @default(0)
 }
 
 /// "The Minds Behind the Magic" team members.
@@ -247,7 +333,11 @@ model TeamMember {
   name      String
   nameEn    String?
   role      String
+  roleEn    String?
+  roleAr    String?
   bio       String?
+  bioEn     String?
+  bioAr     String?
   avatar    String?
   socials   String  @default("[]") // JSON [{platform,href}]
   order     Int     @default(0)
@@ -262,89 +352,209 @@ model Setting {
 
 /// Singleton content for the public homepage (one row, id fixed to "home").
 model HomePage {
-  id                          String   @id @default("home")
-  heroBadge                   String   @default("استودیوی خلاقیت، پروداکشن و دیجیتال مارکتینگ")
-  heroHeadline                String   @default("[]") // JSON string[3] — three stacked hero lines
-  heroDescription              String   @default("آرکا یک پروداکشن‌هاوس خلاق است؛ برندها را با هنر بصری سینمایی، راهکارهای دیجیتال و روایت داده‌محور به سطحی تازه می‌رساند.")
-  heroCtaLabel                 String   @default("شروع پروژه")
-  heroReelLabel                String   @default("تماشای شوریل ۲۰۲۵")
-  trustCaption                 String   @default("اعتماد بیش از ۱۲۰ برند پیشرو")
-  departmentsEyebrow           String   @default("۴ دپارتمان تخصصی")
-  departmentsHeading           String   @default("یک تیم، تمام تخصص‌ها")
-  departmentsHeadingHighlight  String   @default("تمام تخصص‌ها")
-  departmentsDescription       String   @default("از ایده تا اکران؛ همه‌ی آنچه برای ساختن یک برند متمایز لازم است، زیر یک سقف.")
-  departmentsCtaLabel          String   @default("کشف خدمات")
-  featuredEyebrow               String   @default("نمونه‌کارهای منتخب")
+  id                             String   @id @default("home")
+  heroBadge                      String   @default("استودیوی خلاقیت، پروداکشن و دیجیتال مارکتینگ")
+  heroBadgeEn                    String?
+  heroBadgeAr                    String?
+  heroHeadline                   String   @default("[]") // JSON string[3] — three stacked hero lines
+  heroHeadlineEn                 String? // JSON string[3]
+  heroHeadlineAr                 String? // JSON string[3]
+  heroDescription                String   @default("آرکا یک پروداکشن‌هاوس خلاق است؛ برندها را با هنر بصری سینمایی، راهکارهای دیجیتال و روایت داده‌محور به سطحی تازه می‌رساند.")
+  heroDescriptionEn              String?
+  heroDescriptionAr              String?
+  heroCtaLabel                   String   @default("شروع پروژه")
+  heroCtaLabelEn                 String?
+  heroCtaLabelAr                 String?
+  heroReelLabel                  String   @default("تماشای شوریل ۲۰۲۵")
+  heroReelLabelEn                String?
+  heroReelLabelAr                String?
+  trustCaption                   String   @default("اعتماد بیش از ۱۲۰ برند پیشرو")
+  trustCaptionEn                 String?
+  trustCaptionAr                 String?
+  departmentsEyebrow             String   @default("۴ دپارتمان تخصصی")
+  departmentsEyebrowEn           String?
+  departmentsEyebrowAr           String?
+  departmentsHeading             String   @default("یک تیم، تمام تخصص‌ها")
+  departmentsHeadingEn           String?
+  departmentsHeadingAr           String?
+  departmentsHeadingHighlight    String   @default("تمام تخصص‌ها")
+  departmentsHeadingHighlightEn  String?
+  departmentsHeadingHighlightAr  String?
+  departmentsDescription         String   @default("از ایده تا اکران؛ همه‌ی آنچه برای ساختن یک برند متمایز لازم است، زیر یک سقف.")
+  departmentsDescriptionEn       String?
+  departmentsDescriptionAr       String?
+  departmentsCtaLabel            String   @default("کشف خدمات")
+  departmentsCtaLabelEn          String?
+  departmentsCtaLabelAr          String?
+  featuredEyebrow                String   @default("نمونه‌کارهای منتخب")
+  featuredEyebrowEn              String?
+  featuredEyebrowAr              String?
   featuredHeading                String   @default("کارهایی که حرف می‌زنند")
+  featuredHeadingEn              String?
+  featuredHeadingAr              String?
   featuredHeadingHighlight       String   @default("حرف می‌زنند")
-  featuredDescription             String   @default("هر پروژه، یک داستان است: از چالش تا نتیجه‌ای قابل‌اندازه‌گیری.")
-  featuredCtaLabel                String   @default("تمام پروژه‌ها")
-  workflowEyebrow                  String   @default("فرایند کار")
-  workflowHeading                   String   @default("مسیری شفاف تا تأثیر واقعی")
-  workflowHeadingHighlight          String   @default("تأثیر واقعی")
-  workflowDescription                String   @default("چهار گام روشن که خلاقیت را به نتیجه‌ی تجاری تبدیل می‌کند.")
-  workflowSteps                      String   @default("[]") // JSON [{icon,title,desc}] — 4 steps
-  testimonialsEyebrow                 String   @default("صدای مشتریان")
-  testimonialsHeading                  String   @default("برندهایی که به ما اعتماد کردند")
-  testimonialsHeadingHighlight         String   @default("به ما اعتماد کردند")
-  finalEyebrow                         String   @default("آماده‌اید متمایز شوید؟")
-  finalHeading                          String   @default("بیایید برندی بسازیم که فراموش نشود")
-  finalHeadingHighlight                 String   @default("فراموش نشود")
-  finalDescription                       String   @default("یک ایده کافی است. باقی مسیر را با هم می‌سازیم.")
-  finalCtaLabel                          String   @default("شروع پروژه")
-  updatedAt                              DateTime @updatedAt
+  featuredHeadingHighlightEn     String?
+  featuredHeadingHighlightAr     String?
+  featuredDescription            String   @default("هر پروژه، یک داستان است: از چالش تا نتیجه‌ای قابل‌اندازه‌گیری.")
+  featuredDescriptionEn          String?
+  featuredDescriptionAr          String?
+  featuredCtaLabel               String   @default("تمام پروژه‌ها")
+  featuredCtaLabelEn             String?
+  featuredCtaLabelAr             String?
+  workflowEyebrow                String   @default("فرایند کار")
+  workflowEyebrowEn              String?
+  workflowEyebrowAr              String?
+  workflowHeading                String   @default("مسیری شفاف تا تأثیر واقعی")
+  workflowHeadingEn              String?
+  workflowHeadingAr              String?
+  workflowHeadingHighlight       String   @default("تأثیر واقعی")
+  workflowHeadingHighlightEn     String?
+  workflowHeadingHighlightAr     String?
+  workflowDescription            String   @default("چهار گام روشن که خلاقیت را به نتیجه‌ی تجاری تبدیل می‌کند.")
+  workflowDescriptionEn          String?
+  workflowDescriptionAr          String?
+  workflowSteps                  String   @default("[]") // JSON [{icon,title,desc}] — 4 steps
+  workflowStepsEn                String? // JSON [{icon,title,desc}]
+  workflowStepsAr                String? // JSON [{icon,title,desc}]
+  testimonialsEyebrow            String   @default("صدای مشتریان")
+  testimonialsEyebrowEn          String?
+  testimonialsEyebrowAr          String?
+  testimonialsHeading            String   @default("برندهایی که به ما اعتماد کردند")
+  testimonialsHeadingEn          String?
+  testimonialsHeadingAr          String?
+  testimonialsHeadingHighlight   String   @default("به ما اعتماد کردند")
+  testimonialsHeadingHighlightEn String?
+  testimonialsHeadingHighlightAr String?
+  finalEyebrow                   String   @default("آماده‌اید متمایز شوید؟")
+  finalEyebrowEn                 String?
+  finalEyebrowAr                 String?
+  finalHeading                   String   @default("بیایید برندی بسازیم که فراموش نشود")
+  finalHeadingEn                 String?
+  finalHeadingAr                 String?
+  finalHeadingHighlight          String   @default("فراموش نشود")
+  finalHeadingHighlightEn        String?
+  finalHeadingHighlightAr        String?
+  finalDescription               String   @default("یک ایده کافی است. باقی مسیر را با هم می‌سازیم.")
+  finalDescriptionEn             String?
+  finalDescriptionAr             String?
+  finalCtaLabel                  String   @default("شروع پروژه")
+  finalCtaLabelEn                String?
+  finalCtaLabelAr                String?
+  updatedAt                      DateTime @updatedAt
 }
 
 /// Singleton content for the public /about page (one row, id fixed to "about").
 model AboutPage {
-  id                 String   @id @default("about")
-  heroEyebrow        String   @default("درباره آرکا")
-  heroTitle          String   @default("ذهن‌های پشتِ جادو")
-  heroTitleHighlight String   @default("جادو") // substring of heroTitle rendered in the gradient accent
-  heroDescription    String   @default("ما فقط محتوا نمی‌سازیم؛ برای برندها روایت می‌سازیم، تجربه خلق می‌کنیم و تأثیر می‌گذاریم.")
-  storyEyebrow       String   @default("داستان ما")
-  storyHeading       String   @default("یک پروداکشن‌هاوس، نه صرفاً یک آژانس")
-  storyParagraphs    String   @default("[]") // JSON string[]
-  storyVideo         String?
-  storyPoster        String?
-  valuesEyebrow      String   @default("ارزش‌ها")
-  valuesHeading      String   @default("آنچه ما را متمایز می‌کند")
-  values             String   @default("[]") // JSON [{icon,title,desc}]
-  teamEyebrow        String   @default("تیم")
-  teamHeading        String   @default("ذهن‌های خلاق آرکا")
-  timelineEyebrow    String   @default("مسیر رشد")
-  timelineHeading    String   @default("سفر آرکا در یک نگاه")
-  timeline           String   @default("[]") // JSON [{year,title,desc}]
-  galleryEyebrow     String   @default("پشت صحنه")
-  galleryHeading     String   @default("جادو چگونه ساخته می‌شود")
-  galleryVideo       String?
-  galleryPoster      String?
-  galleryImages      String   @default("[]") // JSON string[]
-  metaTitle          String?
-  metaDescription    String?
-  updatedAt          DateTime @updatedAt
+  id                   String   @id @default("about")
+  heroEyebrow          String   @default("درباره آرکا")
+  heroEyebrowEn        String?
+  heroEyebrowAr        String?
+  heroTitle            String   @default("ذهن‌های پشتِ جادو")
+  heroTitleEn          String?
+  heroTitleAr          String?
+  heroTitleHighlight   String   @default("جادو") // substring of heroTitle rendered in the gradient accent
+  heroTitleHighlightEn String? // substring of heroTitleEn
+  heroTitleHighlightAr String? // substring of heroTitleAr
+  heroDescription      String   @default("ما فقط محتوا نمی‌سازیم؛ برای برندها روایت می‌سازیم، تجربه خلق می‌کنیم و تأثیر می‌گذاریم.")
+  heroDescriptionEn    String?
+  heroDescriptionAr    String?
+  storyEyebrow         String   @default("داستان ما")
+  storyEyebrowEn       String?
+  storyEyebrowAr       String?
+  storyHeading         String   @default("یک پروداکشن‌هاوس، نه صرفاً یک آژانس")
+  storyHeadingEn       String?
+  storyHeadingAr       String?
+  storyParagraphs      String   @default("[]") // JSON string[]
+  storyParagraphsEn    String? // JSON string[]
+  storyParagraphsAr    String? // JSON string[]
+  storyVideo           String?
+  storyPoster          String?
+  valuesEyebrow        String   @default("ارزش‌ها")
+  valuesEyebrowEn      String?
+  valuesEyebrowAr      String?
+  valuesHeading        String   @default("آنچه ما را متمایز می‌کند")
+  valuesHeadingEn      String?
+  valuesHeadingAr      String?
+  values               String   @default("[]") // JSON [{icon,title,desc}]
+  valuesEn             String? // JSON [{icon,title,desc}]
+  valuesAr             String? // JSON [{icon,title,desc}]
+  teamEyebrow          String   @default("تیم")
+  teamEyebrowEn        String?
+  teamEyebrowAr        String?
+  teamHeading          String   @default("ذهن‌های خلاق آرکا")
+  teamHeadingEn        String?
+  teamHeadingAr        String?
+  timelineEyebrow      String   @default("مسیر رشد")
+  timelineEyebrowEn    String?
+  timelineEyebrowAr    String?
+  timelineHeading      String   @default("سفر آرکا در یک نگاه")
+  timelineHeadingEn    String?
+  timelineHeadingAr    String?
+  timeline             String   @default("[]") // JSON [{year,title,desc}]
+  timelineEn           String? // JSON [{year,title,desc}]
+  timelineAr           String? // JSON [{year,title,desc}]
+  galleryEyebrow       String   @default("پشت صحنه")
+  galleryEyebrowEn     String?
+  galleryEyebrowAr     String?
+  galleryHeading       String   @default("جادو چگونه ساخته می‌شود")
+  galleryHeadingEn     String?
+  galleryHeadingAr     String?
+  galleryVideo         String?
+  galleryPoster        String?
+  galleryImages        String   @default("[]") // JSON string[]
+  metaTitle            String?
+  metaTitleEn          String?
+  metaTitleAr          String?
+  metaDescription      String?
+  metaDescriptionEn    String?
+  metaDescriptionAr    String?
+  updatedAt            DateTime @updatedAt
 }
 
 /// Singleton content for the public /contact page (one row, id fixed to "contact").
 model ContactPage {
-  id              String   @id @default("contact")
-  heroEyebrow     String   @default("تماس")
-  heroTitle       String   @default("بیایید شروع کنیم")
-  heroTitleHighlight String @default("شروع کنیم") // substring of heroTitle rendered in the gradient accent
-  heroDescription String   @default("ایده‌ای در سر دارید؟ فرم را پر کنید یا مستقیم با ما در ارتباط باشید.")
-  address         String   @default("تهران، خیابان ولیعصر، برج آرکا، طبقه ۱۲")
-  phone           String   @default("+982188000000")
-  phoneDisplay    String   @default("۰۲۱ ۸۸۰۰ ۰۰۰۰")
-  email           String   @default("hello@arka.studio")
-  officeHours     String   @default("شنبه تا چهارشنبه، ۹ تا ۱۸")
-  mapLat          Float    @default(35.7448)
-  mapLng          Float    @default(51.4101)
-  socials         String   @default("[]") // JSON [{platform,href,label}]
-  serviceOptions  String   @default("[]") // JSON string[] — contact form "service" dropdown
-  budgetOptions   String   @default("[]") // JSON string[] — contact form "budget" dropdown
-  metaTitle       String?
-  metaDescription String?
-  updatedAt       DateTime @updatedAt
+  id                   String   @id @default("contact")
+  heroEyebrow          String   @default("تماس")
+  heroEyebrowEn        String?
+  heroEyebrowAr        String?
+  heroTitle            String   @default("بیایید شروع کنیم")
+  heroTitleEn          String?
+  heroTitleAr          String?
+  heroTitleHighlight   String   @default("شروع کنیم") // substring of heroTitle rendered in the gradient accent
+  heroTitleHighlightEn String? // substring of heroTitleEn
+  heroTitleHighlightAr String? // substring of heroTitleAr
+  heroDescription      String   @default("ایده‌ای در سر دارید؟ فرم را پر کنید یا مستقیم با ما در ارتباط باشید.")
+  heroDescriptionEn    String?
+  heroDescriptionAr    String?
+  address              String   @default("تهران، خیابان ولیعصر، برج آرکا، طبقه ۱۲")
+  addressEn            String?
+  addressAr            String?
+  phone                String   @default("+982188000000")
+  phoneDisplay         String   @default("۰۲۱ ۸۸۰۰ ۰۰۰۰")
+  phoneDisplayEn       String?
+  phoneDisplayAr       String?
+  email                String   @default("hello@arka.studio")
+  officeHours          String   @default("شنبه تا چهارشنبه، ۹ تا ۱۸")
+  officeHoursEn        String?
+  officeHoursAr        String?
+  mapLat               Float    @default(35.7448)
+  mapLng               Float    @default(51.4101)
+  socials              String   @default("[]") // JSON [{platform,href,label}]
+  socialsEn            String? // JSON [{platform,href,label}]
+  socialsAr            String? // JSON [{platform,href,label}]
+  serviceOptions       String   @default("[]") // JSON string[] — contact form "service" dropdown
+  serviceOptionsEn     String? // JSON string[]
+  serviceOptionsAr     String? // JSON string[]
+  budgetOptions        String   @default("[]") // JSON string[] — contact form "budget" dropdown
+  budgetOptionsEn      String? // JSON string[]
+  budgetOptionsAr      String? // JSON string[]
+  metaTitle            String?
+  metaTitleEn          String?
+  metaTitleAr          String?
+  metaDescription      String?
+  metaDescriptionEn    String?
+  metaDescriptionAr    String?
+  updatedAt            DateTime @updatedAt
 }
 
 /// Internal task assigned by an admin to a staff/team member (viewed in /portal).

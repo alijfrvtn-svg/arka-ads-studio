@@ -7,15 +7,18 @@ import { EyeOfCreation } from "./EyeOfCreation";
 import { ClassicHero } from "./ClassicHero";
 import { SAMPLE } from "@/lib/media";
 import type { HomeContent } from "@/lib/queries";
+import type { Locale } from "@/types";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
 export function Hero({
   stats,
   content,
+  locale = "fa",
 }: {
   stats: { label: string; value: number; suffix: string }[];
   content: HomeContent;
+  locale?: Locale;
 }) {
   const [reel, setReel] = useState(false);
   const openReel = () => setReel(true);
@@ -26,10 +29,10 @@ export function Hero({
           static classic hero instead — the animation is disabled entirely
           below `lg`, not just visually hidden (see EyeOfCreation's matchMedia gate). */}
       <div className="hidden lg:block">
-        <EyeOfCreation content={content} onWatchReel={openReel} />
+        <EyeOfCreation content={content} onWatchReel={openReel} locale={locale} />
       </div>
       <div className="lg:hidden">
-        <ClassicHero stats={stats} content={content} onWatchReel={openReel} />
+        <ClassicHero stats={stats} content={content} onWatchReel={openReel} locale={locale} />
       </div>
 
       {/* showreel modal (shared by both variants) */}
@@ -45,7 +48,7 @@ export function Hero({
             <button
               className="absolute right-6 top-6 grid h-12 w-12 place-items-center rounded-full border border-card-border text-foreground hover:border-primary"
               onClick={() => setReel(false)}
-              aria-label="بستن"
+              aria-label={locale === "en" ? "Close" : locale === "ar" ? "إغلاق" : "بستن"}
             >
               <X className="h-5 w-5" />
             </button>

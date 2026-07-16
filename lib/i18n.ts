@@ -1,4 +1,5 @@
 import type { Locale } from "@/types";
+import { parseArr } from "@/lib/utils";
 
 // Framework-agnostic — no `next/headers` import here on purpose. This file is
 // imported from Edge Middleware AND from client components (SiteHeader,
@@ -16,6 +17,21 @@ export function tr(locale: Locale, fa: string, en?: string | null, ar?: string |
   if (locale === "en" && en?.trim()) return en;
   if (locale === "ar" && ar?.trim()) return ar;
   return fa;
+}
+
+/** Same fallback semantics as `tr()`, for JSON-stringified array/object columns
+ * (features, workflow, faqs, pricing, metrics, credits, tags, ...): parse the
+ * locale-specific JSON if it's present and non-empty, else fall back to `fa`. */
+export function trArr<T = unknown>(locale: Locale, fa: string, en?: string | null, ar?: string | null): T[] {
+  if (locale === "en" && en) {
+    const parsed = parseArr<T>(en);
+    if (parsed.length > 0) return parsed;
+  }
+  if (locale === "ar" && ar) {
+    const parsed = parseArr<T>(ar);
+    if (parsed.length > 0) return parsed;
+  }
+  return parseArr<T>(fa);
 }
 
 export function dirOf(locale: Locale): "rtl" | "ltr" {
@@ -74,6 +90,41 @@ export const UI = {
     contactErrorNetwork: "خطای شبکه. دوباره تلاش کنید.",
     contactSuccessTitle: "پیام شما رسید! 🎉",
     contactSuccessBody: "تیم آرکا به‌زودی با شما تماس می‌گیرد.",
+    skipToContent: "رفتن به محتوا",
+    before: "قبل",
+    after: "بعد",
+    inThisArticle: "در این مطلب",
+    credits: "عوامل تولید",
+    tagsLabel: "برچسب‌ها",
+    nextProject: "پروژه بعدی",
+    viewProject: "مشاهده پروژه",
+    relatedPosts: "مطالب مرتبط",
+    metaClient: "مشتری",
+    metaYear: "سال",
+    metaLocation: "موقعیت",
+    contactRowOffice: "دفتر مرکزی",
+    contactRowPhone: "تلفن",
+    contactRowEmail: "ایمیل",
+    contactRowHours: "ساعات کاری",
+    mapTitle: "نقشه آرکا",
+    industryHeroEyebrow: "راهکار صنعتی",
+    industryApproachEyebrow: "رویکرد ما",
+    portfolioEyebrow: "نمونه‌کار",
+    serviceFaqEyebrow: "سوالات متداول",
+    serviceFaqTitle: "پرسش‌های پرتکرار",
+    serviceWorkflowEyebrow: "فرایند",
+    serviceWorkflowTitle: "مسیر اجرای پروژه",
+    servicePricingEyebrow: "پلن‌ها",
+    servicePricingTitle: "یک پلن متناسب با هر برند",
+    pricingFeaturedBadge: "پیشنهاد ما",
+    selectPlan: "انتخاب پلن",
+    priceFromPrefix: "شروع از",
+    serviceCtaTalk: "گفت‌وگو با تیم آرکا",
+    scrollHint: "اسکرول",
+    scrollToEnterHint: "برای ورود اسکرول کن",
+    testimonialPrev: "قبلی",
+    testimonialNext: "بعدی",
+    readingMinutesSuffix: "دقیقه مطالعه",
   },
   en: {
     navHome: "Home",
@@ -116,6 +167,41 @@ export const UI = {
     contactErrorNetwork: "Network error. Please try again.",
     contactSuccessTitle: "Message received! 🎉",
     contactSuccessBody: "The ARKA team will contact you soon.",
+    skipToContent: "Skip to content",
+    before: "Before",
+    after: "After",
+    inThisArticle: "In this article",
+    credits: "Production Credits",
+    tagsLabel: "Tags",
+    nextProject: "Next Project",
+    viewProject: "View Project",
+    relatedPosts: "Related Articles",
+    metaClient: "Client",
+    metaYear: "Year",
+    metaLocation: "Location",
+    contactRowOffice: "Head Office",
+    contactRowPhone: "Phone",
+    contactRowEmail: "Email",
+    contactRowHours: "Office Hours",
+    mapTitle: "ARKA Map",
+    industryHeroEyebrow: "Industry Solution",
+    industryApproachEyebrow: "Our Approach",
+    portfolioEyebrow: "Portfolio",
+    serviceFaqEyebrow: "FAQ",
+    serviceFaqTitle: "Frequently Asked Questions",
+    serviceWorkflowEyebrow: "Process",
+    serviceWorkflowTitle: "Our Project Process",
+    servicePricingEyebrow: "Plans",
+    servicePricingTitle: "A Plan for Every Brand",
+    pricingFeaturedBadge: "Our Pick",
+    selectPlan: "Choose Plan",
+    priceFromPrefix: "Starting from",
+    serviceCtaTalk: "Talk to the ARKA team",
+    scrollHint: "Scroll",
+    scrollToEnterHint: "Scroll to enter",
+    testimonialPrev: "Previous",
+    testimonialNext: "Next",
+    readingMinutesSuffix: "min read",
   },
   ar: {
     navHome: "الرئيسية",
@@ -158,6 +244,41 @@ export const UI = {
     contactErrorNetwork: "خطأ في الشبكة. يرجى المحاولة مرة أخرى.",
     contactSuccessTitle: "تم استلام رسالتك! 🎉",
     contactSuccessBody: "سيتواصل معك فريق آركا قريبًا.",
+    skipToContent: "الانتقال إلى المحتوى",
+    before: "قبل",
+    after: "بعد",
+    inThisArticle: "في هذا المقال",
+    credits: "فريق العمل",
+    tagsLabel: "الوسوم",
+    nextProject: "المشروع التالي",
+    viewProject: "عرض المشروع",
+    relatedPosts: "مقالات ذات صلة",
+    metaClient: "العميل",
+    metaYear: "السنة",
+    metaLocation: "الموقع",
+    contactRowOffice: "المكتب الرئيسي",
+    contactRowPhone: "الهاتف",
+    contactRowEmail: "البريد الإلكتروني",
+    contactRowHours: "ساعات العمل",
+    mapTitle: "خريطة آركا",
+    industryHeroEyebrow: "حل صناعي",
+    industryApproachEyebrow: "نهجنا",
+    portfolioEyebrow: "أعمالنا",
+    serviceFaqEyebrow: "الأسئلة الشائعة",
+    serviceFaqTitle: "الأسئلة المتكررة",
+    serviceWorkflowEyebrow: "العملية",
+    serviceWorkflowTitle: "مسار تنفيذ المشروع",
+    servicePricingEyebrow: "الباقات",
+    servicePricingTitle: "باقة تناسب كل علامة تجارية",
+    pricingFeaturedBadge: "الأنسب لك",
+    selectPlan: "اختر الباقة",
+    priceFromPrefix: "يبدأ من",
+    serviceCtaTalk: "تحدث إلى فريق آركا",
+    scrollHint: "مرر لأسفل",
+    scrollToEnterHint: "مرر للدخول",
+    testimonialPrev: "السابق",
+    testimonialNext: "التالي",
+    readingMinutesSuffix: "دقيقة قراءة",
   },
 } as const satisfies Record<Locale, Record<string, string>>;
 

@@ -1,6 +1,8 @@
 import { db } from "./db";
 import { parseArr } from "./utils";
 import { SAMPLE } from "./media";
+import { tr, trArr } from "./i18n";
+import type { Locale } from "@/types";
 
 // Reusable read queries shared across public pages.
 
@@ -120,41 +122,71 @@ const HOME_DEFAULTS: HomeContent = {
   finalCtaLabel: "شروع پروژه",
 };
 
-export async function getHomePage(): Promise<HomeContent> {
+export async function getHomePage(locale: Locale = "fa"): Promise<HomeContent> {
   const row = await db.homePage.findUnique({ where: { id: "home" } });
   if (!row) return HOME_DEFAULTS;
-  const headline = parseArr<string>(row.heroHeadline);
-  const steps = parseArr<{ icon: string; title: string; desc: string }>(row.workflowSteps);
+  const headline = trArr<string>(locale, row.heroHeadline, row.heroHeadlineEn, row.heroHeadlineAr);
+  const steps = trArr<{ icon: string; title: string; desc: string }>(
+    locale,
+    row.workflowSteps,
+    row.workflowStepsEn,
+    row.workflowStepsAr,
+  );
   return {
-    heroBadge: row.heroBadge,
+    heroBadge: tr(locale, row.heroBadge, row.heroBadgeEn, row.heroBadgeAr),
     heroHeadline: headline.length ? headline : HOME_DEFAULTS.heroHeadline,
-    heroDescription: row.heroDescription,
-    heroCtaLabel: row.heroCtaLabel,
-    heroReelLabel: row.heroReelLabel,
-    trustCaption: row.trustCaption,
-    departmentsEyebrow: row.departmentsEyebrow,
-    departmentsHeading: row.departmentsHeading,
-    departmentsHeadingHighlight: row.departmentsHeadingHighlight,
-    departmentsDescription: row.departmentsDescription,
-    departmentsCtaLabel: row.departmentsCtaLabel,
-    featuredEyebrow: row.featuredEyebrow,
-    featuredHeading: row.featuredHeading,
-    featuredHeadingHighlight: row.featuredHeadingHighlight,
-    featuredDescription: row.featuredDescription,
-    featuredCtaLabel: row.featuredCtaLabel,
-    workflowEyebrow: row.workflowEyebrow,
-    workflowHeading: row.workflowHeading,
-    workflowHeadingHighlight: row.workflowHeadingHighlight,
-    workflowDescription: row.workflowDescription,
+    heroDescription: tr(locale, row.heroDescription, row.heroDescriptionEn, row.heroDescriptionAr),
+    heroCtaLabel: tr(locale, row.heroCtaLabel, row.heroCtaLabelEn, row.heroCtaLabelAr),
+    heroReelLabel: tr(locale, row.heroReelLabel, row.heroReelLabelEn, row.heroReelLabelAr),
+    trustCaption: tr(locale, row.trustCaption, row.trustCaptionEn, row.trustCaptionAr),
+    departmentsEyebrow: tr(locale, row.departmentsEyebrow, row.departmentsEyebrowEn, row.departmentsEyebrowAr),
+    departmentsHeading: tr(locale, row.departmentsHeading, row.departmentsHeadingEn, row.departmentsHeadingAr),
+    departmentsHeadingHighlight: tr(
+      locale,
+      row.departmentsHeadingHighlight,
+      row.departmentsHeadingHighlightEn,
+      row.departmentsHeadingHighlightAr,
+    ),
+    departmentsDescription: tr(
+      locale,
+      row.departmentsDescription,
+      row.departmentsDescriptionEn,
+      row.departmentsDescriptionAr,
+    ),
+    departmentsCtaLabel: tr(locale, row.departmentsCtaLabel, row.departmentsCtaLabelEn, row.departmentsCtaLabelAr),
+    featuredEyebrow: tr(locale, row.featuredEyebrow, row.featuredEyebrowEn, row.featuredEyebrowAr),
+    featuredHeading: tr(locale, row.featuredHeading, row.featuredHeadingEn, row.featuredHeadingAr),
+    featuredHeadingHighlight: tr(
+      locale,
+      row.featuredHeadingHighlight,
+      row.featuredHeadingHighlightEn,
+      row.featuredHeadingHighlightAr,
+    ),
+    featuredDescription: tr(locale, row.featuredDescription, row.featuredDescriptionEn, row.featuredDescriptionAr),
+    featuredCtaLabel: tr(locale, row.featuredCtaLabel, row.featuredCtaLabelEn, row.featuredCtaLabelAr),
+    workflowEyebrow: tr(locale, row.workflowEyebrow, row.workflowEyebrowEn, row.workflowEyebrowAr),
+    workflowHeading: tr(locale, row.workflowHeading, row.workflowHeadingEn, row.workflowHeadingAr),
+    workflowHeadingHighlight: tr(
+      locale,
+      row.workflowHeadingHighlight,
+      row.workflowHeadingHighlightEn,
+      row.workflowHeadingHighlightAr,
+    ),
+    workflowDescription: tr(locale, row.workflowDescription, row.workflowDescriptionEn, row.workflowDescriptionAr),
     workflowSteps: steps.length ? steps : HOME_DEFAULTS.workflowSteps,
-    testimonialsEyebrow: row.testimonialsEyebrow,
-    testimonialsHeading: row.testimonialsHeading,
-    testimonialsHeadingHighlight: row.testimonialsHeadingHighlight,
-    finalEyebrow: row.finalEyebrow,
-    finalHeading: row.finalHeading,
-    finalHeadingHighlight: row.finalHeadingHighlight,
-    finalDescription: row.finalDescription,
-    finalCtaLabel: row.finalCtaLabel,
+    testimonialsEyebrow: tr(locale, row.testimonialsEyebrow, row.testimonialsEyebrowEn, row.testimonialsEyebrowAr),
+    testimonialsHeading: tr(locale, row.testimonialsHeading, row.testimonialsHeadingEn, row.testimonialsHeadingAr),
+    testimonialsHeadingHighlight: tr(
+      locale,
+      row.testimonialsHeadingHighlight,
+      row.testimonialsHeadingHighlightEn,
+      row.testimonialsHeadingHighlightAr,
+    ),
+    finalEyebrow: tr(locale, row.finalEyebrow, row.finalEyebrowEn, row.finalEyebrowAr),
+    finalHeading: tr(locale, row.finalHeading, row.finalHeadingEn, row.finalHeadingAr),
+    finalHeadingHighlight: tr(locale, row.finalHeadingHighlight, row.finalHeadingHighlightEn, row.finalHeadingHighlightAr),
+    finalDescription: tr(locale, row.finalDescription, row.finalDescriptionEn, row.finalDescriptionAr),
+    finalCtaLabel: tr(locale, row.finalCtaLabel, row.finalCtaLabelEn, row.finalCtaLabelAr),
   };
 }
 
@@ -232,34 +264,39 @@ const ABOUT_DEFAULTS: AboutContent = {
   metaDescription: "آرکا؛ تیمی از ذهن‌های خلاق که برندها را با روایت بصری سینمایی متحول می‌کنند.",
 };
 
-export async function getAboutPage(): Promise<AboutContent> {
+export async function getAboutPage(locale: Locale = "fa"): Promise<AboutContent> {
   const row = await db.aboutPage.findUnique({ where: { id: "about" } });
   if (!row) return ABOUT_DEFAULTS;
   return {
-    heroEyebrow: row.heroEyebrow,
-    heroTitle: row.heroTitle,
-    heroTitleHighlight: row.heroTitleHighlight,
-    heroDescription: row.heroDescription,
-    storyEyebrow: row.storyEyebrow,
-    storyHeading: row.storyHeading,
-    storyParagraphs: parseArr<string>(row.storyParagraphs),
+    heroEyebrow: tr(locale, row.heroEyebrow, row.heroEyebrowEn, row.heroEyebrowAr),
+    heroTitle: tr(locale, row.heroTitle, row.heroTitleEn, row.heroTitleAr),
+    heroTitleHighlight: tr(locale, row.heroTitleHighlight, row.heroTitleHighlightEn, row.heroTitleHighlightAr),
+    heroDescription: tr(locale, row.heroDescription, row.heroDescriptionEn, row.heroDescriptionAr),
+    storyEyebrow: tr(locale, row.storyEyebrow, row.storyEyebrowEn, row.storyEyebrowAr),
+    storyHeading: tr(locale, row.storyHeading, row.storyHeadingEn, row.storyHeadingAr),
+    storyParagraphs: trArr<string>(locale, row.storyParagraphs, row.storyParagraphsEn, row.storyParagraphsAr),
     storyVideo: row.storyVideo || ABOUT_DEFAULTS.storyVideo,
     storyPoster: row.storyPoster || ABOUT_DEFAULTS.storyPoster,
-    valuesEyebrow: row.valuesEyebrow,
-    valuesHeading: row.valuesHeading,
-    values: parseArr(row.values),
-    teamEyebrow: row.teamEyebrow,
-    teamHeading: row.teamHeading,
-    timelineEyebrow: row.timelineEyebrow,
-    timelineHeading: row.timelineHeading,
-    timeline: parseArr(row.timeline),
-    galleryEyebrow: row.galleryEyebrow,
-    galleryHeading: row.galleryHeading,
+    valuesEyebrow: tr(locale, row.valuesEyebrow, row.valuesEyebrowEn, row.valuesEyebrowAr),
+    valuesHeading: tr(locale, row.valuesHeading, row.valuesHeadingEn, row.valuesHeadingAr),
+    values: trArr(locale, row.values, row.valuesEn, row.valuesAr),
+    teamEyebrow: tr(locale, row.teamEyebrow, row.teamEyebrowEn, row.teamEyebrowAr),
+    teamHeading: tr(locale, row.teamHeading, row.teamHeadingEn, row.teamHeadingAr),
+    timelineEyebrow: tr(locale, row.timelineEyebrow, row.timelineEyebrowEn, row.timelineEyebrowAr),
+    timelineHeading: tr(locale, row.timelineHeading, row.timelineHeadingEn, row.timelineHeadingAr),
+    timeline: trArr(locale, row.timeline, row.timelineEn, row.timelineAr),
+    galleryEyebrow: tr(locale, row.galleryEyebrow, row.galleryEyebrowEn, row.galleryEyebrowAr),
+    galleryHeading: tr(locale, row.galleryHeading, row.galleryHeadingEn, row.galleryHeadingAr),
     galleryVideo: row.galleryVideo || ABOUT_DEFAULTS.galleryVideo,
     galleryPoster: row.galleryPoster || ABOUT_DEFAULTS.galleryPoster,
     galleryImages: parseArr<string>(row.galleryImages),
-    metaTitle: row.metaTitle || ABOUT_DEFAULTS.metaTitle,
-    metaDescription: row.metaDescription || ABOUT_DEFAULTS.metaDescription,
+    metaTitle: tr(locale, row.metaTitle || ABOUT_DEFAULTS.metaTitle, row.metaTitleEn, row.metaTitleAr),
+    metaDescription: tr(
+      locale,
+      row.metaDescription || ABOUT_DEFAULTS.metaDescription,
+      row.metaDescriptionEn,
+      row.metaDescriptionAr,
+    ),
   };
 }
 
@@ -310,25 +347,30 @@ const CONTACT_DEFAULTS: ContactContent = {
   metaDescription: "بریف پروژه‌تان را بفرستید یا با تیم آرکا در تهران تماس بگیرید.",
 };
 
-export async function getContactPage(): Promise<ContactContent> {
+export async function getContactPage(locale: Locale = "fa"): Promise<ContactContent> {
   const row = await db.contactPage.findUnique({ where: { id: "contact" } });
   if (!row) return CONTACT_DEFAULTS;
   return {
-    heroEyebrow: row.heroEyebrow,
-    heroTitle: row.heroTitle,
-    heroTitleHighlight: row.heroTitleHighlight,
-    heroDescription: row.heroDescription,
-    address: row.address,
+    heroEyebrow: tr(locale, row.heroEyebrow, row.heroEyebrowEn, row.heroEyebrowAr),
+    heroTitle: tr(locale, row.heroTitle, row.heroTitleEn, row.heroTitleAr),
+    heroTitleHighlight: tr(locale, row.heroTitleHighlight, row.heroTitleHighlightEn, row.heroTitleHighlightAr),
+    heroDescription: tr(locale, row.heroDescription, row.heroDescriptionEn, row.heroDescriptionAr),
+    address: tr(locale, row.address, row.addressEn, row.addressAr),
     phone: row.phone,
-    phoneDisplay: row.phoneDisplay,
+    phoneDisplay: tr(locale, row.phoneDisplay, row.phoneDisplayEn, row.phoneDisplayAr),
     email: row.email,
-    officeHours: row.officeHours,
+    officeHours: tr(locale, row.officeHours, row.officeHoursEn, row.officeHoursAr),
     mapLat: row.mapLat,
     mapLng: row.mapLng,
-    socials: parseArr(row.socials),
-    serviceOptions: parseArr<string>(row.serviceOptions),
-    budgetOptions: parseArr<string>(row.budgetOptions),
-    metaTitle: row.metaTitle || CONTACT_DEFAULTS.metaTitle,
-    metaDescription: row.metaDescription || CONTACT_DEFAULTS.metaDescription,
+    socials: trArr(locale, row.socials, row.socialsEn, row.socialsAr),
+    serviceOptions: trArr<string>(locale, row.serviceOptions, row.serviceOptionsEn, row.serviceOptionsAr),
+    budgetOptions: trArr<string>(locale, row.budgetOptions, row.budgetOptionsEn, row.budgetOptionsAr),
+    metaTitle: tr(locale, row.metaTitle || CONTACT_DEFAULTS.metaTitle, row.metaTitleEn, row.metaTitleAr),
+    metaDescription: tr(
+      locale,
+      row.metaDescription || CONTACT_DEFAULTS.metaDescription,
+      row.metaDescriptionEn,
+      row.metaDescriptionAr,
+    ),
   };
 }

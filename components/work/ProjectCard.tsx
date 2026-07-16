@@ -1,16 +1,24 @@
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowUpLeft, Play } from "lucide-react";
-import { cn, parseArr } from "@/lib/utils";
+import { cn } from "@/lib/utils";
+import { tr, trArr } from "@/lib/i18n";
+import type { Locale } from "@/types";
 
 interface CardProject {
   slug: string;
   title: string;
+  titleEn?: string | null;
+  titleAr?: string | null;
   category: string;
+  categoryEn?: string | null;
+  categoryAr?: string | null;
   cover: string;
   accent?: string;
   heroVideo?: string | null;
   tags?: string;
+  tagsEn?: string | null;
+  tagsAr?: string | null;
   client?: { name: string } | null;
 }
 
@@ -19,13 +27,17 @@ export function ProjectCard({
   aspect = "aspect-[4/5]",
   priority = false,
   className,
+  locale = "fa",
 }: {
   project: CardProject;
   aspect?: string;
   priority?: boolean;
   className?: string;
+  locale?: Locale;
 }) {
-  const tags = parseArr<string>(project.tags).slice(0, 3);
+  const title = tr(locale, project.title, project.titleEn, project.titleAr);
+  const category = tr(locale, project.category, project.categoryEn, project.categoryAr);
+  const tags = trArr<string>(locale, project.tags ?? "[]", project.tagsEn, project.tagsAr).slice(0, 3);
   return (
     <Link
       href={`/work/${project.slug}`}
@@ -38,7 +50,7 @@ export function ProjectCard({
       <div className={cn("relative w-full overflow-hidden", aspect)}>
         <Image
           src={project.cover}
-          alt={project.title}
+          alt={title}
           fill
           priority={priority}
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -51,7 +63,7 @@ export function ProjectCard({
         />
 
         <span className="absolute right-4 top-4 rounded-full border border-white/15 bg-black/30 px-3 py-1 text-xs font-medium text-white backdrop-blur">
-          {project.category}
+          {category}
         </span>
         {project.heroVideo && (
           <span className="absolute left-4 top-4 grid h-9 w-9 place-items-center rounded-full border border-white/20 bg-black/30 text-white backdrop-blur">
@@ -65,7 +77,7 @@ export function ProjectCard({
           <p className="mb-1 text-xs text-white/60">{project.client.name}</p>
         )}
         <div className="flex items-end justify-between gap-3">
-          <h3 className="font-display text-xl font-bold text-white">{project.title}</h3>
+          <h3 className="font-display text-xl font-bold text-white">{title}</h3>
           <span className="grid h-9 w-9 shrink-0 translate-y-2 place-items-center rounded-full bg-primary text-primary-foreground opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100">
             <ArrowUpLeft className="h-4 w-4" />
           </span>

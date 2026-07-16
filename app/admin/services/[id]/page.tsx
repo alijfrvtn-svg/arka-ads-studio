@@ -3,11 +3,18 @@ import { notFound } from "next/navigation";
 import { ArrowRight } from "lucide-react";
 import { db } from "@/lib/db";
 import { Field, Input, Textarea, Select, Toggle, FormSection } from "@/components/admin/form";
+import { LangTabs } from "@/components/admin/LangTabs";
 import { SubmitButton } from "@/components/admin/SubmitButton";
 import { saveService } from "@/lib/actions";
 import { DEPARTMENTS } from "@/lib/constants";
 import { parseArr } from "@/lib/utils";
 import type { PricingTier } from "@/types";
+
+function pricingText(json: string | null | undefined) {
+  return parseArr<PricingTier>(json)
+    .map((t) => `${t.name} | ${t.price} | ${t.unit ?? ""} | ${(t.features ?? []).join(";")} | ${t.featured ? "بله" : "خیر"}`)
+    .join("\n");
+}
 
 export default async function ServiceForm({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -15,9 +22,13 @@ export default async function ServiceForm({ params }: { params: Promise<{ id: st
   const s = isNew ? null : await db.service.findUnique({ where: { id } });
   if (!isNew && !s) notFound();
   const features = parseArr<string>(s?.features).join("\n");
-  const pricing = parseArr<PricingTier>(s?.pricing)
-    .map((t) => `${t.name} | ${t.price} | ${t.unit ?? ""} | ${(t.features ?? []).join(";")} | ${t.featured ? "بله" : "خیر"}`)
-    .join("\n");
+  const featuresEn = parseArr<string>(s?.featuresEn).join("\n");
+  const featuresAr = parseArr<string>(s?.featuresAr).join("\n");
+  const pricing = pricingText(s?.pricing);
+  const pricingEn = pricingText(s?.pricingEn);
+  const pricingAr = pricingText(s?.pricingAr);
+  const pricingHint =
+    "هر خط یک پلن: نام | قیمت | واحد | ویژگی۱;ویژگی۲;ویژگی۳ | بله/خیر (پیشنهادی) — مثال: حرفه‌ای | ۲۵,۰۰۰,۰۰۰ | تومان | استراتژی اختصاصی;سه راند بازنگری | بله";
 
   return (
     <div className="mx-auto max-w-3xl">
@@ -31,16 +42,45 @@ export default async function ServiceForm({ params }: { params: Promise<{ id: st
       <form action={saveService} className="space-y-5">
         {!isNew && <input type="hidden" name="id" value={s!.id} />}
         <FormSection title="اطلاعات سرویس">
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="عنوان" required><Input name="title" defaultValue={s?.title} required /></Field>
-            <Field label="عنوان انگلیسی"><Input name="titleEn" defaultValue={s?.titleEn ?? ""} dir="ltr" className="text-left" /></Field>
-          </div>
+          <Field label="عنوان">
+            <LangTabs
+              tabs={[
+                { locale: "fa", content: <Input name="title" defaultValue={s?.title} required /> },
+                { locale: "en", content: <Input name="titleEn" defaultValue={s?.titleEn ?? ""} dir="ltr" className="text-left" /> },
+                { locale: "ar", content: <Input name="titleAr" defaultValue={s?.titleAr ?? ""} dir="rtl" /> },
+              ]}
+            />
+          </Field>
           <div className="grid gap-4 sm:grid-cols-2">
             <Field label="اسلاگ" hint="خالی بگذارید تا خودکار ساخته شود"><Input name="slug" defaultValue={s?.slug} dir="ltr" className="text-left" /></Field>
-            <Field label="شعار"><Input name="tagline" defaultValue={s?.tagline ?? ""} /></Field>
           </div>
-          <Field label="خلاصه" required><Textarea name="excerpt" defaultValue={s?.excerpt} required /></Field>
-          <Field label="توضیحات کامل"><Textarea name="description" defaultValue={s?.description} className="min-h-32" /></Field>
+          <Field label="شعار">
+            <LangTabs
+              tabs={[
+                { locale: "fa", content: <Input name="tagline" defaultValue={s?.tagline ?? ""} /> },
+                { locale: "en", content: <Input name="taglineEn" defaultValue={s?.taglineEn ?? ""} dir="ltr" className="text-left" /> },
+                { locale: "ar", content: <Input name="taglineAr" defaultValue={s?.taglineAr ?? ""} dir="rtl" /> },
+              ]}
+            />
+          </Field>
+          <Field label="خلاصه">
+            <LangTabs
+              tabs={[
+                { locale: "fa", content: <Textarea name="excerpt" defaultValue={s?.excerpt} required /> },
+                { locale: "en", content: <Textarea name="excerptEn" defaultValue={s?.excerptEn ?? ""} dir="ltr" className="text-left" /> },
+                { locale: "ar", content: <Textarea name="excerptAr" defaultValue={s?.excerptAr ?? ""} dir="rtl" /> },
+              ]}
+            />
+          </Field>
+          <Field label="توضیحات کامل">
+            <LangTabs
+              tabs={[
+                { locale: "fa", content: <Textarea name="description" defaultValue={s?.description} className="min-h-32" /> },
+                { locale: "en", content: <Textarea name="descriptionEn" defaultValue={s?.descriptionEn ?? ""} className="min-h-32" dir="ltr" /> },
+                { locale: "ar", content: <Textarea name="descriptionAr" defaultValue={s?.descriptionAr ?? ""} className="min-h-32" dir="rtl" /> },
+              ]}
+            />
+          </Field>
           <div className="grid gap-4 sm:grid-cols-3">
             <Field label="دپارتمان">
               <Select name="department" defaultValue={s?.department ?? "FILM"}>
@@ -52,22 +92,47 @@ export default async function ServiceForm({ params }: { params: Promise<{ id: st
           </div>
           <Field label="تصویر کاور"><Input name="cover" defaultValue={s?.cover ?? ""} dir="ltr" className="text-left" placeholder="https://…" /></Field>
           <Field label="ویژگی‌ها" hint="هر ویژگی در یک خط">
-            <Textarea name="features" defaultValue={features} className="min-h-28" />
+            <LangTabs
+              tabs={[
+                { locale: "fa", content: <Textarea name="features" defaultValue={features} className="min-h-28" /> },
+                { locale: "en", content: <Textarea name="featuresEn" defaultValue={featuresEn} className="min-h-28" dir="ltr" /> },
+                { locale: "ar", content: <Textarea name="featuresAr" defaultValue={featuresAr} className="min-h-28" dir="rtl" /> },
+              ]}
+            />
           </Field>
         </FormSection>
 
         <FormSection title="پلن‌های قیمت‌گذاری" description="همان پلن‌هایی که در صفحه‌ی این سرویس با دکمه‌ی «انتخاب پلن» نمایش داده می‌شوند">
-          <Field
-            label="پلن‌ها"
-            hint="هر خط یک پلن: نام | قیمت | واحد | ویژگی۱;ویژگی۲;ویژگی۳ | بله/خیر (پیشنهادی) — مثال: حرفه‌ای | ۲۵,۰۰۰,۰۰۰ | تومان | استراتژی اختصاصی;سه راند بازنگری | بله"
-          >
-            <Textarea name="pricing" defaultValue={pricing} className="min-h-32" dir="rtl" />
+          <Field label="پلن‌ها" hint={pricingHint}>
+            <LangTabs
+              tabs={[
+                { locale: "fa", content: <Textarea name="pricing" defaultValue={pricing} className="min-h-32" dir="rtl" /> },
+                { locale: "en", content: <Textarea name="pricingEn" defaultValue={pricingEn} className="min-h-32" dir="ltr" /> },
+                { locale: "ar", content: <Textarea name="pricingAr" defaultValue={pricingAr} className="min-h-32" dir="rtl" /> },
+              ]}
+            />
           </Field>
         </FormSection>
 
         <FormSection title="سئو">
-          <Field label="Meta Title"><Input name="metaTitle" defaultValue={s?.metaTitle ?? ""} /></Field>
-          <Field label="Meta Description"><Textarea name="metaDescription" defaultValue={s?.metaDescription ?? ""} /></Field>
+          <Field label="Meta Title">
+            <LangTabs
+              tabs={[
+                { locale: "fa", content: <Input name="metaTitle" defaultValue={s?.metaTitle ?? ""} /> },
+                { locale: "en", content: <Input name="metaTitleEn" defaultValue={s?.metaTitleEn ?? ""} dir="ltr" className="text-left" /> },
+                { locale: "ar", content: <Input name="metaTitleAr" defaultValue={s?.metaTitleAr ?? ""} dir="rtl" /> },
+              ]}
+            />
+          </Field>
+          <Field label="Meta Description">
+            <LangTabs
+              tabs={[
+                { locale: "fa", content: <Textarea name="metaDescription" defaultValue={s?.metaDescription ?? ""} /> },
+                { locale: "en", content: <Textarea name="metaDescriptionEn" defaultValue={s?.metaDescriptionEn ?? ""} dir="ltr" /> },
+                { locale: "ar", content: <Textarea name="metaDescriptionAr" defaultValue={s?.metaDescriptionAr ?? ""} dir="rtl" /> },
+              ]}
+            />
+          </Field>
         </FormSection>
 
         <div className="flex items-center justify-between rounded-2xl border border-card-border bg-surface p-5">

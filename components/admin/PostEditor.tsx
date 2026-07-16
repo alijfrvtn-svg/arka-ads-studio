@@ -6,6 +6,7 @@ import Link from "next/link";
 import { marked } from "marked";
 import { ArrowRight, Eye, Loader2, Pencil, Save, Trash2 } from "lucide-react";
 import { Field, Input, Textarea, Select, Toggle, FormSection } from "./form";
+import { LangTabs } from "./LangTabs";
 import { TagInput, ImageInput } from "./client-fields";
 import { SerpPreview } from "./SerpPreview";
 import { savePost, deletePost, type PostInput } from "@/lib/actions";
@@ -68,14 +69,26 @@ export function PostEditor({ initial }: { initial: PostInput }) {
       <div className="grid gap-5 lg:grid-cols-[1fr_340px]">
         <div className="space-y-5">
           <FormSection title="محتوا">
-            <Field label="عنوان" required>
-              <Input value={p.title} onChange={(e) => set({ title: e.target.value })} className="text-lg font-bold" />
+            <Field label="عنوان">
+              <LangTabs
+                tabs={[
+                  { locale: "fa", content: <Input value={p.title} onChange={(e) => set({ title: e.target.value })} className="text-lg font-bold" /> },
+                  { locale: "en", content: <Input value={p.titleEn ?? ""} onChange={(e) => set({ titleEn: e.target.value })} dir="ltr" className="text-left text-lg font-bold" /> },
+                  { locale: "ar", content: <Input value={p.titleAr ?? ""} onChange={(e) => set({ titleAr: e.target.value })} dir="rtl" className="text-lg font-bold" /> },
+                ]}
+              />
             </Field>
             <Field label="اسلاگ" hint={`/journal/${slugify(p.slug || p.title) || "…"}`}>
               <Input value={p.slug} onChange={(e) => set({ slug: e.target.value })} dir="ltr" className="text-left" />
             </Field>
             <Field label="خلاصه">
-              <Textarea value={p.excerpt} onChange={(e) => set({ excerpt: e.target.value })} />
+              <LangTabs
+                tabs={[
+                  { locale: "fa", content: <Textarea value={p.excerpt} onChange={(e) => set({ excerpt: e.target.value })} /> },
+                  { locale: "en", content: <Textarea value={p.excerptEn ?? ""} onChange={(e) => set({ excerptEn: e.target.value })} dir="ltr" /> },
+                  { locale: "ar", content: <Textarea value={p.excerptAr ?? ""} onChange={(e) => set({ excerptAr: e.target.value })} dir="rtl" /> },
+                ]}
+              />
             </Field>
             <div>
               <div className="mb-2 flex items-center gap-1 rounded-xl border border-card-border bg-background/50 p-1 w-fit">
@@ -86,19 +99,69 @@ export function PostEditor({ initial }: { initial: PostInput }) {
                   <Eye className="h-3.5 w-3.5" /> پیش‌نمایش
                 </button>
               </div>
-              {tab === "write" ? (
-                <Textarea value={p.content} onChange={(e) => set({ content: e.target.value })} className="min-h-96 font-mono text-sm" placeholder="محتوا را با Markdown بنویسید…" />
-              ) : (
-                <div className="prose-arka min-h-96 rounded-xl border border-card-border bg-background/50 p-5" dangerouslySetInnerHTML={{ __html: marked.parse(p.content || "*چیزی برای نمایش نیست*") as string }} />
-              )}
+              <LangTabs
+                tabs={[
+                  {
+                    locale: "fa",
+                    content:
+                      tab === "write" ? (
+                        <Textarea value={p.content} onChange={(e) => set({ content: e.target.value })} className="min-h-96 font-mono text-sm" placeholder="محتوا را با Markdown بنویسید…" />
+                      ) : (
+                        <div className="prose-arka min-h-96 rounded-xl border border-card-border bg-background/50 p-5" dangerouslySetInnerHTML={{ __html: marked.parse(p.content || "*چیزی برای نمایش نیست*") as string }} />
+                      ),
+                  },
+                  {
+                    locale: "en",
+                    content:
+                      tab === "write" ? (
+                        <Textarea value={p.contentEn ?? ""} onChange={(e) => set({ contentEn: e.target.value })} className="min-h-96 font-mono text-sm" dir="ltr" placeholder="Write the article in Markdown…" />
+                      ) : (
+                        <div dir="ltr" className="prose-arka min-h-96 rounded-xl border border-card-border bg-background/50 p-5" dangerouslySetInnerHTML={{ __html: marked.parse(p.contentEn || "*Nothing to preview yet*") as string }} />
+                      ),
+                  },
+                  {
+                    locale: "ar",
+                    content:
+                      tab === "write" ? (
+                        <Textarea value={p.contentAr ?? ""} onChange={(e) => set({ contentAr: e.target.value })} className="min-h-96 font-mono text-sm" dir="rtl" placeholder="اكتب المقال بصيغة Markdown…" />
+                      ) : (
+                        <div dir="rtl" className="prose-arka min-h-96 rounded-xl border border-card-border bg-background/50 p-5" dangerouslySetInnerHTML={{ __html: marked.parse(p.contentAr || "*لا يوجد محتوى للمعاينة*") as string }} />
+                      ),
+                  },
+                ]}
+              />
               <p className="mt-1.5 text-xs text-foreground-faint">زمان مطالعه تخمینی: {readingTime(p.content)} دقیقه</p>
             </div>
           </FormSection>
 
           <FormSection title="سئو">
-            <Field label="Meta Title"><Input value={p.metaTitle ?? ""} onChange={(e) => set({ metaTitle: e.target.value })} /></Field>
-            <Field label="Meta Description"><Textarea value={p.metaDescription ?? ""} onChange={(e) => set({ metaDescription: e.target.value })} /></Field>
-            <Field label="کلمات کلیدی"><TagInput value={p.keywords} onChange={(v) => set({ keywords: v })} /></Field>
+            <Field label="Meta Title">
+              <LangTabs
+                tabs={[
+                  { locale: "fa", content: <Input value={p.metaTitle ?? ""} onChange={(e) => set({ metaTitle: e.target.value })} /> },
+                  { locale: "en", content: <Input value={p.metaTitleEn ?? ""} onChange={(e) => set({ metaTitleEn: e.target.value })} dir="ltr" className="text-left" /> },
+                  { locale: "ar", content: <Input value={p.metaTitleAr ?? ""} onChange={(e) => set({ metaTitleAr: e.target.value })} dir="rtl" /> },
+                ]}
+              />
+            </Field>
+            <Field label="Meta Description">
+              <LangTabs
+                tabs={[
+                  { locale: "fa", content: <Textarea value={p.metaDescription ?? ""} onChange={(e) => set({ metaDescription: e.target.value })} /> },
+                  { locale: "en", content: <Textarea value={p.metaDescriptionEn ?? ""} onChange={(e) => set({ metaDescriptionEn: e.target.value })} dir="ltr" /> },
+                  { locale: "ar", content: <Textarea value={p.metaDescriptionAr ?? ""} onChange={(e) => set({ metaDescriptionAr: e.target.value })} dir="rtl" /> },
+                ]}
+              />
+            </Field>
+            <Field label="کلمات کلیدی">
+              <LangTabs
+                tabs={[
+                  { locale: "fa", content: <TagInput value={p.keywords} onChange={(v) => set({ keywords: v })} /> },
+                  { locale: "en", content: <TagInput value={p.keywordsEn ?? []} onChange={(v) => set({ keywordsEn: v })} /> },
+                  { locale: "ar", content: <TagInput value={p.keywordsAr ?? []} onChange={(v) => set({ keywordsAr: v })} /> },
+                ]}
+              />
+            </Field>
           </FormSection>
         </div>
 
@@ -106,9 +169,25 @@ export function PostEditor({ initial }: { initial: PostInput }) {
           <FormSection title="انتشار">
             <div className="flex items-center justify-between"><span className="text-sm text-foreground-muted">منتشر شده</span><Toggle checked={p.published} onChange={(e) => set({ published: e.target.checked })} /></div>
             <div className="flex items-center justify-between"><span className="text-sm text-foreground-muted">مطلب شاخص</span><Toggle checked={p.featured} onChange={(e) => set({ featured: e.target.checked })} /></div>
-            <Field label="دسته‌بندی"><Select value={p.category} onChange={(e) => set({ category: e.target.value })}>{CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}</Select></Field>
+            <Field label="دسته‌بندی">
+              <LangTabs
+                tabs={[
+                  { locale: "fa", content: <Select value={p.category} onChange={(e) => set({ category: e.target.value })}>{CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}</Select> },
+                  { locale: "en", content: <Input value={p.categoryEn ?? ""} onChange={(e) => set({ categoryEn: e.target.value })} dir="ltr" className="text-left" /> },
+                  { locale: "ar", content: <Input value={p.categoryAr ?? ""} onChange={(e) => set({ categoryAr: e.target.value })} dir="rtl" /> },
+                ]}
+              />
+            </Field>
             <Field label="تصویر کاور"><ImageInput value={p.cover} onChange={(v) => set({ cover: v })} /></Field>
-            <Field label="برچسب‌ها"><TagInput value={p.tags} onChange={(v) => set({ tags: v })} /></Field>
+            <Field label="برچسب‌ها">
+              <LangTabs
+                tabs={[
+                  { locale: "fa", content: <TagInput value={p.tags} onChange={(v) => set({ tags: v })} /> },
+                  { locale: "en", content: <TagInput value={p.tagsEn ?? []} onChange={(v) => set({ tagsEn: v })} /> },
+                  { locale: "ar", content: <TagInput value={p.tagsAr ?? []} onChange={(v) => set({ tagsAr: v })} /> },
+                ]}
+              />
+            </Field>
           </FormSection>
           <div className="rounded-2xl border border-card-border bg-surface p-5">
             <h3 className="mb-3 font-display text-sm font-bold text-foreground">پیش‌نمایش جستجو</h3>

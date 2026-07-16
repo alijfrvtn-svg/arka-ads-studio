@@ -5,9 +5,11 @@ import { Reveal } from "@/components/fx/Reveal";
 import { Icon } from "@/components/ui/Icon";
 import { HighlightedTitle } from "@/components/ui/HighlightedTitle";
 import { DEPARTMENTS } from "@/lib/constants";
+import { tr } from "@/lib/i18n";
 import type { HomeContent } from "@/lib/queries";
+import type { Locale } from "@/types";
 
-export function Departments({ content }: { content: HomeContent }) {
+export function Departments({ content, locale = "fa" }: { content: HomeContent; locale?: Locale }) {
   return (
     <Section id="departments">
       <Container>
@@ -33,11 +35,11 @@ export function Departments({ content }: { content: HomeContent }) {
                 <div className="mb-6 grid h-14 w-14 place-items-center rounded-xl border border-card-border bg-background/50 text-primary transition-colors group-hover:border-primary/40">
                   <Icon name={d.icon} className="h-6 w-6" />
                 </div>
-                <h3 className="font-display text-xl font-bold text-foreground">{d.title}</h3>
-                <p className="mt-1 text-xs uppercase tracking-widest text-foreground-faint">
-                  {d.titleEn}
-                </p>
-                <p className="mt-4 flex-1 text-sm leading-relaxed text-foreground-muted">{d.desc}</p>
+                <h3 className="font-display text-xl font-bold text-foreground">{tr(locale, d.title, d.titleEn, d.titleAr)}</h3>
+                {locale === "fa" && (
+                  <p className="mt-1 text-xs uppercase tracking-widest text-foreground-faint">{d.titleEn}</p>
+                )}
+                <p className="mt-4 flex-1 text-sm leading-relaxed text-foreground-muted">{tr(locale, d.desc, d.descEn, d.descAr)}</p>
                 <span className="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold text-primary">
                   {content.departmentsCtaLabel}
                   <ArrowUpLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1 group-hover:-translate-y-1" />

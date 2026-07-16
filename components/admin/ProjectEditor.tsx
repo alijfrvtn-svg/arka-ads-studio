@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, Loader2, Plus, Save, Trash2, X } from "lucide-react";
 import { Field, Input, Textarea, Select, Toggle, FormSection } from "./form";
+import { LangTabs } from "./LangTabs";
 import { TagInput, MultiSelect, ImageInput } from "./client-fields";
 import { SerpPreview } from "./SerpPreview";
 import { saveProject, deleteProject, type ProjectInput } from "@/lib/actions";
@@ -105,27 +106,45 @@ export function ProjectEditor({
         {/* form */}
         <div className="space-y-5">
           <FormSection title="اطلاعات پایه">
-            <div className="grid gap-4 sm:grid-cols-2">
-              <Field label="عنوان فارسی" required>
-                <Input value={p.title} onChange={(e) => set({ title: e.target.value })} placeholder="مثلاً کمپین سینمایی…" />
-              </Field>
-              <Field label="عنوان انگلیسی">
-                <Input value={p.titleEn ?? ""} onChange={(e) => set({ titleEn: e.target.value })} dir="ltr" className="text-left" />
-              </Field>
-            </div>
+            <Field label="عنوان">
+              <LangTabs
+                tabs={[
+                  { locale: "fa", content: <Input value={p.title} onChange={(e) => set({ title: e.target.value })} placeholder="مثلاً کمپین سینمایی…" /> },
+                  { locale: "en", content: <Input value={p.titleEn ?? ""} onChange={(e) => set({ titleEn: e.target.value })} dir="ltr" className="text-left" /> },
+                  { locale: "ar", content: <Input value={p.titleAr ?? ""} onChange={(e) => set({ titleAr: e.target.value })} dir="rtl" /> },
+                ]}
+              />
+            </Field>
             <Field label="اسلاگ (URL)" hint={`/work/${slugify(p.slug || p.title) || "…"}`}>
               <Input value={p.slug} onChange={(e) => set({ slug: e.target.value })} dir="ltr" className="text-left" placeholder="project-slug" />
             </Field>
             <Field label="زیرعنوان">
-              <Input value={p.subtitle ?? ""} onChange={(e) => set({ subtitle: e.target.value })} />
+              <LangTabs
+                tabs={[
+                  { locale: "fa", content: <Input value={p.subtitle ?? ""} onChange={(e) => set({ subtitle: e.target.value })} /> },
+                  { locale: "en", content: <Input value={p.subtitleEn ?? ""} onChange={(e) => set({ subtitleEn: e.target.value })} dir="ltr" className="text-left" /> },
+                  { locale: "ar", content: <Input value={p.subtitleAr ?? ""} onChange={(e) => set({ subtitleAr: e.target.value })} dir="rtl" /> },
+                ]}
+              />
             </Field>
             <div className="grid gap-4 sm:grid-cols-3">
               <Field label="دسته‌بندی">
-                <Select value={p.category} onChange={(e) => set({ category: e.target.value })}>
-                  {WORK_CATEGORIES.slice(1).map((c) => (
-                    <option key={c} value={c}>{c}</option>
-                  ))}
-                </Select>
+                <LangTabs
+                  tabs={[
+                    {
+                      locale: "fa",
+                      content: (
+                        <Select value={p.category} onChange={(e) => set({ category: e.target.value })}>
+                          {WORK_CATEGORIES.slice(1).map((c) => (
+                            <option key={c} value={c}>{c}</option>
+                          ))}
+                        </Select>
+                      ),
+                    },
+                    { locale: "en", content: <Input value={p.categoryEn ?? ""} onChange={(e) => set({ categoryEn: e.target.value })} dir="ltr" className="text-left" /> },
+                    { locale: "ar", content: <Input value={p.categoryAr ?? ""} onChange={(e) => set({ categoryAr: e.target.value })} dir="rtl" /> },
+                  ]}
+                />
               </Field>
               <Field label="سال">
                 <Input type="number" value={p.year} onChange={(e) => set({ year: Number(e.target.value) })} />
@@ -147,7 +166,13 @@ export function ProjectEditor({
                 </Select>
               </Field>
               <Field label="موقعیت">
-                <Input value={p.location ?? ""} onChange={(e) => set({ location: e.target.value })} />
+                <LangTabs
+                  tabs={[
+                    { locale: "fa", content: <Input value={p.location ?? ""} onChange={(e) => set({ location: e.target.value })} /> },
+                    { locale: "en", content: <Input value={p.locationEn ?? ""} onChange={(e) => set({ locationEn: e.target.value })} dir="ltr" className="text-left" /> },
+                    { locale: "ar", content: <Input value={p.locationAr ?? ""} onChange={(e) => set({ locationAr: e.target.value })} dir="rtl" /> },
+                  ]}
+                />
               </Field>
             </div>
           </FormSection>
@@ -192,38 +217,41 @@ export function ProjectEditor({
               ["production", "تولید (پشت صحنه)"],
               ["marketing", "بازاریابی"],
               ["result", "نتیجه"],
-            ] as const).map(([k, label]) => (
-              <Field key={k} label={label}>
-                <Textarea value={(p[k] as string) ?? ""} onChange={(e) => set({ [k]: e.target.value } as any)} />
-              </Field>
-            ))}
+            ] as const).map(([k, label]) => {
+              const kEn = `${k}En` as const;
+              const kAr = `${k}Ar` as const;
+              return (
+                <Field key={k} label={label}>
+                  <LangTabs
+                    tabs={[
+                      { locale: "fa", content: <Textarea value={(p[k] as string) ?? ""} onChange={(e) => set({ [k]: e.target.value } as any)} /> },
+                      { locale: "en", content: <Textarea value={(p[kEn] as string) ?? ""} onChange={(e) => set({ [kEn]: e.target.value } as any)} dir="ltr" /> },
+                      { locale: "ar", content: <Textarea value={(p[kAr] as string) ?? ""} onChange={(e) => set({ [kAr]: e.target.value } as any)} dir="rtl" /> },
+                    ]}
+                  />
+                </Field>
+              );
+            })}
           </FormSection>
 
           <FormSection title="متریک‌ها و نتایج">
-            <div className="space-y-2">
-              {p.metrics.map((m, i) => (
-                <div key={i} className="flex items-center gap-2">
-                  <Input placeholder="عنوان" value={m.label} onChange={(e) => set({ metrics: patch(p.metrics, i, { label: e.target.value }) })} />
-                  <Input placeholder="مقدار" value={m.value} onChange={(e) => set({ metrics: patch(p.metrics, i, { value: e.target.value }) })} className="w-24" />
-                  <Input placeholder="پسوند" value={m.suffix ?? ""} onChange={(e) => set({ metrics: patch(p.metrics, i, { suffix: e.target.value }) })} className="w-24" />
-                  <button onClick={() => set({ metrics: p.metrics.filter((_, j) => j !== i) })} className="grid h-9 w-9 shrink-0 place-items-center rounded-lg text-foreground-muted hover:text-rose-400"><X className="h-4 w-4" /></button>
-                </div>
-              ))}
-              <button onClick={() => set({ metrics: [...p.metrics, { label: "", value: "", suffix: "" }] })} className="inline-flex items-center gap-1.5 text-sm text-primary"><Plus className="h-4 w-4" /> افزودن متریک</button>
-            </div>
+            <LangTabs
+              tabs={[
+                { locale: "fa", content: metricsEditor(p.metrics, (v) => set({ metrics: v })) },
+                { locale: "en", content: metricsEditor(p.metricsEn ?? [], (v) => set({ metricsEn: v })) },
+                { locale: "ar", content: metricsEditor(p.metricsAr ?? [], (v) => set({ metricsAr: v })) },
+              ]}
+            />
           </FormSection>
 
           <FormSection title="عوامل تولید">
-            <div className="space-y-2">
-              {p.credits.map((c, i) => (
-                <div key={i} className="flex items-center gap-2">
-                  <Input placeholder="نقش" value={c.role} onChange={(e) => set({ credits: patch(p.credits, i, { role: e.target.value }) })} />
-                  <Input placeholder="نام" value={c.name} onChange={(e) => set({ credits: patch(p.credits, i, { name: e.target.value }) })} />
-                  <button onClick={() => set({ credits: p.credits.filter((_, j) => j !== i) })} className="grid h-9 w-9 shrink-0 place-items-center rounded-lg text-foreground-muted hover:text-rose-400"><X className="h-4 w-4" /></button>
-                </div>
-              ))}
-              <button onClick={() => set({ credits: [...p.credits, { role: "", name: "" }] })} className="inline-flex items-center gap-1.5 text-sm text-primary"><Plus className="h-4 w-4" /> افزودن عامل</button>
-            </div>
+            <LangTabs
+              tabs={[
+                { locale: "fa", content: creditsEditor(p.credits, (v) => set({ credits: v })) },
+                { locale: "en", content: creditsEditor(p.creditsEn ?? [], (v) => set({ creditsEn: v })) },
+                { locale: "ar", content: creditsEditor(p.creditsAr ?? [], (v) => set({ creditsAr: v })) },
+              ]}
+            />
           </FormSection>
 
           <FormSection title="ارتباطات و برچسب‌ها">
@@ -234,19 +262,43 @@ export function ProjectEditor({
               <MultiSelect value={p.industrySlugs} onChange={(v) => set({ industrySlugs: v })} options={industries} />
             </Field>
             <Field label="برچسب‌ها">
-              <TagInput value={p.tags} onChange={(v) => set({ tags: v })} />
+              <LangTabs
+                tabs={[
+                  { locale: "fa", content: <TagInput value={p.tags} onChange={(v) => set({ tags: v })} /> },
+                  { locale: "en", content: <TagInput value={p.tagsEn ?? []} onChange={(v) => set({ tagsEn: v })} /> },
+                  { locale: "ar", content: <TagInput value={p.tagsAr ?? []} onChange={(v) => set({ tagsAr: v })} /> },
+                ]}
+              />
             </Field>
           </FormSection>
 
           <FormSection title="سئو" description="متا و کلمات کلیدی این پروژه">
             <Field label="Meta Title">
-              <Input value={p.seo.metaTitle ?? ""} onChange={(e) => set({ seo: { ...p.seo, metaTitle: e.target.value } })} />
+              <LangTabs
+                tabs={[
+                  { locale: "fa", content: <Input value={p.seo.metaTitle ?? ""} onChange={(e) => set({ seo: { ...p.seo, metaTitle: e.target.value } })} /> },
+                  { locale: "en", content: <Input value={p.seo.metaTitleEn ?? ""} onChange={(e) => set({ seo: { ...p.seo, metaTitleEn: e.target.value } })} dir="ltr" className="text-left" /> },
+                  { locale: "ar", content: <Input value={p.seo.metaTitleAr ?? ""} onChange={(e) => set({ seo: { ...p.seo, metaTitleAr: e.target.value } })} dir="rtl" /> },
+                ]}
+              />
             </Field>
             <Field label="Meta Description">
-              <Textarea value={p.seo.metaDescription ?? ""} onChange={(e) => set({ seo: { ...p.seo, metaDescription: e.target.value } })} />
+              <LangTabs
+                tabs={[
+                  { locale: "fa", content: <Textarea value={p.seo.metaDescription ?? ""} onChange={(e) => set({ seo: { ...p.seo, metaDescription: e.target.value } })} /> },
+                  { locale: "en", content: <Textarea value={p.seo.metaDescriptionEn ?? ""} onChange={(e) => set({ seo: { ...p.seo, metaDescriptionEn: e.target.value } })} dir="ltr" /> },
+                  { locale: "ar", content: <Textarea value={p.seo.metaDescriptionAr ?? ""} onChange={(e) => set({ seo: { ...p.seo, metaDescriptionAr: e.target.value } })} dir="rtl" /> },
+                ]}
+              />
             </Field>
             <Field label="کلمات کلیدی">
-              <TagInput value={p.seo.keywords} onChange={(v) => set({ seo: { ...p.seo, keywords: v } })} />
+              <LangTabs
+                tabs={[
+                  { locale: "fa", content: <TagInput value={p.seo.keywords} onChange={(v) => set({ seo: { ...p.seo, keywords: v } })} /> },
+                  { locale: "en", content: <TagInput value={p.seo.keywordsEn ?? []} onChange={(v) => set({ seo: { ...p.seo, keywordsEn: v } })} /> },
+                  { locale: "ar", content: <TagInput value={p.seo.keywordsAr ?? []} onChange={(v) => set({ seo: { ...p.seo, keywordsAr: v } })} /> },
+                ]}
+              />
             </Field>
           </FormSection>
         </div>
@@ -310,4 +362,35 @@ export function ProjectEditor({
 
 function patch<T>(arr: T[], i: number, part: Partial<T>): T[] {
   return arr.map((x, j) => (j === i ? { ...x, ...part } : x));
+}
+
+function metricsEditor(list: Metric[], setList: (v: Metric[]) => void) {
+  return (
+    <div className="space-y-2">
+      {list.map((m, i) => (
+        <div key={i} className="flex items-center gap-2">
+          <Input placeholder="عنوان" value={m.label} onChange={(e) => setList(patch(list, i, { label: e.target.value }))} />
+          <Input placeholder="مقدار" value={m.value} onChange={(e) => setList(patch(list, i, { value: e.target.value }))} className="w-24" />
+          <Input placeholder="پسوند" value={m.suffix ?? ""} onChange={(e) => setList(patch(list, i, { suffix: e.target.value }))} className="w-24" />
+          <button onClick={() => setList(list.filter((_, j) => j !== i))} className="grid h-9 w-9 shrink-0 place-items-center rounded-lg text-foreground-muted hover:text-rose-400"><X className="h-4 w-4" /></button>
+        </div>
+      ))}
+      <button onClick={() => setList([...list, { label: "", value: "", suffix: "" }])} className="inline-flex items-center gap-1.5 text-sm text-primary"><Plus className="h-4 w-4" /> افزودن متریک</button>
+    </div>
+  );
+}
+
+function creditsEditor(list: Credit[], setList: (v: Credit[]) => void) {
+  return (
+    <div className="space-y-2">
+      {list.map((c, i) => (
+        <div key={i} className="flex items-center gap-2">
+          <Input placeholder="نقش" value={c.role} onChange={(e) => setList(patch(list, i, { role: e.target.value }))} />
+          <Input placeholder="نام" value={c.name} onChange={(e) => setList(patch(list, i, { name: e.target.value }))} />
+          <button onClick={() => setList(list.filter((_, j) => j !== i))} className="grid h-9 w-9 shrink-0 place-items-center rounded-lg text-foreground-muted hover:text-rose-400"><X className="h-4 w-4" /></button>
+        </div>
+      ))}
+      <button onClick={() => setList([...list, { role: "", name: "" }])} className="inline-flex items-center gap-1.5 text-sm text-primary"><Plus className="h-4 w-4" /> افزودن عامل</button>
+    </div>
+  );
 }
