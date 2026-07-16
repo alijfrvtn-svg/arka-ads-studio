@@ -9,32 +9,36 @@ import { VideoPlayer } from "@/components/work/VideoPlayer";
 import { SocialIcon } from "@/components/layout/SocialIcon";
 import { getStats, getTeam, getAboutPage, getHomePage, getContactPage } from "@/lib/queries";
 import { buildMetadata } from "@/lib/seo";
+import { tr, ui } from "@/lib/i18n";
 import { parseArr } from "@/lib/utils";
+import { getLocale } from "@/lib/get-locale";
 import { HighlightedTitle } from "@/components/ui/HighlightedTitle";
 import type { Social } from "@/types";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const a = await getAboutPage();
+  const locale = await getLocale();
+  const a = await getAboutPage(locale);
   return buildMetadata({ title: a.metaTitle, path: "/about", description: a.metaDescription });
 }
 
 const ICONS: Record<string, LucideIcon> = { Target, Gem, Zap, Sparkles };
 
 export default async function AboutPage() {
+  const locale = await getLocale();
   const [team, stats, a, home, contact] = await Promise.all([
     getTeam(),
     getStats(),
-    getAboutPage(),
-    getHomePage(),
-    getContactPage(),
+    getAboutPage(locale),
+    getHomePage(locale),
+    getContactPage(locale),
   ]);
-  const statData = stats.map((s) => ({ label: s.label, value: s.value, suffix: s.suffix }));
+  const statData = stats.map((s) => ({ label: tr(locale, s.label, s.labelEn, s.labelAr), value: s.value, suffix: s.suffix }));
 
   return (
     <>
       <PageHero
         eyebrow={a.heroEyebrow}
-        breadcrumb={[{ label: "خانه", href: "/" }, { label: "درباره ما" }]}
+        breadcrumb={[{ label: ui(locale).navHome, href: "/" }, { label: ui(locale).navAbout }]}
         title={<HighlightedTitle title={a.heroTitle} highlight={a.heroTitleHighlight} />}
         description={a.heroDescription}
       />
@@ -65,7 +69,7 @@ export default async function AboutPage() {
         </Container>
       </Section>
 
-      <StatsBar stats={statData} />
+      <StatsBar stats={statData} locale={locale} />
 
       {/* values */}
       <Section>
@@ -106,8 +110,8 @@ export default async function AboutPage() {
                       <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
                     </div>
                     <div className="absolute inset-x-0 bottom-0 p-5">
-                      <h3 className="font-display text-lg font-bold text-white">{m.name}</h3>
-                      <p className="text-sm text-white/70">{m.role}</p>
+                      <h3 className="font-display text-lg font-bold text-white">{tr(locale, m.name, m.nameEn, null)}</h3>
+                      <p className="text-sm text-white/70">{tr(locale, m.role, m.roleEn, m.roleAr)}</p>
                       <div className="mt-3 flex gap-2 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
                         {socials.map((s, k) => (
                           <span key={k} className="grid h-8 w-8 place-items-center rounded-full border border-white/20 text-white">

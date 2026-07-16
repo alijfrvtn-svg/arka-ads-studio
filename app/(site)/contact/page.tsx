@@ -8,15 +8,18 @@ import { SocialIcon } from "@/components/layout/SocialIcon";
 import { getContactPage } from "@/lib/queries";
 import { buildMetadata } from "@/lib/seo";
 import { getLocale } from "@/lib/get-locale";
+import { ui } from "@/lib/i18n";
 import { HighlightedTitle } from "@/components/ui/HighlightedTitle";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const c = await getContactPage();
+  const locale = await getLocale();
+  const c = await getContactPage(locale);
   return buildMetadata({ title: c.metaTitle, path: "/contact", description: c.metaDescription });
 }
 
 export default async function ContactPage() {
-  const [c, locale] = await Promise.all([getContactPage(), getLocale()]);
+  const locale = await getLocale();
+  const c = await getContactPage(locale);
   const bboxLat = 0.03;
   const bboxLng = 0.03;
   const bbox = `${c.mapLng - bboxLng}%2C${c.mapLat - bboxLat}%2C${c.mapLng + bboxLng}%2C${c.mapLat + bboxLat}`;
@@ -25,7 +28,7 @@ export default async function ContactPage() {
     <>
       <PageHero
         eyebrow={c.heroEyebrow}
-        breadcrumb={[{ label: "خانه", href: "/" }, { label: "تماس" }]}
+        breadcrumb={[{ label: ui(locale).navHome, href: "/" }, { label: ui(locale).navContact }]}
         title={<HighlightedTitle title={c.heroTitle} highlight={c.heroTitleHighlight} />}
         description={c.heroDescription}
       />
@@ -42,16 +45,16 @@ export default async function ContactPage() {
             <Reveal delay={0.1}>
               <div className="space-y-6">
                 <div className="space-y-3">
-                  <ContactRow icon={MapPin} label="دفتر مرکزی" value={c.address} />
-                  <ContactRow icon={Phone} label="تلفن" value={c.phoneDisplay} href={`tel:${c.phone}`} ltr />
-                  <ContactRow icon={Mail} label="ایمیل" value={c.email} href={`mailto:${c.email}`} ltr />
-                  <ContactRow icon={Clock} label="ساعات کاری" value={c.officeHours} />
+                  <ContactRow icon={MapPin} label={ui(locale).contactRowOffice} value={c.address} />
+                  <ContactRow icon={Phone} label={ui(locale).contactRowPhone} value={c.phoneDisplay} href={`tel:${c.phone}`} ltr />
+                  <ContactRow icon={Mail} label={ui(locale).contactRowEmail} value={c.email} href={`mailto:${c.email}`} ltr />
+                  <ContactRow icon={Clock} label={ui(locale).contactRowHours} value={c.officeHours} />
                 </div>
 
                 {/* dark-themed map */}
                 <div className="relative overflow-hidden rounded-2xl border border-card-border">
                   <iframe
-                    title="نقشه آرکا"
+                    title={ui(locale).mapTitle}
                     src={`https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${c.mapLat}%2C${c.mapLng}`}
                     className="h-64 w-full"
                     style={{ filter: "invert(0.92) hue-rotate(180deg) saturate(0.8) contrast(0.9)" }}
@@ -61,7 +64,7 @@ export default async function ContactPage() {
                 </div>
 
                 <div className="rounded-2xl border border-card-border bg-surface/50 p-6">
-                  <p className="mb-4 text-sm font-semibold text-foreground">ما را دنبال کنید</p>
+                  <p className="mb-4 text-sm font-semibold text-foreground">{ui(locale).footerFollowUs}</p>
                   <div className="flex gap-2">
                     {c.socials.map((s) => (
                       <a

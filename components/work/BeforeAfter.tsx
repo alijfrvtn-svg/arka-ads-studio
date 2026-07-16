@@ -2,9 +2,11 @@
 
 import { useRef, useState } from "react";
 import { MoveHorizontal } from "lucide-react";
+import { ui } from "@/lib/i18n";
+import type { Locale } from "@/types";
 
 /** Interactive before/after comparison slider (drag to reveal). */
-export function BeforeAfter({ before, after }: { before: string; after: string }) {
+export function BeforeAfter({ before, after, locale = "fa" }: { before: string; after: string; locale?: Locale }) {
   const ref = useRef<HTMLDivElement>(null);
   const [pos, setPos] = useState(50);
 
@@ -26,13 +28,13 @@ export function BeforeAfter({ before, after }: { before: string; after: string }
     >
       {/* after (full) */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={after} alt="بعد" className="absolute inset-0 h-full w-full object-cover" draggable={false} />
-      <span className="absolute bottom-3 left-3 rounded-full bg-black/50 px-3 py-1 text-xs text-white backdrop-blur">بعد</span>
+      <img src={after} alt={ui(locale).after} className="absolute inset-0 h-full w-full object-cover" draggable={false} />
+      <span className="absolute bottom-3 left-3 rounded-full bg-black/50 px-3 py-1 text-xs text-white backdrop-blur">{ui(locale).after}</span>
       {/* before (clipped) */}
       <div className="absolute inset-0 overflow-hidden" style={{ width: `${pos}%` }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={before} alt="قبل" className="absolute inset-0 h-full w-full object-cover" style={{ width: `${10000 / pos}%`, maxWidth: "none" }} draggable={false} />
-        <span className="absolute bottom-3 right-3 rounded-full bg-black/50 px-3 py-1 text-xs text-white backdrop-blur">قبل</span>
+        <img src={before} alt={ui(locale).before} className="absolute inset-0 h-full w-full object-cover" style={{ width: `${10000 / pos}%`, maxWidth: "none" }} draggable={false} />
+        <span className="absolute bottom-3 right-3 rounded-full bg-black/50 px-3 py-1 text-xs text-white backdrop-blur">{ui(locale).before}</span>
       </div>
       {/* handle */}
       <div className="absolute inset-y-0 z-10 w-0.5 bg-white" style={{ left: `${pos}%` }}>

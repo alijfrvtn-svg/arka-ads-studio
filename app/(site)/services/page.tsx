@@ -8,23 +8,54 @@ import { Icon } from "@/components/ui/Icon";
 import { getServices } from "@/lib/queries";
 import { DEPARTMENTS } from "@/lib/constants";
 import { buildMetadata } from "@/lib/seo";
-import { faNumber } from "@/lib/utils";
+import { localeNumber } from "@/lib/utils";
+import { tr, ui } from "@/lib/i18n";
+import { getLocale } from "@/lib/get-locale";
+import type { Locale } from "@/types";
 
-export const metadata: Metadata = buildMetadata({
-  title: "خدمات",
-  path: "/services",
-  description: "ده سرویس تخصصی آرکا در چهار دپارتمان: فیلم و پروداکشن، دیجیتال مارکتینگ، برندینگ و طراحی، استراتژی و محتوا.",
-});
+const COPY: Record<Locale, { title: string; highlight: string; description: string; metaDescription: string; details: string; priceUnit: string }> = {
+  fa: {
+    title: "هر آنچه برند شما",
+    highlight: "نیاز دارد",
+    description: "از ایده تا اجرا و تحلیل؛ ده سرویس تخصصی، زیر یک سقف.",
+    metaDescription: "ده سرویس تخصصی آرکا در چهار دپارتمان: فیلم و پروداکشن، دیجیتال مارکتینگ، برندینگ و طراحی، استراتژی و محتوا.",
+    details: "جزئیات",
+    priceUnit: "ت",
+  },
+  en: {
+    title: "Everything your brand",
+    highlight: "needs",
+    description: "From idea to execution and analysis — ten specialized services, under one roof.",
+    metaDescription: "ARKA's ten specialized services across four departments: Film & Production, Digital Marketing, Branding & Design, Strategy & Content.",
+    details: "Details",
+    priceUnit: "Toman",
+  },
+  ar: {
+    title: "كل ما تحتاجه",
+    highlight: "علامتك التجارية",
+    description: "من الفكرة إلى التنفيذ والتحليل؛ عشر خدمات متخصصة تحت سقف واحد.",
+    metaDescription: "عشر خدمات متخصصة من آركا في أربعة أقسام: الأفلام والإنتاج، التسويق الرقمي، العلامة التجارية والتصميم، الاستراتيجية والمحتوى.",
+    details: "التفاصيل",
+    priceUnit: "تومان",
+  },
+};
+
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale();
+  return buildMetadata({ title: ui(locale).navServices, path: "/services", description: COPY[locale].metaDescription });
+}
 
 export default async function ServicesPage() {
+  const locale = await getLocale();
   const services = await getServices();
+  const c = COPY[locale];
   return (
     <>
       <PageHero
-        eyebrow="خدمات"
-        breadcrumb={[{ label: "خانه", href: "/" }, { label: "خدمات" }]}
-        title={<>هر آنچه برند شما <span className="text-gradient">نیاز دارد</span></>}
-        description="از ایده تا اجرا و تحلیل؛ ده سرویس تخصصی، زیر یک سقف."
+        eyebrow={ui(locale).navServices}
+        breadcrumb={[{ label: ui(locale).navHome, href: "/" }, { label: ui(locale).navServices }]}
+        title={<>{c.title} <span className="text-gradient">{c.highlight}</span></>}
+        description={c.description}
       />
       <Section>
         <Container className="space-y-16">
@@ -39,8 +70,8 @@ export default async function ServicesPage() {
                       <Icon name={dept.icon} className="h-5 w-5" />
                     </span>
                     <div>
-                      <h2 className="font-display text-2xl font-bold text-foreground">{dept.title}</h2>
-                      <p className="text-xs uppercase tracking-widest text-foreground-faint">{dept.titleEn}</p>
+                      <h2 className="font-display text-2xl font-bold text-foreground">{tr(locale, dept.title, dept.titleEn, dept.titleAr)}</h2>
+                      {locale === "fa" && <p className="text-xs uppercase tracking-widest text-foreground-faint">{dept.titleEn}</p>}
                     </div>
                   </div>
                 </Reveal>
@@ -54,13 +85,13 @@ export default async function ServicesPage() {
                         <div className="mb-4 grid h-12 w-12 place-items-center rounded-xl border border-card-border bg-background/50 text-primary">
                           <Icon name={s.icon} className="h-5 w-5" />
                         </div>
-                        <h3 className="font-display text-lg font-bold text-foreground">{s.title}</h3>
-                        {s.tagline && <p className="mt-1 text-xs text-primary">{s.tagline}</p>}
-                        <p className="mt-3 flex-1 text-sm leading-relaxed text-foreground-muted">{s.excerpt}</p>
+                        <h3 className="font-display text-lg font-bold text-foreground">{tr(locale, s.title, s.titleEn, s.titleAr)}</h3>
+                        {s.tagline && <p className="mt-1 text-xs text-primary">{tr(locale, s.tagline, s.taglineEn, s.taglineAr)}</p>}
+                        <p className="mt-3 flex-1 text-sm leading-relaxed text-foreground-muted">{tr(locale, s.excerpt, s.excerptEn, s.excerptAr)}</p>
                         <div className="mt-5 flex items-center justify-between border-t border-card-border pt-4">
-                          <span className="text-xs text-foreground-faint ltr-nums">{s.priceFrom ? `از ${faNumber(s.priceFrom)} ت` : ""}</span>
+                          <span className="text-xs text-foreground-faint ltr-nums">{s.priceFrom ? `${ui(locale).priceFromPrefix} ${localeNumber(locale, s.priceFrom)} ${c.priceUnit}` : ""}</span>
                           <span className="inline-flex items-center gap-1 text-sm font-semibold text-primary">
-                            جزئیات <ArrowUpLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1 group-hover:-translate-y-1" />
+                            {c.details} <ArrowUpLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1 group-hover:-translate-y-1" />
                           </span>
                         </div>
                       </Link>

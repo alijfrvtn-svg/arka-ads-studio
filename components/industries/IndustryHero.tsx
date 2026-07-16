@@ -6,6 +6,8 @@ import { Reveal } from "@/components/fx/Reveal";
 import { EmbedFrame } from "@/components/media/EmbedFrame";
 import { getEmbedUrl } from "@/lib/embed";
 import { cn } from "@/lib/utils";
+import { ui } from "@/lib/i18n";
+import type { Locale } from "@/types";
 
 /**
  * Static cover + title/description by default; hovering the background
@@ -17,11 +19,13 @@ export function IndustryHero({
   description,
   cover,
   heroVideo,
+  locale = "fa",
 }: {
   title: string;
   description: string;
   cover: string | null;
   heroVideo: string | null;
+  locale?: Locale;
 }) {
   const [hover, setHover] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -94,11 +98,11 @@ export function IndustryHero({
       >
         <Reveal>
           <nav className="mb-4 text-xs text-foreground-muted">
-            <Link href="/" className="hover:text-primary">خانه</Link> ‹ <Link href="/industries" className="hover:text-primary">صنایع</Link>
+            <Link href="/" className="hover:text-primary">{ui(locale).navHome}</Link> ‹ <Link href="/industries" className="hover:text-primary">{ui(locale).navIndustries}</Link>
           </nav>
         </Reveal>
         <Reveal delay={0.05}>
-          <span className="eyebrow">راهکار صنعتی</span>
+          <span className="eyebrow">{ui(locale).industryHeroEyebrow}</span>
         </Reveal>
         <Reveal delay={0.1}>
           <h1 className="mt-4 font-display text-5xl font-extrabold text-foreground md:text-7xl">{title}</h1>

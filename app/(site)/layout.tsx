@@ -7,7 +7,7 @@ import { getServices, getIndustries, getContactPage } from "@/lib/queries";
 import { db } from "@/lib/db";
 import { getSessionUser } from "@/lib/auth";
 import { parseObj } from "@/lib/utils";
-import { tr } from "@/lib/i18n";
+import { tr, ui } from "@/lib/i18n";
 import { getLocale } from "@/lib/get-locale";
 import { SITE } from "@/lib/constants";
 import type { FooterSettings } from "@/components/layout/SiteFooter";
@@ -31,13 +31,13 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
   // constants.ts list, so admin edits to Services/Industries never showed up
   // there (and stale slugs could 404) — fetch the live, published rows here
   // once and pass down instead.
-  const [services, industries, settingRow, sessionUser, locale, contact] = await Promise.all([
+  const locale = await getLocale();
+  const [services, industries, settingRow, sessionUser, contact] = await Promise.all([
     getServices(),
     getIndustries(),
     db.setting.findUnique({ where: { key: "site" } }),
     getSessionUser(),
-    getLocale(),
-    getContactPage(),
+    getContactPage(locale),
   ]);
   const footer: FooterSettings = { ...FOOTER_DEFAULTS, ...parseObj<Partial<FooterSettings>>(settingRow?.value, {}) };
   const serviceLinks = services.map((s) => ({
@@ -59,7 +59,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
     <SmoothScroll>
       <CustomCursor />
       <a href="#main" className="skip-link">
-        رفتن به محتوا
+        {ui(locale).skipToContent}
       </a>
       <SiteHeader services={serviceLinks} industries={industryLinks} locale={locale} />
       <main id="main" className="min-h-screen">

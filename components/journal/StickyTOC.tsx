@@ -2,8 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
+import { ui } from "@/lib/i18n";
+import type { Locale } from "@/types";
 
-export function StickyTOC({ items }: { items: { level: number; text: string; id: string }[] }) {
+export function StickyTOC({ items, locale = "fa" }: { items: { level: number; text: string; id: string }[]; locale?: Locale }) {
   const [active, setActive] = useState(items[0]?.id);
 
   useEffect(() => {
@@ -24,7 +26,7 @@ export function StickyTOC({ items }: { items: { level: number; text: string; id:
 
   return (
     <nav className="hidden lg:block">
-      <p className="mb-3 text-xs font-bold uppercase tracking-widest text-foreground-faint">در این مطلب</p>
+      <p className="mb-3 text-xs font-bold uppercase tracking-widest text-foreground-faint">{ui(locale).inThisArticle}</p>
       <ul className="space-y-2 border-r border-card-border pr-4">
         {items.map((it) => (
           <li key={it.id} style={{ paddingRight: it.level === 3 ? 12 : 0 }}>

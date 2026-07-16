@@ -7,19 +7,22 @@ import { Icon } from "@/components/ui/Icon";
 import { cn } from "@/lib/utils";
 import { getEmbedUrl } from "@/lib/embed";
 import { EmbedFrame } from "@/components/media/EmbedFrame";
+import { tr } from "@/lib/i18n";
+import type { Locale } from "@/types";
 
 interface Ind {
   id: string;
   slug: string;
   title: string;
   titleEn: string | null;
+  titleAr: string | null;
   excerpt: string;
   icon: string;
   cover: string | null;
   heroVideo: string | null;
 }
 
-export function IndustryShowcase({ industries }: { industries: Ind[] }) {
+export function IndustryShowcase({ industries, locale = "fa" }: { industries: Ind[]; locale?: Locale }) {
   const [active, setActive] = useState(0);
   const cur = industries[active];
 
@@ -76,11 +79,13 @@ export function IndustryShowcase({ industries }: { industries: Ind[] }) {
                     i === active ? "text-foreground" : "text-foreground-faint",
                   )}
                 >
-                  {ind.title}
+                  {tr(locale, ind.title, ind.titleEn, ind.titleAr)}
                 </span>
-                <p className={cn("text-xs uppercase tracking-widest transition-opacity", i === active ? "text-primary opacity-100" : "opacity-0")}>
-                  {ind.titleEn}
-                </p>
+                {locale === "fa" && (
+                  <p className={cn("text-xs uppercase tracking-widest transition-opacity", i === active ? "text-primary opacity-100" : "opacity-0")}>
+                    {ind.titleEn}
+                  </p>
+                )}
               </div>
             </div>
             <ArrowUpLeft
