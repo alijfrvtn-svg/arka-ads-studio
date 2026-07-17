@@ -239,6 +239,7 @@ export interface PostInput {
   excerptEn?: string;
   excerptAr?: string;
   cover: string;
+  authorId?: string;
   content: string;
   contentEn?: string;
   contentAr?: string;
@@ -264,10 +265,11 @@ export interface PostInput {
 }
 
 export async function savePost(input: PostInput) {
-  await requirePermission("blog.manage");
+  const currentUser = await requirePermission("blog.manage");
   const slug = slugify(input.slug || input.title);
   const data = {
     slug,
+    authorId: input.authorId || undefined,
     title: input.title,
     titleEn: input.titleEn || null,
     titleAr: input.titleAr || null,
@@ -302,8 +304,7 @@ export async function savePost(input: PostInput) {
   if (id) {
     await db.post.update({ where: { id }, data });
   } else {
-    const u = await db.user.findFirst({ where: { role: "SUPER_ADMIN" } });
-    const created = await db.post.create({ data: { ...data, authorId: u?.id } });
+    const created = await db.post.create({ data: { ...data, authorId: data.authorId || currentUser.id } });
     id = created.id;
   }
   revalidateSite("/admin/journal", "/journal", `/journal/${slug}`);

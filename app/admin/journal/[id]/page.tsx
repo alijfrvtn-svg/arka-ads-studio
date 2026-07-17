@@ -9,6 +9,12 @@ export default async function EditPostPage({ params }: { params: Promise<{ id: s
   const post = await db.post.findUnique({ where: { id } });
   if (!post) notFound();
 
+  const authors = await db.user.findMany({
+    where: { OR: [{ role: { in: ["SUPER_ADMIN", "ADMIN", "EDITOR", "AUTHOR"] } }, ...(post.authorId ? [{ id: post.authorId }] : [])] },
+    select: { id: true, name: true },
+    orderBy: { name: "asc" },
+  });
+
   const initial: PostInput = {
     id: post.id,
     slug: post.slug,
@@ -19,6 +25,7 @@ export default async function EditPostPage({ params }: { params: Promise<{ id: s
     excerptEn: post.excerptEn ?? "",
     excerptAr: post.excerptAr ?? "",
     cover: post.cover,
+    authorId: post.authorId ?? undefined,
     content: post.content,
     contentEn: post.contentEn ?? "",
     contentAr: post.contentAr ?? "",
@@ -43,5 +50,5 @@ export default async function EditPostPage({ params }: { params: Promise<{ id: s
     keywordsAr: parseArr<string>(post.keywordsAr),
   };
 
-  return <PostEditor initial={initial} />;
+  return <PostEditor initial={initial} authors={authors} />;
 }

@@ -14,7 +14,7 @@ import { cn, readingTime, slugify } from "@/lib/utils";
 
 const CATEGORIES = ["استراتژی برند", "دیجیتال مارکتینگ", "پروداکشن", "برندینگ", "طراحی", "سوشال مدیا", "سئو"];
 
-export function PostEditor({ initial }: { initial: PostInput }) {
+export function PostEditor({ initial, authors }: { initial: PostInput; authors: { id: string; name: string }[] }) {
   const router = useRouter();
   const [p, setP] = useState<PostInput>(initial);
   const [tab, setTab] = useState<"write" | "preview">("write");
@@ -169,6 +169,11 @@ export function PostEditor({ initial }: { initial: PostInput }) {
           <FormSection title="انتشار">
             <div className="flex items-center justify-between"><span className="text-sm text-foreground-muted">منتشر شده</span><Toggle checked={p.published} onChange={(e) => set({ published: e.target.checked })} /></div>
             <div className="flex items-center justify-between"><span className="text-sm text-foreground-muted">مطلب شاخص</span><Toggle checked={p.featured} onChange={(e) => set({ featured: e.target.checked })} /></div>
+            <Field label="نویسنده">
+              <Select value={p.authorId ?? ""} onChange={(e) => set({ authorId: e.target.value })}>
+                {authors.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}
+              </Select>
+            </Field>
             <Field label="دسته‌بندی">
               <LangTabs
                 tabs={[
