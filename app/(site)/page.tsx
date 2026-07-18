@@ -16,6 +16,13 @@ import {
 } from "@/lib/queries";
 import { getLocale } from "@/lib/get-locale";
 import { tr } from "@/lib/i18n";
+import { buildMetadata } from "@/lib/seo";
+import type { Metadata } from "next";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale();
+  return buildMetadata({ path: "/", locale });
+}
 
 export default async function HomePage() {
   const locale = await getLocale();

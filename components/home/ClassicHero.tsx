@@ -58,7 +58,7 @@ export function ClassicHero({
           {content.heroBadge}
         </motion.div>
 
-        <h1 className="font-display text-[13vw] font-extrabold leading-[0.95] tracking-tight sm:text-7xl md:text-8xl lg:text-[7.5rem]">
+        <h1 className="font-display break-words text-[11vw] font-extrabold leading-[0.95] tracking-tight sm:text-7xl md:text-8xl lg:text-[7.5rem]">
           {content.heroHeadline.map((line, i) => (
             <motion.span
               key={line}

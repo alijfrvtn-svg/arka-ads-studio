@@ -39,6 +39,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     image: p.seo?.ogImage || p.cover,
     keywords: trArr<string>(locale, p.seo?.keywords ?? "[]", p.seo?.keywordsEn, p.seo?.keywordsAr),
     type: "article",
+    locale,
   });
 }
 
@@ -51,7 +52,8 @@ export default async function CaseStudy({ params }: { params: Promise<{ slug: st
   });
   if (!p) notFound();
 
-  await db.project.update({ where: { id: p.id }, data: { views: { increment: 1 } } }).catch(() => {});
+  // Raw SQL bypasses Prisma's @updatedAt hook so a page view doesn't corrupt sitemap lastmod freshness signals.
+  await db.$executeRaw`UPDATE "Project" SET views = views + 1 WHERE id = ${p.id}`.catch(() => {});
 
   const gallery = parseArr<string>(p.gallery);
   const metrics = trArr<Metric>(locale, p.metrics, p.metricsEn, p.metricsAr);

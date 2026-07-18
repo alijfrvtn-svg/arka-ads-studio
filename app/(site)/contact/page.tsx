@@ -14,7 +14,7 @@ import { HighlightedTitle } from "@/components/ui/HighlightedTitle";
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
   const c = await getContactPage(locale);
-  return buildMetadata({ title: c.metaTitle, path: "/contact", description: c.metaDescription });
+  return buildMetadata({ title: c.metaTitle, path: "/contact", description: c.metaDescription, locale });
 }
 
 export default async function ContactPage() {

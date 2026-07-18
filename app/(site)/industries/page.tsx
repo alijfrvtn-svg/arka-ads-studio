@@ -35,6 +35,7 @@ export async function generateMetadata(): Promise<Metadata> {
     title: ui(locale).navIndustries,
     path: "/industries",
     description: COPY[locale].metaDescription,
+    locale,
   });
 }
 

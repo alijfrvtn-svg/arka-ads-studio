@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { SITE } from "./constants";
+import type { Locale } from "@/types";
 
 interface SeoInput {
   title?: string;
@@ -9,7 +10,10 @@ interface SeoInput {
   keywords?: string[];
   noindex?: boolean;
   type?: "website" | "article";
+  locale?: Locale;
 }
+
+const OG_LOCALE: Record<Locale, string> = { fa: "fa_IR", en: "en_US", ar: "ar_SA" };
 
 /** Build consistent page metadata (canonical + OG + Twitter). */
 export function buildMetadata({
@@ -20,9 +24,10 @@ export function buildMetadata({
   keywords = [],
   noindex = false,
   type = "website",
+  locale = "fa",
 }: SeoInput): Metadata {
   const url = `${SITE.url}${path}`;
-  const ogImage = image || `${SITE.url}/og.png`;
+  const ogImage = image || `${SITE.url}/opengraph-image`;
   return {
     title,
     description,
@@ -35,7 +40,7 @@ export function buildMetadata({
       title: title || `${SITE.nameEn} — ${SITE.positioning}`,
       description,
       url,
-      locale: "fa_IR",
+      locale: OG_LOCALE[locale],
       images: [{ url: ogImage, width: 1200, height: 630, alt: title || SITE.nameEn }],
     },
     twitter: {
@@ -47,7 +52,17 @@ export function buildMetadata({
   };
 }
 
-export function organizationJsonLd() {
+/** Social links known to be dead/wrong — excluded from schema regardless of source data. */
+const BROKEN_SOCIAL_HREFS = ["youtube.com/@arka.studio", "linkedin.com/company/arka-studio"];
+
+export function organizationJsonLd(contact: {
+  address: string;
+  phone: string;
+  email: string;
+  mapLat: number;
+  mapLng: number;
+  socials: { href: string }[];
+}) {
   return {
     "@context": "https://schema.org",
     "@type": "Organization",
@@ -55,15 +70,40 @@ export function organizationJsonLd() {
     alternateName: SITE.name,
     url: SITE.url,
     description: SITE.descriptionEn,
-    email: SITE.email,
+    email: contact.email,
+    telephone: contact.phone,
     foundingDate: String(SITE.founded),
     address: {
       "@type": "PostalAddress",
-      streetAddress: SITE.addressEn,
-      addressLocality: "Tehran",
+      streetAddress: contact.address,
+      addressLocality: "Tabriz",
       addressCountry: "IR",
     },
-    sameAs: SITE.socials.map((s) => s.href),
+    geo: { "@type": "GeoCoordinates", latitude: contact.mapLat, longitude: contact.mapLng },
+    sameAs: contact.socials.map((s) => s.href).filter((href) => !BROKEN_SOCIAL_HREFS.some((bad) => href.includes(bad))),
+  };
+}
+
+export function faqPageJsonLd(items: { q: string; a: string }[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: items.map((it) => ({
+      "@type": "Question",
+      name: it.q,
+      acceptedAnswer: { "@type": "Answer", text: it.a },
+    })),
+  };
+}
+
+export function serviceJsonLd(p: { name: string; description: string; path: string }) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    name: p.name,
+    description: p.description,
+    url: `${SITE.url}${p.path}`,
+    provider: { "@type": "Organization", name: SITE.nameEn, url: SITE.url },
   };
 }
 
@@ -95,7 +135,7 @@ export function articleJsonLd(p: {
     description: p.description,
     image: p.image,
     datePublished: new Date(p.datePublished).toISOString(),
-    author: { "@type": "Organization", name: p.author || SITE.nameEn },
+    author: p.author ? { "@type": "Person", name: p.author } : { "@type": "Organization", name: SITE.nameEn },
     publisher: {
       "@type": "Organization",
       name: SITE.nameEn,

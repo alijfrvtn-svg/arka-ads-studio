@@ -18,7 +18,7 @@ import type { Social } from "@/types";
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
   const a = await getAboutPage(locale);
-  return buildMetadata({ title: a.metaTitle, path: "/about", description: a.metaDescription });
+  return buildMetadata({ title: a.metaTitle, path: "/about", description: a.metaDescription, locale });
 }
 
 const ICONS: Record<string, LucideIcon> = { Target, Gem, Zap, Sparkles };

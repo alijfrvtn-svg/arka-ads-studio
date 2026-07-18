@@ -5,6 +5,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { SITE } from "@/lib/constants";
 import { organizationJsonLd } from "@/lib/seo";
+import { getContactPage } from "@/lib/queries";
 import { dirOf } from "@/lib/i18n";
 import type { Locale } from "@/types";
 
@@ -72,6 +73,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   // site-language cookie.
   const h = await headers();
   const locale = (h.get("x-locale") as Locale) || "fa";
+  const contact = await getContactPage("fa");
 
   return (
     <html lang={locale} dir={dirOf(locale)} suppressHydrationWarning className={`${vazir.variable} ${syne.variable}`}>
@@ -83,7 +85,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
         <div className="global-grain" aria-hidden />
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd()) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd(contact)) }}
         />
       </body>
     </html>

@@ -42,7 +42,7 @@ const COPY: Record<Locale, { title: string; highlight: string; description: stri
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
-  return buildMetadata({ title: ui(locale).navServices, path: "/services", description: COPY[locale].metaDescription });
+  return buildMetadata({ title: ui(locale).navServices, path: "/services", description: COPY[locale].metaDescription, locale });
 }
 
 export default async function ServicesPage() {

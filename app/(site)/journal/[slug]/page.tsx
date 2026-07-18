@@ -30,6 +30,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     image: p.ogImage || p.cover,
     keywords: trArr<string>(locale, p.keywords, p.keywordsEn, p.keywordsAr),
     type: "article",
+    locale,
   });
 }
 
@@ -39,7 +40,8 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
   const p = await db.post.findUnique({ where: { slug }, include: { author: { select: { name: true, avatar: true } } } });
   if (!p) notFound();
 
-  await db.post.update({ where: { id: p.id }, data: { views: { increment: 1 } } }).catch(() => {});
+  // Raw SQL bypasses Prisma's @updatedAt hook so a page view doesn't corrupt sitemap lastmod freshness signals.
+  await db.$executeRaw`UPDATE "Post" SET views = views + 1 WHERE id = ${p.id}`.catch(() => {});
 
   const title = tr(locale, p.title, p.titleEn, p.titleAr);
   const excerpt = tr(locale, p.excerpt, p.excerptEn, p.excerptAr);

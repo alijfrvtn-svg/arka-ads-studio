@@ -57,6 +57,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     description: tr(locale, ind.metaDescription ?? "", ind.metaDescriptionEn, ind.metaDescriptionAr) || tr(locale, ind.excerpt, ind.excerptEn, ind.excerptAr),
     path: `/industries/${ind.slug}`,
     image: ind.cover || undefined,
+    locale,
   });
 }
 

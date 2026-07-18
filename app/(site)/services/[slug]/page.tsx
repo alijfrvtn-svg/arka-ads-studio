@@ -8,7 +8,7 @@ import { Section, Container, SectionHeading } from "@/components/ui/Section";
 import { Reveal } from "@/components/fx/Reveal";
 import { Accordion } from "@/components/ui/Accordion";
 import { ProjectCard } from "@/components/work/ProjectCard";
-import { buildMetadata } from "@/lib/seo";
+import { buildMetadata, breadcrumbJsonLd, serviceJsonLd, faqPageJsonLd } from "@/lib/seo";
 import { localeNumber } from "@/lib/utils";
 import { tr, trArr, ui } from "@/lib/i18n";
 import { getLocale } from "@/lib/get-locale";
@@ -31,6 +31,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     path: `/services/${s.slug}`,
     image: s.cover || undefined,
     keywords: trArr<string>(locale, s.keywords, s.keywordsEn, s.keywordsAr),
+    locale,
   });
 }
 
@@ -60,6 +61,16 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
 
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify([
+            breadcrumbJsonLd([{ name: ui(locale).navHome, path: "/" }, { name: ui(locale).navServices, path: "/services" }, { name: title, path: `/services/${s.slug}` }]),
+            serviceJsonLd({ name: title, description, path: `/services/${s.slug}` }),
+            ...(faqs.length ? [faqPageJsonLd(faqs)] : []),
+          ]),
+        }}
+      />
       <PageHero
         eyebrow={tr(locale, s.tagline || "", s.taglineEn, s.taglineAr) || c.defaultEyebrow}
         breadcrumb={[{ label: ui(locale).navHome, href: "/" }, { label: ui(locale).navServices, href: "/services" }, { label: title }]}
@@ -124,22 +135,22 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
         <Section>
           <Container>
             <SectionHeading align="center" eyebrow={ui(locale).servicePricingEyebrow} title={ui(locale).servicePricingTitle} className="mx-auto mb-14 max-w-2xl" />
-            <div className="grid gap-5 md:grid-cols-3">
+            <div className="grid min-w-0 gap-5 md:grid-cols-3">
               {pricing.map((tier, i) => (
                 <Reveal key={i} delay={i * 0.08}>
-                  <div className={`relative flex h-full flex-col overflow-hidden rounded-2xl border p-7 ${tier.featured ? "border-primary/50 bg-primary/5" : "border-card-border glass"}`}>
+                  <div className={`relative flex h-full min-w-0 flex-col overflow-hidden rounded-2xl border p-7 ${tier.featured ? "border-primary/50 bg-primary/5" : "border-card-border glass"}`}>
                     {tier.featured && (
                       <span className="absolute left-5 top-5 rounded-full bg-primary px-3 py-1 text-xs font-semibold text-primary-foreground">{ui(locale).pricingFeaturedBadge}</span>
                     )}
-                    <h3 className="font-display text-lg font-bold text-foreground">{tier.name}</h3>
+                    <h3 className="font-display break-words text-lg font-bold text-foreground">{tier.name}</h3>
                     <div className="mt-4 flex items-end gap-1">
-                      <span className="font-display text-3xl font-extrabold text-foreground ltr-nums">{tier.price}</span>
+                      <span className="font-display break-words text-3xl font-extrabold text-foreground ltr-nums">{tier.price}</span>
                       {tier.unit && <span className="mb-1 text-sm text-foreground-muted">{tier.unit}</span>}
                     </div>
                     <ul className="mt-6 flex-1 space-y-3">
                       {tier.features.map((f, k) => (
                         <li key={k} className="flex items-center gap-2.5 text-sm text-foreground-muted">
-                          <Check className="h-4 w-4 shrink-0 text-primary" /> {f}
+                          <Check className="h-4 w-4 shrink-0 text-primary" /> <span className="break-words">{f}</span>
                         </li>
                       ))}
                     </ul>
