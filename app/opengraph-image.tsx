@@ -25,7 +25,7 @@ export default async function OpengraphImage() {
           {SITE.nameEn}
         </div>
         <div style={{ display: "flex", marginTop: 24, fontSize: 64, fontWeight: 800, lineHeight: 1.15, maxWidth: 980 }}>
-          {SITE.positioning}
+          Creative Production &amp; Digital Marketing Studio
         </div>
         <div style={{ display: "flex", marginTop: 28, fontSize: 30, color: "#9aa3ad" }}>{SITE.sloganEn}</div>
       </div>
