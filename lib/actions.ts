@@ -318,6 +318,57 @@ export async function deletePost(id: string) {
   return { ok: true };
 }
 
+const CITATION_PATTERN = /\[cite_start\]|\[cite:\s*\d+\]/g;
+function strip(v: string): string;
+function strip(v: string | null | undefined): string | null | undefined;
+function strip(v: string | null | undefined) {
+  return v ? v.replace(CITATION_PATTERN, "") : v;
+}
+
+/** One-off cleanup: strips leftover AI-drafting citation artifacts ("[cite_start]", "[cite: 376]") from published content. */
+export async function cleanCitationArtifacts() {
+  await requirePermission("blog.manage");
+  let postsChanged = 0;
+  const posts = await db.post.findMany({ select: { id: true, content: true, contentEn: true, contentAr: true, excerpt: true, excerptEn: true, excerptAr: true } });
+  for (const p of posts) {
+    const next = {
+      content: strip(p.content),
+      contentEn: strip(p.contentEn),
+      contentAr: strip(p.contentAr),
+      excerpt: strip(p.excerpt),
+      excerptEn: strip(p.excerptEn),
+      excerptAr: strip(p.excerptAr),
+    };
+    if (next.content !== p.content || next.contentEn !== p.contentEn || next.contentAr !== p.contentAr || next.excerpt !== p.excerpt || next.excerptEn !== p.excerptEn || next.excerptAr !== p.excerptAr) {
+      await db.post.update({ where: { id: p.id }, data: next });
+      postsChanged++;
+    }
+  }
+
+  let servicesChanged = 0;
+  const services = await db.service.findMany({ select: { id: true, description: true, descriptionEn: true, descriptionAr: true } });
+  for (const s of services) {
+    const next = { description: strip(s.description), descriptionEn: strip(s.descriptionEn), descriptionAr: strip(s.descriptionAr) };
+    if (next.description !== s.description || next.descriptionEn !== s.descriptionEn || next.descriptionAr !== s.descriptionAr) {
+      await db.service.update({ where: { id: s.id }, data: next });
+      servicesChanged++;
+    }
+  }
+
+  let industriesChanged = 0;
+  const industries = await db.industry.findMany({ select: { id: true, description: true, descriptionEn: true, descriptionAr: true } });
+  for (const i of industries) {
+    const next = { description: strip(i.description), descriptionEn: strip(i.descriptionEn), descriptionAr: strip(i.descriptionAr) };
+    if (next.description !== i.description || next.descriptionEn !== i.descriptionEn || next.descriptionAr !== i.descriptionAr) {
+      await db.industry.update({ where: { id: i.id }, data: next });
+      industriesChanged++;
+    }
+  }
+
+  revalidateSite("/admin/journal", "/journal", "/services", "/industries");
+  return { ok: true, postsChanged, servicesChanged, industriesChanged };
+}
+
 // ============================================================
 // MEDIA
 // ============================================================

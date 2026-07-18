@@ -3,6 +3,7 @@ import { Newspaper, Plus, Star, Clock, Eye } from "lucide-react";
 import { db } from "@/lib/db";
 import { PageHeader, StatusBadge, EmptyState } from "@/components/admin/ui";
 import { RowActions } from "@/components/admin/RowActions";
+import { CleanCitationsButton } from "@/components/admin/CleanCitationsButton";
 import { deletePost, togglePublish } from "@/lib/actions";
 import { faDate, faNumber, toFa } from "@/lib/utils";
 
@@ -15,6 +16,7 @@ export default async function JournalList() {
   return (
     <div className="mx-auto max-w-7xl">
       <PageHeader title="ژورنال" description={`${faNumber(posts.length)} مطلب`}>
+        <CleanCitationsButton />
         <Link href="/admin/journal/new" className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground hover:brightness-110">
           <Plus className="h-4 w-4" /> مطلب جدید
         </Link>
