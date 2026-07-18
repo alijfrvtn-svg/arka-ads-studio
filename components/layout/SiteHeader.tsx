@@ -9,7 +9,8 @@ import { Logo } from "@/components/brand/Logo";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { Button } from "@/components/ui/Button";
 import { Magnetic } from "@/components/fx/Magnetic";
-import { LanguageSwitcher } from "@/components/layout/LanguageSwitcher";
+// LanguageSwitcher import removed while multi-language is paused — component kept at
+// components/layout/LanguageSwitcher.tsx for re-enabling later.
 import { NAV, DEPARTMENTS } from "@/lib/constants";
 import { ui } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
@@ -105,7 +106,6 @@ export function SiteHeader({
 
           {/* actions */}
           <div className="flex items-center gap-2">
-            <LanguageSwitcher locale={locale} className="hidden sm:block" />
             <ThemeToggle />
             <div className="hidden md:block">
               <Magnetic strength={0.4}>
@@ -209,9 +209,6 @@ export function SiteHeader({
                   </Link>
                 </motion.div>
               ))}
-              <div className="mt-4 flex justify-center sm:hidden">
-                <LanguageSwitcher locale={locale} />
-              </div>
               <Button href="/contact" size="lg" variant="glow" className="mt-6 w-full">
                 {t.ctaStartProject}
                 <ArrowUpLeft className="h-5 w-5" />
