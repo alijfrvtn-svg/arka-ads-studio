@@ -21,10 +21,14 @@ const FOOTER_DEFAULTS: FooterSettings = {
   footerCopyright: "تمام حقوق محفوظ است.",
 };
 
-// All public pages read live data from the database (projects, services,
-// posts, etc.) that admins can edit at any time — force dynamic rendering
-// so pages are never frozen as stale static HTML from build time.
-export const dynamic = "force-dynamic";
+// Public pages are statically cached and served instantly from Netlify's edge
+// (huge win for Core Web Vitals/SEO) instead of rendering from scratch on
+// every request. Admin saves call revalidatePath so edits still show up
+// immediately (see revalidateSite() in lib/actions.ts) — this `revalidate`
+// is just a safety-net backstop: if some future mutation ever forgets to
+// invalidate a page, it self-heals within 5 minutes instead of staying
+// stale indefinitely.
+export const revalidate = 300;
 
 export default async function SiteLayout({ children }: { children: React.ReactNode }) {
   // Header mega-menu and footer link columns used to read from a hardcoded

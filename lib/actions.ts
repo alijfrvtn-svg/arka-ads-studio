@@ -32,8 +32,17 @@ const PL = (fd: FormData, k: string, fields: string[]) =>
     return obj;
   });
 
+/**
+ * Every admin save calls this, but individual paths alone aren't enough now
+ * that (site)/layout.tsx no longer forces dynamic rendering: the header/footer
+ * (services, industries, contact info, socials) it renders are shared across
+ * every public page, not just the ones listed here. Always also bust that
+ * shared layout cache so a service/contact/settings edit can never leave
+ * stale nav or footer content stuck on unrelated pages.
+ */
 function revalidateSite(...paths: string[]) {
   for (const p of paths) revalidatePath(p);
+  revalidatePath("/", "layout");
 }
 
 // ============================================================
