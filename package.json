@@ -23,6 +23,7 @@
     "bcryptjs": "^2.4.3",
     "clsx": "^2.1.1",
     "framer-motion": "^12.42.2",
+    "jalaali-js": "^2.0.0",
     "jose": "^5.9.6",
     "lenis": "^1.3.25",
     "lucide-react": "^0.469.0",

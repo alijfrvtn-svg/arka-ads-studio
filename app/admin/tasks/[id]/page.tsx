@@ -5,6 +5,7 @@ import { db } from "@/lib/db";
 import { Field, Input, Textarea, Select, FormSection } from "@/components/admin/form";
 import { SubmitButton } from "@/components/admin/SubmitButton";
 import { CommentThread } from "@/components/tasks/CommentThread";
+import { JalaliDatePicker } from "@/components/tasks/JalaliDatePicker";
 import { saveTask, addTaskComment } from "@/lib/actions";
 import { TASK_STATUSES, TASK_PRIORITIES } from "@/lib/constants";
 import { DeleteTaskButton } from "./DeleteTaskButton";
@@ -68,7 +69,7 @@ export default async function TaskForm({ params }: { params: Promise<{ id: strin
               </Select>
             </Field>
             <Field label="سررسید">
-              <Input name="dueDate" type="date" defaultValue={toInputDate(task?.dueDate)} />
+              <JalaliDatePicker name="dueDate" defaultValue={toInputDate(task?.dueDate)} />
             </Field>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">

@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { LogOut } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { LogOut, ListTodo, CalendarDays } from "lucide-react";
 import { LogoMark } from "@/components/brand/Logo";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
+import { cn } from "@/lib/utils";
 
 export function PortalShell({
   user,
@@ -14,6 +15,19 @@ export function PortalShell({
   children: React.ReactNode;
 }) {
   const router = useRouter();
+  const pathname = usePathname();
+
+  const navLink = (href: string, label: string, Icon: typeof ListTodo) => (
+    <Link
+      href={href}
+      className={cn(
+        "inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+        pathname === href ? "bg-primary/10 text-primary" : "text-foreground-muted hover:text-foreground",
+      )}
+    >
+      <Icon className="h-4 w-4" /> {label}
+    </Link>
+  );
 
   const logout = async () => {
     await fetch("/api/auth/logout", { method: "POST" });
@@ -26,8 +40,12 @@ export function PortalShell({
       <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-card-border bg-surface/80 px-4 backdrop-blur-xl md:px-6">
         <Link href="/portal" className="flex items-center gap-2">
           <LogoMark className="h-8 w-8" />
-          <span className="font-display text-lg font-bold text-foreground">پنل کاربران</span>
+          <span className="hidden font-display text-lg font-bold text-foreground sm:block">پنل کاربران</span>
         </Link>
+        <nav className="flex items-center gap-1">
+          {navLink("/portal", "تسک‌های من", ListTodo)}
+          {navLink("/portal/calendar", "تقویم تیم", CalendarDays)}
+        </nav>
         <div className="mr-auto flex items-center gap-3">
           <ThemeToggle />
           <p className="hidden text-sm font-semibold text-foreground sm:block">{user.name}</p>

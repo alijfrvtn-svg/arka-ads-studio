@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Plus, ListTodo } from "lucide-react";
+import { Plus, ListTodo, CalendarDays } from "lucide-react";
 import { db } from "@/lib/db";
 import { PageHeader, EmptyState } from "@/components/admin/ui";
 import { TasksBoard } from "@/components/admin/TasksBoard";
@@ -21,6 +21,12 @@ export default async function TasksPage() {
         title="تسک‌ها"
         description={`${faNumber(tasks.length)} تسک · ${faNumber(open)} باز — برای جابه‌جایی، کارت را بکشید`}
       >
+        <Link
+          href="/admin/tasks/calendar"
+          className="inline-flex items-center gap-1.5 rounded-xl border border-card-border px-4 py-2.5 text-sm font-semibold text-foreground hover:border-primary"
+        >
+          <CalendarDays className="h-4 w-4" /> تقویم
+        </Link>
         <Link
           href="/admin/tasks/new"
           className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground hover:brightness-110"
