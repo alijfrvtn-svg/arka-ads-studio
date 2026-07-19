@@ -3,9 +3,10 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { db } from "./db";
-import { requirePermission } from "./auth";
+import { requirePermission, requireUser } from "./auth";
 import { hashPassword } from "./auth";
 import { slugify, parseObj } from "./utils";
+import { sendSms } from "./sms";
 import type { Credit, Metric } from "@/types";
 
 // ————— helpers —————
@@ -590,6 +591,7 @@ export async function saveUser(fd: FormData) {
   const base = {
     name: S(fd, "name"),
     email: S(fd, "email").toLowerCase(),
+    phone: S(fd, "phone") || null,
     role: S(fd, "role", "EDITOR"),
     bio: S(fd, "bio") || null,
     avatar: S(fd, "avatar") || null,
@@ -701,6 +703,16 @@ export async function saveStats(fd: FormData) {
   redirect("/admin/settings");
 }
 
+async function notifyAndTextAssignee(userId: string, taskId: string, taskTitle: string) {
+  const assignee = await db.user.findUnique({ where: { id: userId }, select: { phone: true } });
+  await db.notification.create({
+    data: { userId, title: "تسک جدید برای شما", body: taskTitle, link: `/portal/tasks/${taskId}` },
+  });
+  if (assignee?.phone) {
+    await sendSms(assignee.phone, `آرکا: یک تسک جدید برای شما ثبت شد: «${taskTitle}». برای مشاهده وارد پنل کاربران شوید.`).catch(() => {});
+  }
+}
+
 // ============================================================
 // TASKS (admin/CMS side — gated by tasks.manage; staff self-service lives in lib/portal-actions.ts)
 // ============================================================
@@ -709,17 +721,27 @@ export async function saveTask(fd: FormData) {
   const id = S(fd, "id");
   const dueDateRaw = S(fd, "dueDate");
   const status = S(fd, "status", "TODO");
+  const title = S(fd, "title");
+  const assigneeId = S(fd, "assigneeId");
   const data = {
-    title: S(fd, "title"),
+    title,
     description: S(fd, "description") || null,
     status,
     priority: S(fd, "priority", "MEDIUM"),
     dueDate: dueDateRaw ? new Date(dueDateRaw) : null,
-    assigneeId: S(fd, "assigneeId"),
+    assigneeId,
     completedAt: status === "DONE" ? new Date() : null,
   };
-  if (id) await db.task.update({ where: { id }, data });
-  else await db.task.create({ data: { ...data, createdById: user.id } });
+  if (id) {
+    const existing = await db.task.findUnique({ where: { id }, select: { assigneeId: true } });
+    await db.task.update({ where: { id }, data });
+    if (existing && existing.assigneeId !== assigneeId) {
+      await notifyAndTextAssignee(assigneeId, id, title);
+    }
+  } else {
+    const created = await db.task.create({ data: { ...data, createdById: user.id } });
+    await notifyAndTextAssignee(assigneeId, created.id, title);
+  }
   revalidateSite("/admin/tasks");
   redirect("/admin/tasks");
 }
@@ -729,6 +751,32 @@ export async function deleteTask(id: string) {
   await db.task.delete({ where: { id } });
   revalidateSite("/admin/tasks");
   return { ok: true };
+}
+
+// ============================================================
+// NOTIFICATIONS (bell icon — /admin and /portal both use these)
+// ============================================================
+export async function markNotificationRead(id: string) {
+  const user = await requireUser();
+  await db.notification.updateMany({ where: { id, userId: user.id }, data: { read: true } });
+  return { ok: true };
+}
+
+export async function markAllNotificationsRead() {
+  const user = await requireUser();
+  await db.notification.updateMany({ where: { userId: user.id, read: false }, data: { read: true } });
+  return { ok: true };
+}
+
+/** Admin broadcast — send a message to one or more users, shown in their notification bell. */
+export async function sendNotification(fd: FormData) {
+  await requirePermission("users.manage");
+  const title = S(fd, "title");
+  const body = S(fd, "body") || null;
+  const recipientIds = fd.getAll("recipientIds").map(String);
+  if (!title || recipientIds.length === 0) return { ok: false, error: "عنوان و حداقل یک گیرنده الزامی است" };
+  await db.notification.createMany({ data: recipientIds.map((userId) => ({ userId, title, body })) });
+  return { ok: true, count: recipientIds.length };
 }
 
 export async function updateTaskStatus(id: string, status: string) {

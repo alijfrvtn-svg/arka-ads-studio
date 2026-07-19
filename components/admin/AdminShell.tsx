@@ -21,7 +21,7 @@ import {
   Shield,
   Settings,
   Search,
-  Bell,
+  Send,
   LogOut,
   ExternalLink,
   Menu,
@@ -31,6 +31,7 @@ import {
 } from "lucide-react";
 import { Logo, LogoMark } from "@/components/brand/Logo";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
+import { NotificationBell, type NotificationItem } from "@/components/notifications/NotificationBell";
 import { ROLES } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import type { Role } from "@/types";
@@ -70,7 +71,10 @@ const NAV: { group: string; items: NavItem[] }[] = [
   },
   {
     group: "پرسنل",
-    items: [{ label: "تسک‌ها", href: "/admin/tasks", icon: ListTodo, perm: "tasks.view" }],
+    items: [
+      { label: "تسک‌ها", href: "/admin/tasks", icon: ListTodo, perm: "tasks.view" },
+      { label: "ارسال پیام", href: "/admin/notifications", icon: Send, perm: "users.manage" },
+    ],
   },
   {
     group: "سیستم",
@@ -84,10 +88,12 @@ const NAV: { group: string; items: NavItem[] }[] = [
 export function AdminShell({
   user,
   effective,
+  notifications,
   children,
 }: {
   user: { name: string; email: string; role: Role; avatar: string | null };
   effective: string[];
+  notifications: NotificationItem[];
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
@@ -228,10 +234,7 @@ export function AdminShell({
               <ExternalLink className="h-3.5 w-3.5" />
               مشاهده سایت
             </Link>
-            <button className="relative grid h-10 w-10 place-items-center rounded-full text-foreground-muted hover:bg-card-hover">
-              <Bell className="h-[18px] w-[18px]" />
-              <span className="absolute right-2.5 top-2.5 h-2 w-2 rounded-full bg-primary" />
-            </button>
+            <NotificationBell initial={notifications} />
             <ThemeToggle />
           </div>
         </header>

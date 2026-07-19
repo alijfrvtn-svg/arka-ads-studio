@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getSessionUser } from "@/lib/auth";
 import { effectivePermissions } from "@/lib/rbac";
 import { AdminShell } from "@/components/admin/AdminShell";
+import { db } from "@/lib/db";
 import { parseArr } from "@/lib/utils";
 import type { Role } from "@/types";
 
@@ -18,11 +19,17 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
   const overrides = parseArr<string>(user.permissions);
   const effective = effectivePermissions(user.role as Role, overrides);
+  const notifications = await db.notification.findMany({
+    where: { userId: user.id },
+    orderBy: { createdAt: "desc" },
+    take: 30,
+  });
 
   return (
     <AdminShell
       user={{ name: user.name, email: user.email, role: user.role as Role, avatar: user.avatar }}
       effective={effective}
+      notifications={notifications}
     >
       {children}
     </AdminShell>

@@ -44,6 +44,9 @@ export default async function UserForm({ params }: { params: Promise<{ id: strin
               </Select>
             </Field>
           </div>
+          <Field label="شماره موبایل" hint="برای ارسال پیامک هنگام محول‌شدن تسک — مثال: 09121234567">
+            <Input name="phone" defaultValue={u?.phone ?? ""} dir="ltr" className="text-left" placeholder="0912…" />
+          </Field>
           <Field label="آواتار (URL)"><Input name="avatar" defaultValue={u?.avatar ?? ""} dir="ltr" className="text-left" placeholder="https://…" /></Field>
           <Field label="بیو"><Textarea name="bio" defaultValue={u?.bio ?? ""} /></Field>
         </FormSection>

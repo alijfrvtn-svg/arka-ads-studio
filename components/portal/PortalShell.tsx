@@ -5,13 +5,16 @@ import { usePathname, useRouter } from "next/navigation";
 import { LogOut, ListTodo, CalendarDays } from "lucide-react";
 import { LogoMark } from "@/components/brand/Logo";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
+import { NotificationBell, type NotificationItem } from "@/components/notifications/NotificationBell";
 import { cn } from "@/lib/utils";
 
 export function PortalShell({
   user,
+  notifications,
   children,
 }: {
   user: { name: string; email: string; avatar: string | null };
+  notifications: NotificationItem[];
   children: React.ReactNode;
 }) {
   const router = useRouter();
@@ -47,6 +50,7 @@ export function PortalShell({
           {navLink("/portal/calendar", "تقویم تیم", CalendarDays)}
         </nav>
         <div className="mr-auto flex items-center gap-3">
+          <NotificationBell initial={notifications} />
           <ThemeToggle />
           <p className="hidden text-sm font-semibold text-foreground sm:block">{user.name}</p>
           {/* eslint-disable-next-line @next/next/no-img-element */}

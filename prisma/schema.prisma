@@ -16,22 +16,37 @@ datasource db {
 
 /// Admin users with role-based + granular permission access control.
 model User {
-  id            String        @id @default(cuid())
-  email         String        @unique
+  id            String         @id @default(cuid())
+  email         String         @unique
   password      String
   name          String
   avatar        String?
-  role          String        @default("EDITOR") // SUPER_ADMIN | ADMIN | EDITOR | AUTHOR | VIEWER | STAFF
-  permissions   String        @default("[]") // JSON string[] — granular overrides on top of role
+  phone         String? // E.164-ish mobile number, used for task-assignment SMS alerts
+  role          String         @default("EDITOR") // SUPER_ADMIN | ADMIN | EDITOR | AUTHOR | VIEWER | STAFF
+  permissions   String         @default("[]") // JSON string[] — granular overrides on top of role
   bio           String?
-  active        Boolean       @default(true)
+  active        Boolean        @default(true)
   lastLoginAt   DateTime?
   posts         Post[]
-  tasksAssigned Task[]        @relation("TaskAssignee")
-  tasksCreated  Task[]        @relation("TaskCreatedBy")
+  tasksAssigned Task[]         @relation("TaskAssignee")
+  tasksCreated  Task[]         @relation("TaskCreatedBy")
   taskComments  TaskComment[]
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
+  notifications Notification[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+}
+
+/// In-app notification (task assignment, management broadcasts) shown via the
+/// bell icon in both /admin and /portal.
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  body      String?
+  link      String? // e.g. /portal/tasks/xxx — where clicking the notification goes
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
 }
 
 /// Brands ARKA works with (1:N → projects, testimonials).
