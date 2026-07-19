@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Plus, Shield } from "lucide-react";
+import { Plus, Shield, CircleCheck, CircleAlert } from "lucide-react";
 import { db } from "@/lib/db";
 import { PageHeader, StatusBadge, EmptyState } from "@/components/admin/ui";
 import { RowActions } from "@/components/admin/RowActions";
@@ -8,6 +8,8 @@ import { ROLES } from "@/lib/constants";
 import { faDate, faNumber } from "@/lib/utils";
 
 const roleLabel = (r: string) => ROLES.find((x) => x.value === r)?.label ?? r;
+// Standard Iranian mobile format after normalization: 09 + 9 digits.
+const isValidPhone = (p: string) => /^09\d{9}$/.test(p);
 
 export default async function UsersList() {
   const users = await db.user.findMany({ orderBy: { createdAt: "asc" } });
@@ -27,6 +29,7 @@ export default async function UsersList() {
               <tr className="border-b border-card-border text-right text-xs text-foreground-faint">
                 <th className="px-5 py-3 font-medium">کاربر</th>
                 <th className="hidden px-4 py-3 font-medium sm:table-cell">نقش</th>
+                <th className="hidden px-4 py-3 font-medium sm:table-cell">شماره موبایل</th>
                 <th className="px-4 py-3 font-medium">وضعیت</th>
                 <th className="hidden px-4 py-3 font-medium md:table-cell">آخرین ورود</th>
                 <th className="px-4 py-3 text-left font-medium">عملیات</th>
@@ -47,6 +50,16 @@ export default async function UsersList() {
                   </td>
                   <td className="hidden px-4 py-3 sm:table-cell">
                     <span className="rounded-md bg-primary/10 px-2 py-0.5 text-xs text-primary">{roleLabel(u.role)}</span>
+                  </td>
+                  <td className="hidden px-4 py-3 sm:table-cell">
+                    {u.phone ? (
+                      <span className={`flex items-center gap-1.5 text-xs ltr-nums ${isValidPhone(u.phone) ? "text-foreground-muted" : "text-amber-500"}`}>
+                        {isValidPhone(u.phone) ? <CircleCheck className="h-3.5 w-3.5 shrink-0 text-emerald-400" /> : <CircleAlert className="h-3.5 w-3.5 shrink-0" />}
+                        {u.phone}
+                      </span>
+                    ) : (
+                      <span className="text-xs text-foreground-faint">ثبت نشده</span>
+                    )}
                   </td>
                   <td className="px-4 py-3"><StatusBadge status={u.active ? "PUBLISHED" : "DRAFT"} /></td>
                   <td className="hidden px-4 py-3 text-xs text-foreground-muted md:table-cell">
