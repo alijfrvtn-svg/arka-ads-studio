@@ -581,6 +581,15 @@ export async function deleteIndustry(id: string) {
   return { ok: true };
 }
 
+/** Sends a real test SMS to the CALLER'S OWN phone (never an arbitrary number) — for diagnosing Kavenegar setup. */
+export async function testSms() {
+  const user = await requirePermission("users.manage");
+  const hasKey = Boolean(process.env.KAVENEGAR_API_KEY);
+  if (!user.phone) return { ok: false, error: "ابتدا شماره موبایل خودت رو تو پروفایلت ثبت و ذخیره کن", hasKey };
+  const result = await sendSms(user.phone, "آرکا: این یک پیامک آزمایشی است.");
+  return { ...result, hasKey };
+}
+
 // ============================================================
 // USERS / ROLES
 // ============================================================
