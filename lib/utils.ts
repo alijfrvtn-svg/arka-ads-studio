@@ -35,6 +35,26 @@ export function toFa(input: string | number): string {
   return String(input).replace(/[0-9]/g, (d) => FA_DIGITS[Number(d)]);
 }
 
+/**
+ * Normalize a phone number typed with a Persian or Arabic-Indic keyboard
+ * (۰۹۱۲... or ٠٩١٢...) into plain ASCII digits, and strip spaces/dashes/
+ * parens. Iranian mobile numbers entered with a +98/0098 prefix are folded
+ * to the local 0-prefixed form Kavenegar expects (e.g. "+989121234567" and
+ * "989121234567" both become "09121234567"). Visually a Persian-digit phone
+ * number is indistinguishable from an ASCII one, but APIs like Kavenegar's
+ * silently reject (or never even log) the request if it isn't ASCII.
+ */
+export function normalizePhone(input: string): string {
+  let s = String(input).trim();
+  s = s.replace(/[۰-۹]/g, (d) => String(d.charCodeAt(0) - "۰".charCodeAt(0)));
+  s = s.replace(/[٠-٩]/g, (d) => String(d.charCodeAt(0) - "٠".charCodeAt(0)));
+  s = s.replace(/[\s\-().]/g, "");
+  if (s.startsWith("+98")) s = "0" + s.slice(3);
+  else if (s.startsWith("0098")) s = "0" + s.slice(4);
+  else if (s.startsWith("98") && s.length === 12) s = "0" + s.slice(2);
+  return s;
+}
+
 /** Persian-grouped number, e.g. 12500 → "۱۲٬۵۰۰". */
 export function faNumber(n: number): string {
   return new Intl.NumberFormat("fa-IR").format(n);

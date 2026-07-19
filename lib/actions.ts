@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { db } from "./db";
 import { requirePermission, requireUser } from "./auth";
 import { hashPassword } from "./auth";
-import { slugify, parseObj } from "./utils";
+import { slugify, parseObj, normalizePhone } from "./utils";
 import { sendSms } from "./sms";
 import type { Credit, Metric } from "@/types";
 
@@ -597,10 +597,11 @@ export async function saveUser(fd: FormData) {
   await requirePermission("users.manage");
   const id = S(fd, "id");
   const permissions = fd.getAll("permissions").map((p) => p.toString());
+  const rawPhone = S(fd, "phone");
   const base = {
     name: S(fd, "name"),
     email: S(fd, "email").toLowerCase(),
-    phone: S(fd, "phone") || null,
+    phone: rawPhone ? normalizePhone(rawPhone) : null,
     role: S(fd, "role", "EDITOR"),
     bio: S(fd, "bio") || null,
     avatar: S(fd, "avatar") || null,

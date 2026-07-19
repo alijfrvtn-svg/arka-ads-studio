@@ -1,4 +1,5 @@
 import "server-only";
+import { normalizePhone } from "./utils";
 
 /**
  * Sends an SMS via Kavenegar (https://kavenegar.com). This calls the same
@@ -22,7 +23,7 @@ export async function sendSms(phone: string, message: string): Promise<{ ok: boo
   }
 
   try {
-    const params = new URLSearchParams({ receptor: phone, message });
+    const params = new URLSearchParams({ receptor: normalizePhone(phone), message });
     const sender = process.env.KAVENEGAR_SENDER;
     if (sender) params.set("sender", sender);
 
