@@ -32,6 +32,7 @@ import {
 import { Logo, LogoMark } from "@/components/brand/Logo";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { NotificationBell, type NotificationItem } from "@/components/notifications/NotificationBell";
+import { IdleLogout } from "@/components/auth/IdleLogout";
 import { ROLES } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import type { Role } from "@/types";
@@ -185,6 +186,7 @@ export function AdminShell({
 
   return (
     <div className="flex min-h-screen bg-background-2">
+      <IdleLogout loginPath="/admin/login" />
       {/* desktop sidebar */}
       <aside className="sticky top-0 hidden h-screen w-72 shrink-0 flex-col border-l border-card-border bg-surface lg:flex">
         {SidebarInner}

@@ -6,6 +6,7 @@ import { LogOut, ListTodo, CalendarDays } from "lucide-react";
 import { LogoMark } from "@/components/brand/Logo";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { NotificationBell, type NotificationItem } from "@/components/notifications/NotificationBell";
+import { IdleLogout } from "@/components/auth/IdleLogout";
 import { cn } from "@/lib/utils";
 
 export function PortalShell({
@@ -40,6 +41,7 @@ export function PortalShell({
 
   return (
     <div className="min-h-screen bg-background-2">
+      <IdleLogout loginPath="/portal/login" />
       <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-card-border bg-surface/80 px-4 backdrop-blur-xl md:px-6">
         <Link href="/portal" className="flex items-center gap-2">
           <LogoMark className="h-8 w-8" />
