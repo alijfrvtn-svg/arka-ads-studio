@@ -10,13 +10,11 @@ export async function POST() {
   if (user) {
     const now = new Date();
     await db.user.update({ where: { id: user.id }, data: { lastLogoutAt: now } });
-    const openSession = await db.sessionLog.findFirst({
-      where: { userId: user.id, logoutAt: null },
-      orderBy: { loginAt: "desc" },
-    });
-    if (openSession) {
-      await db.sessionLog.update({ where: { id: openSession.id }, data: { logoutAt: now } });
-    }
+    // Close EVERY open session, not just the most recent — a user who logged
+    // in from another device (or whose session predates this feature) can
+    // have more than one row with logoutAt still null, and leaving those
+    // open would let them silently inflate the weekly activity report.
+    await db.sessionLog.updateMany({ where: { userId: user.id, logoutAt: null }, data: { logoutAt: now } });
   }
 
   const res = NextResponse.json({ ok: true });
