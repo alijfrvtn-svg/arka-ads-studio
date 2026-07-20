@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRight, ChevronRight, ChevronLeft, Clock3 } from "lucide-react";
 import { db } from "@/lib/db";
 import { EmptyState } from "@/components/admin/ui";
+import { AutoRefresh } from "@/components/admin/AutoRefresh";
 import { jalaliWeekRange, gregorianToJalali, JALALI_MONTHS } from "@/lib/jalali";
 import { toFa, faDate } from "@/lib/utils";
 
@@ -75,6 +76,7 @@ export default async function UserActivityPage({ searchParams }: { searchParams:
 
   return (
     <div className="mx-auto max-w-3xl">
+      <AutoRefresh />
       <div className="mb-6 flex items-center gap-3">
         <Link href="/admin/users" className="grid h-10 w-10 place-items-center rounded-xl border border-card-border text-foreground-muted hover:text-primary">
           <ArrowRight className="h-5 w-5" />

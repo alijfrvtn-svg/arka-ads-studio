@@ -3,6 +3,7 @@ import { Plus, Shield, CircleCheck, CircleAlert, Clock } from "lucide-react";
 import { db } from "@/lib/db";
 import { PageHeader, StatusBadge, EmptyState } from "@/components/admin/ui";
 import { RowActions } from "@/components/admin/RowActions";
+import { AutoRefresh } from "@/components/admin/AutoRefresh";
 import { deleteUser } from "@/lib/actions";
 import { ROLES } from "@/lib/constants";
 import { faDate, faNumber } from "@/lib/utils";
@@ -15,6 +16,7 @@ export default async function UsersList() {
   const users = await db.user.findMany({ orderBy: { createdAt: "asc" } });
   return (
     <div className="mx-auto max-w-5xl">
+      <AutoRefresh />
       <PageHeader title="کاربران و نقش‌ها" description={`${faNumber(users.length)} کاربر · کنترل دسترسی نقش‌محور`}>
         <Link href="/admin/users/activity" className="inline-flex items-center gap-1.5 rounded-xl border border-card-border px-4 py-2.5 text-sm font-semibold text-foreground hover:border-primary">
           <Clock className="h-4 w-4" /> زمان فعالیت هفتگی
