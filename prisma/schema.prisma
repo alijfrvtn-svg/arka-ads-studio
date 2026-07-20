@@ -27,13 +27,29 @@ model User {
   bio           String?
   active        Boolean        @default(true)
   lastLoginAt   DateTime?
+  lastLogoutAt  DateTime?
   posts         Post[]
   tasksAssigned Task[]         @relation("TaskAssignee")
   tasksCreated  Task[]         @relation("TaskCreatedBy")
   taskComments  TaskComment[]
   notifications Notification[]
+  sessionLogs   SessionLog[]
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
+}
+
+/// One row per login, closed off on explicit logout — powers the weekly
+/// active-hours report. Measures logged-in session windows, not literal
+/// continuous interaction (no activity heartbeat), so a user who never
+/// clicks "خروج" between work sessions will show one long session instead
+/// of several short ones — the report caps each session's counted length
+/// to avoid that skewing the numbers too badly.
+model SessionLog {
+  id       String    @id @default(cuid())
+  userId   String
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  loginAt  DateTime  @default(now())
+  logoutAt DateTime?
 }
 
 /// In-app notification (task assignment, management broadcasts) shown via the

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Plus, Shield, CircleCheck, CircleAlert } from "lucide-react";
+import { Plus, Shield, CircleCheck, CircleAlert, Clock } from "lucide-react";
 import { db } from "@/lib/db";
 import { PageHeader, StatusBadge, EmptyState } from "@/components/admin/ui";
 import { RowActions } from "@/components/admin/RowActions";
@@ -16,6 +16,9 @@ export default async function UsersList() {
   return (
     <div className="mx-auto max-w-5xl">
       <PageHeader title="کاربران و نقش‌ها" description={`${faNumber(users.length)} کاربر · کنترل دسترسی نقش‌محور`}>
+        <Link href="/admin/users/activity" className="inline-flex items-center gap-1.5 rounded-xl border border-card-border px-4 py-2.5 text-sm font-semibold text-foreground hover:border-primary">
+          <Clock className="h-4 w-4" /> زمان فعالیت هفتگی
+        </Link>
         <Link href="/admin/users/new" className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground hover:brightness-110">
           <Plus className="h-4 w-4" /> کاربر جدید
         </Link>
@@ -32,6 +35,7 @@ export default async function UsersList() {
                 <th className="hidden px-4 py-3 font-medium sm:table-cell">شماره موبایل</th>
                 <th className="px-4 py-3 font-medium">وضعیت</th>
                 <th className="hidden px-4 py-3 font-medium md:table-cell">آخرین ورود</th>
+                <th className="hidden px-4 py-3 font-medium lg:table-cell">آخرین خروج</th>
                 <th className="px-4 py-3 text-left font-medium">عملیات</th>
               </tr>
             </thead>
@@ -64,6 +68,9 @@ export default async function UsersList() {
                   <td className="px-4 py-3"><StatusBadge status={u.active ? "PUBLISHED" : "DRAFT"} /></td>
                   <td className="hidden px-4 py-3 text-xs text-foreground-muted md:table-cell">
                     {u.lastLoginAt ? faDate(u.lastLoginAt, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }) : "—"}
+                  </td>
+                  <td className="hidden px-4 py-3 text-xs text-foreground-muted lg:table-cell">
+                    {u.lastLogoutAt ? faDate(u.lastLogoutAt, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }) : "—"}
                   </td>
                   <td className="px-4 py-3">
                     <RowActions

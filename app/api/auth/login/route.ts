@@ -31,6 +31,7 @@ export async function POST(req: Request) {
   if (!ok) return invalid;
 
   await db.user.update({ where: { id: user.id }, data: { lastLoginAt: new Date() } });
+  await db.sessionLog.create({ data: { userId: user.id } });
   const token = await signSession({
     sub: user.id,
     email: user.email,

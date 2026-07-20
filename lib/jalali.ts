@@ -95,3 +95,18 @@ export function normalizeJalaliMonth(jy: number, jm: number): { jy: number; jm: 
   while (m > 12) { m -= 12; y += 1; }
   return { jy: y, jm: m };
 }
+
+/** Start (Saturday, UTC midnight) of the Jalali week containing the given date. */
+export function jalaliWeekStart(date: Date): Date {
+  const weekdayIndex = (date.getUTCDay() + 1) % 7; // Sat->0 ... Fri->6
+  const start = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
+  start.setUTCDate(start.getUTCDate() - weekdayIndex);
+  return start;
+}
+
+/** [start, end) UTC range for the Jalali week that contains `date` (defaults to now, using local wall-clock day). */
+export function jalaliWeekRange(date: Date = new Date(Date.UTC(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()))) {
+  const start = jalaliWeekStart(date);
+  const end = new Date(start.getTime() + 7 * 24 * 60 * 60 * 1000);
+  return { start, end };
+}

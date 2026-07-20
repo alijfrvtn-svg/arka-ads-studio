@@ -65,13 +65,15 @@ export function faPrice(n: number): string {
   return new Intl.NumberFormat("fa-IR").format(n);
 }
 
-/** Format a date using the Persian (Jalali) calendar. */
+/** Format a date using the Persian (Jalali) calendar, always in Iran local time
+ * regardless of the server's own timezone (Netlify functions run in UTC, so
+ * without this, times like "آخرین ورود" would silently render 3.5h off). */
 export function faDate(
   date: Date | string | number,
   opts: Intl.DateTimeFormatOptions = { year: "numeric", month: "long", day: "numeric" },
 ): string {
   const d = typeof date === "object" ? date : new Date(date);
-  return new Intl.DateTimeFormat("fa-IR-u-ca-persian", opts).format(d);
+  return new Intl.DateTimeFormat("fa-IR-u-ca-persian", { timeZone: "Asia/Tehran", ...opts }).format(d);
 }
 
 /** Slug from Persian or Latin text (keeps unicode letters). */
