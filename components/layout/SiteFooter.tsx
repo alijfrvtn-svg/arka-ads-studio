@@ -6,6 +6,7 @@ import { SITE, NAV } from "@/lib/constants";
 import { ui } from "@/lib/i18n";
 import type { Locale } from "@/types";
 import type { ContactContent } from "@/lib/queries";
+import { AccentSwitcher } from "@/components/theme/AccentSwitcher";
 
 const NAV_KEY: Record<string, string> = {
   "/": "navHome",
@@ -123,9 +124,22 @@ export function SiteFooter({
           </div>
         </div>
 
+        {/* Living-colour switch. The header carries an icon-only copy; this is
+            the one that explains itself, because the footer has room for a
+            sentence and the header does not. */}
+        <div className="mt-12 flex items-center justify-center gap-3 rounded-2xl border border-card-border bg-surface/40 p-4 sm:justify-start">
+          <AccentSwitcher />
+          <div className="text-sm leading-snug">
+            <p className="font-medium text-foreground">تغییر خودکار رنگ سایت</p>
+            <p className="mt-0.5 text-xs text-foreground-muted">
+              با روشن بودن، هویت رنگی سایت هر ۳۰ ثانیه به‌آرامی عوض می‌شود. با خاموش کردن، روی آبی آرکا ثابت می‌ماند.
+            </p>
+          </div>
+        </div>
+
         {/* bottom */}
-        <div className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-card-border pt-7 text-sm text-foreground-faint md:flex-row">
-          <p>
+        <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-card-border pt-7 text-sm text-foreground-faint md:flex-row">
+          <p className="text-center md:text-right">
             © {year} {SITE.legalName}. {copyright}
           </p>
           <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-0 md:justify-start">

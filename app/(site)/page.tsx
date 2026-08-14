@@ -1,5 +1,4 @@
 import { Hero } from "@/components/home/Hero";
-import { SiteSearch } from "@/components/search/SiteSearch";
 import { TrustMarquee } from "@/components/home/TrustMarquee";
 import { Departments } from "@/components/home/Departments";
 import { FeaturedWork } from "@/components/home/FeaturedWork";
@@ -52,13 +51,6 @@ export default async function HomePage() {
   return (
     <>
       <Hero stats={statData} content={content} locale={locale} />
-      {/* Site search — placed straight after the hero, where visitors who
-          arrived with a specific need in mind look first. */}
-      <div className="container-x -mt-2 mb-2 sm:mb-6">
-        <div className="mx-auto max-w-2xl">
-          <SiteSearch trigger="inline" />
-        </div>
-      </div>
       <TrustMarquee clients={clients.map((c) => ({ name: tr(locale, c.name, c.nameEn, c.nameEn) }))} caption={content.trustCaption} />
       <Departments content={content} departments={departments} locale={locale} />
       <FeaturedWork projects={projects} content={content} locale={locale} />

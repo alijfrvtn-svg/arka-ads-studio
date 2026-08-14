@@ -58,16 +58,16 @@ export const viewport: Viewport = {
   ],
 };
 
-// Prevent theme flash: set the class before first paint. Same pass applies the
-// visitor's saved identity colour — 'blue' is the brand default and is encoded
-// as *no* data-accent attribute, so an unset/invalid value paints the real
-// ARKA blue with zero overrides.
+// Prevent theme flash: set the class before first paint.
+//
+// The identity colour deliberately is NOT restored here: every visit opens on
+// the brand blue and the 30-second cycle takes over from there (see
+// AccentProvider). Painting a mid-cycle colour before the page has rendered
+// would make the site look like it has a different brand each time you arrive.
 const themeScript = `
 (function(){try{var t=localStorage.getItem('arka-theme');
 if(t!=='light'&&t!=='dark'){t=window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark';}
 var e=document.documentElement;e.classList.remove('light','dark');e.classList.add(t);e.style.colorScheme=t;
-var a=localStorage.getItem('arka-accent');
-if(a&&a!=='blue'&&['red','orange','yellow','green','purple','pink'].indexOf(a)>-1){e.setAttribute('data-accent',a);}
 }catch(e){document.documentElement.classList.add('dark');}})();
 `;
 

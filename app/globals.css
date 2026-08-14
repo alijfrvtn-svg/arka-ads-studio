@@ -30,7 +30,9 @@
   --radius-xl: 28px;
   --radius-2xl: 36px;
 
-  --shadow-glow: 0 0 0 1px rgba(102, 153, 255, 0.14), 0 18px 60px -18px rgba(102, 153, 255, 0.5);
+  /* Driven by --eoc-primary so a glowing button matches the active identity
+     colour instead of staying brand blue. */
+  --shadow-glow: 0 0 0 1px rgba(var(--eoc-primary), 0.14), 0 18px 60px -18px rgba(var(--eoc-primary), 0.5);
   --shadow-card: 0 24px 60px -28px rgba(4, 8, 22, 0.65);
 
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
@@ -99,6 +101,37 @@
   --selection-bg: #2b56d6;
   --selection-fg: #ffffff;
   color-scheme: light;
+}
+
+/* ============================================================
+   Identity cross-fade
+   ------------------------------------------------------------
+   The 30-second colour cycle swaps data-accent on <html>. Custom properties
+   cannot be transitioned directly (and registering them with @property made
+   Chrome refuse the cascade change outright), so instead the provider adds
+   `.accent-shifting` for the length of the fade and we transition the
+   *consuming* properties. The class is only present during the swap, so normal
+   hover timings are untouched the rest of the time.
+
+   stop-color is in the list on purpose: it is what fades the logo mark.
+   ============================================================ */
+html.accent-shifting,
+html.accent-shifting *,
+html.accent-shifting *::before,
+html.accent-shifting *::after {
+  transition-property: color, background-color, border-color, outline-color, fill, stroke,
+    stop-color, box-shadow, text-decoration-color !important;
+  transition-duration: 1800ms !important;
+  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.accent-shifting,
+  html.accent-shifting *,
+  html.accent-shifting *::before,
+  html.accent-shifting *::after {
+    transition-duration: 0.01ms !important;
+  }
 }
 
 /* ============================================================
@@ -250,6 +283,12 @@ html[data-accent="pink"].light {
   --eoc-light-1: #f5f8fe;
   --eoc-light-2: #eef3fc;
   --eoc-light-3: #dde6f5;
+  --eoc-bright: #7aa6ff;
+  --eoc-box-end: #3f6fe0;
+  --eoc-navy-darkest: #0b1a45;
+  --eoc-royal: #2b4bb8;
+  --eoc-primary-c: #6699ff;
+  --eoc-accent-c: #a6c9ff;
   --eoc-light-ink: 10, 19, 46;
 }
 
@@ -280,6 +319,12 @@ html[data-accent="red"] {
   --eoc-light-1: #fef6f5;
   --eoc-light-2: #fcf0ee;
   --eoc-light-3: #f4e0de;
+  --eoc-bright: #f3837b;
+  --eoc-box-end: #cc3d3d;
+  --eoc-navy-darkest: #3d0608;
+  --eoc-royal: #a3121e;
+  --eoc-primary-c: #ef6f68;
+  --eoc-accent-c: #fab2ab;
   --eoc-light-ink: 42, 8, 8;
 }
 
@@ -310,6 +355,12 @@ html[data-accent="orange"] {
   --eoc-light-1: #fdf7f3;
   --eoc-light-2: #faf1eb;
   --eoc-light-3: #f2e2d8;
+  --eoc-bright: #ea8e4a;
+  --eoc-box-end: #b55c00;
+  --eoc-navy-darkest: #331500;
+  --eoc-royal: #864300;
+  --eoc-primary-c: #e67d22;
+  --eoc-accent-c: #f3b992;
   --eoc-light-ink: 37, 14, 0;
 }
 
@@ -340,6 +391,12 @@ html[data-accent="yellow"] {
   --eoc-light-1: #faf8f2;
   --eoc-light-2: #f5f3e9;
   --eoc-light-3: #eae6d5;
+  --eoc-bright: #c3a629;
+  --eoc-box-end: #8d7600;
+  --eoc-navy-darkest: #261e00;
+  --eoc-royal: #685600;
+  --eoc-primary-c: #b89a00;
+  --eoc-accent-c: #d8c787;
   --eoc-light-ink: 27, 21, 0;
 }
 
@@ -370,6 +427,12 @@ html[data-accent="green"] {
   --eoc-light-1: #f4faf5;
   --eoc-light-2: #edf5ee;
   --eoc-light-3: #dceadd;
+  --eoc-bright: #65c075;
+  --eoc-box-end: #009038;
+  --eoc-navy-darkest: #002609;
+  --eoc-royal: #006a27;
+  --eoc-primary-c: #48b760;
+  --eoc-accent-c: #a2d7a8;
   --eoc-light-ink: 0, 28, 6;
 }
 
@@ -400,6 +463,12 @@ html[data-accent="purple"] {
   --eoc-light-1: #f9f7fd;
   --eoc-light-2: #f5f1fa;
   --eoc-light-3: #e9e2f2;
+  --eoc-bright: #bc90ee;
+  --eoc-box-end: #9154cb;
+  --eoc-navy-darkest: #28103d;
+  --eoc-royal: #6f32a4;
+  --eoc-primary-c: #b480eb;
+  --eoc-accent-c: #d4baf4;
   --eoc-light-ink: 27, 13, 41;
 }
 
@@ -430,6 +499,12 @@ html[data-accent="pink"] {
   --eoc-light-1: #fdf6f9;
   --eoc-light-2: #faeff4;
   --eoc-light-3: #f2e0e7;
+  --eoc-bright: #e882b4;
+  --eoc-box-end: #c03e86;
+  --eoc-navy-darkest: #390724;
+  --eoc-royal: #981665;
+  --eoc-primary-c: #e46eaa;
+  --eoc-accent-c: #f3b1cf;
   --eoc-light-ink: 39, 8, 25;
 }
 
@@ -656,14 +731,14 @@ body {
 .reel-bg {
   background: linear-gradient(
     115deg,
-    #04060d 0%,
-    #0b1a45 18%,
-    #162d73 36%,
-    #2b4bb8 50%,
-    #6699ff 60%,
-    #162d73 74%,
-    #0b1a45 86%,
-    #04060d 100%
+    var(--background) 0%,
+    var(--eoc-navy-darkest) 18%,
+    var(--eoc-navy) 36%,
+    var(--eoc-royal) 50%,
+    var(--eoc-primary-c) 60%,
+    var(--eoc-navy) 74%,
+    var(--eoc-navy-darkest) 86%,
+    var(--background) 100%
   );
   background-size: 280% 280%;
   animation: reel-pan 18s ease-in-out infinite;

@@ -13,12 +13,11 @@ const EASE = [0.16, 1, 0.3, 1] as const;
 /**
  * Site-wide search across projects, services, articles and industries.
  *
- * Opens as an overlay rather than an always-open field: the header already
- * carries nav, theme, accent and the primary CTA, and a permanently expanded
- * input there would push the CTA off-screen on small phones. `trigger="inline"`
- * renders the full bar for placements that have the room, like the homepage.
+ * Opens as an overlay from a header icon rather than an always-open field: the
+ * header already carries nav, theme, accent and the primary CTA, and a
+ * permanently expanded input there would push the CTA off-screen on a phone.
  */
-export function SiteSearch({ trigger = "icon" }: { trigger?: "icon" | "inline" }) {
+export function SiteSearch() {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -50,25 +49,13 @@ export function SiteSearch({ trigger = "icon" }: { trigger?: "icon" | "inline" }
 
   return (
     <>
-      {trigger === "icon" ? (
-        <button
-          onClick={() => setOpen(true)}
-          aria-label="جستجو در سایت"
-          className="grid h-11 w-11 place-items-center rounded-full border border-card-border bg-surface/60 text-foreground transition-colors hover:border-primary/50 hover:text-primary"
-        >
-          <Search className="h-[18px] w-[18px]" />
-        </button>
-      ) : (
-        <button
-          onClick={() => setOpen(true)}
-          className="group flex w-full items-center gap-3 rounded-2xl border border-card-border bg-surface/60 px-5 py-4 text-right backdrop-blur transition-colors hover:border-primary/50"
-        >
-          <Search className="h-5 w-5 shrink-0 text-foreground-faint transition-colors group-hover:text-primary" />
-          <span className="flex-1 text-sm text-foreground-faint">
-            جستجو در نمونه‌کارها، خدمات و مقالات…
-          </span>
-        </button>
-      )}
+      <button
+        onClick={() => setOpen(true)}
+        aria-label="جستجو در سایت"
+        className="grid h-11 w-11 place-items-center rounded-full border border-card-border bg-surface/60 text-foreground transition-colors hover:border-primary/50 hover:text-primary"
+      >
+        <Search className="h-[18px] w-[18px]" />
+      </button>
 
       <AnimatePresence>
         {open && (

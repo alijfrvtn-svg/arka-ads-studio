@@ -61,7 +61,9 @@ export function ProjectCard({
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent opacity-95" />
         <div
           className="absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-          style={{ background: `radial-gradient(120% 80% at 50% 100%, ${project.accent ?? "#6699ff"}22, transparent)` }}
+          // The per-project accent is still stored, but the hover glow follows the
+          // site identity so a colour switch leaves no blue halo behind.
+          style={{ background: "radial-gradient(120% 80% at 50% 100%, color-mix(in srgb, var(--primary) 14%, transparent), transparent)" }}
         />
 
         <span className="absolute right-4 top-4 rounded-full border border-white/15 bg-black/30 px-3 py-1 text-xs font-medium text-white backdrop-blur">

@@ -38,7 +38,7 @@ export function Departments({
               >
                 <div
                   className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full opacity-0 blur-3xl transition-opacity duration-500 group-hover:opacity-100"
-                  style={{ background: d.accent }}
+                  style={{ background: "var(--primary)" }}
                 />
                 <div className="mb-6 grid h-14 w-14 place-items-center rounded-xl border border-card-border bg-background/50 text-primary transition-colors group-hover:border-primary/40">
                   <Icon name={d.icon} className="h-6 w-6" />

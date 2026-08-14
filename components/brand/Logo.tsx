@@ -1,6 +1,12 @@
 import { cn } from "@/lib/utils";
 
-/** ARKA fast-forward / double-play mark, recreated from the brand sheet. */
+/** ARKA fast-forward / double-play mark, recreated from the brand sheet.
+ *
+ * Gradient stops read the --eoc-* identity variables rather than literals, so
+ * the mark tracks the visitor's chosen accent — a blue logo sitting above a red
+ * site was the most obvious thing left behind by the accent switch. The default
+ * values of those variables are the exact brand blues, so an untouched site is
+ * pixel-identical. */
 export function LogoMark({
   className,
   mono = false,
@@ -21,16 +27,16 @@ export function LogoMark({
     >
       <defs>
         <linearGradient id={`arka-a-${id}`} x1="6" y1="10" x2="40" y2="56" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#a6c9ff" />
-          <stop offset="1" stopColor="#6699ff" />
+          <stop stopColor="var(--eoc-accent-c)" />
+          <stop offset="1" stopColor="var(--eoc-primary-c)" />
         </linearGradient>
         <linearGradient id={`arka-b-${id}`} x1="26" y1="10" x2="58" y2="56" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#6699ff" />
-          <stop offset="1" stopColor="#162d73" />
+          <stop stopColor="var(--eoc-primary-c)" />
+          <stop offset="1" stopColor="var(--eoc-navy)" />
         </linearGradient>
         <linearGradient id={`arka-box-${id}`} x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#7aa6ff" />
-          <stop offset="1" stopColor="#3f6fe0" />
+          <stop stopColor="var(--eoc-bright)" />
+          <stop offset="1" stopColor="var(--eoc-box-end)" />
         </linearGradient>
       </defs>
       {boxed && <rect width="64" height="64" rx="18" fill={`url(#arka-box-${id})`} />}
@@ -77,7 +83,7 @@ export function Logo({
             ARKA
           </span>
           {tagline && (
-            <span className="mt-0.5 text-[8px] font-medium uppercase tracking-[0.32em] text-foreground-muted">
+            <span className="mt-0.5 text-[9px] font-medium uppercase tracking-[0.28em] text-foreground-muted">
               digital marketing
             </span>
           )}

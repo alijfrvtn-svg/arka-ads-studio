@@ -97,7 +97,7 @@ export default async function CaseStudy({ params }: { params: Promise<{ slug: st
             </div>
           </Reveal>
           <Reveal delay={0.1}>
-            <h1 className="mt-4 max-w-4xl font-display text-4xl font-extrabold leading-[1.05] text-white balance md:text-6xl lg:text-7xl">
+            <h1 className="mt-4 max-w-4xl font-display text-3xl font-extrabold leading-[1.2] text-white balance sm:text-4xl md:text-6xl md:leading-[1.05] lg:text-7xl">
               {title}
             </h1>
           </Reveal>

@@ -78,7 +78,7 @@ export function HeroCopy({
         </motion.div>
       )}
 
-      <h1 className="font-display break-words text-[11vw] font-extrabold leading-[0.95] tracking-tight sm:text-7xl md:text-8xl lg:text-[7.5rem]">
+      <h1 className="font-display break-words text-[11vw] font-extrabold leading-[1.15] tracking-tight sm:text-7xl sm:leading-[1.02] md:text-8xl lg:text-[7.5rem] lg:leading-[0.95]">
         {headline.map((line, i) => (
           <motion.span
             key={`${line}-${i}`}

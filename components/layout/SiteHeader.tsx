@@ -113,7 +113,7 @@ export function SiteHeader({
           {/* actions */}
           <div className="flex items-center gap-1.5 sm:gap-2">
             <SiteSearch />
-            <AccentSwitcher className="hidden sm:block" />
+            <AccentSwitcher className="hidden sm:flex" />
             <ThemeToggle />
             <div className="hidden md:block">
               <Magnetic strength={0.4}>
@@ -217,8 +217,13 @@ export function SiteHeader({
                   </Link>
                 </motion.div>
               ))}
-              <div className="mt-6 flex items-center justify-between gap-3 sm:hidden">
-                <span className="text-sm text-foreground-muted">رنگ هویت سایت</span>
+              <div className="mt-6 flex items-center justify-between gap-3 rounded-2xl border border-card-border p-3 sm:hidden">
+                <span className="text-sm leading-snug text-foreground-muted">
+                  تغییر خودکار رنگ سایت
+                  <span className="mt-0.5 block text-xs text-foreground-faint">
+                    هر ۳۰ ثانیه رنگ هویت عوض می‌شود
+                  </span>
+                </span>
                 <AccentSwitcher />
               </div>
               <Button href="/contact" size="lg" variant="glow" className="mt-6 w-full" data-track="mobile-nav-cta">
