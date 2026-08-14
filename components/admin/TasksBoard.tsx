@@ -7,6 +7,7 @@ import { Trash2, MessageSquare, CalendarDays } from "lucide-react";
 import { updateTaskStatus, deleteTask } from "@/lib/actions";
 import { TASK_STATUSES, TASK_PRIORITIES } from "@/lib/constants";
 import { faDate } from "@/lib/utils";
+import { Avatar } from "@/components/ui/Avatar";
 
 interface TaskItem {
   id: string;
@@ -74,12 +75,7 @@ export function TasksBoard({ tasks }: { tasks: TaskItem[] }) {
                       )}
                       {t.assignee && (
                         <span className="flex items-center gap-1 text-foreground-faint">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img
-                            src={t.assignee.avatar || `https://i.pravatar.cc/80?u=${t.assignee.name}`}
-                            alt=""
-                            className="h-4 w-4 rounded-full object-cover"
-                          />
+                          <Avatar src={t.assignee.avatar} name={t.assignee.name} className="h-4 w-4 text-[8px]" />
                           {t.assignee.name}
                         </span>
                       )}

@@ -1,9 +1,10 @@
 import SmoothScroll from "@/components/fx/SmoothScroll";
 import CustomCursor from "@/components/fx/CustomCursor";
+import { Analytics } from "@/components/fx/Analytics";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
-import { MaintenanceScreen } from "@/components/layout/MaintenanceScreen";
-import { getServices, getIndustries, getContactPage } from "@/lib/queries";
+import { MaintenanceScreen, MaintenanceBanner } from "@/components/layout/MaintenanceScreen";
+import { getServices, getIndustries, getContactPage, getCategories } from "@/lib/queries";
 import { db } from "@/lib/db";
 import { getSessionUser } from "@/lib/auth";
 import { parseObj } from "@/lib/utils";
@@ -36,12 +37,12 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
   // there (and stale slugs could 404) — fetch the live, published rows here
   // once and pass down instead.
   const locale = await getLocale();
-  const [services, industries, settingRow, sessionUser, contact] = await Promise.all([
+  const [services, industries, settingRow, contact, departments] = await Promise.all([
     getServices(),
     getIndustries(),
     db.setting.findUnique({ where: { key: "site" } }),
-    getSessionUser(),
     getContactPage(locale),
+    getCategories("DEPARTMENT"),
   ]);
   const footer: FooterSettings = { ...FOOTER_DEFAULTS, ...parseObj<Partial<FooterSettings>>(settingRow?.value, {}) };
   const serviceLinks = services.map((s) => ({
@@ -54,18 +55,34 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
   // Maintenance mode (toggled in /admin/settings) takes down the public site
   // for everyone except signed-in CMS staff, who can still preview it to turn
   // the flag back off.
+  //
+  // getSessionUser() reads cookies(), and calling that anywhere in this layout
+  // opted EVERY public page out of static rendering — Netlify was answering
+  // each visit with `Cache-Control: no-store` and re-running the function plus
+  // ~11 database round-trips to us-east-2. Reading the session only once the
+  // flag is actually on keeps the normal path fully cacheable, and the
+  // maintenance path is the one case where per-visitor rendering is correct.
   const { maintenance } = parseObj<{ maintenance?: boolean }>(settingRow?.value, {});
-  if (maintenance && (!sessionUser || sessionUser.role === "STAFF")) {
-    return <MaintenanceScreen />;
+  let staffPreview = false;
+  if (maintenance) {
+    const sessionUser = await getSessionUser();
+    if (!sessionUser || sessionUser.role === "STAFF") return <MaintenanceScreen />;
+    // Signed-in CMS staff keep browsing so they can fix whatever the site is
+    // down for. That bypass is also why maintenance mode kept looking broken:
+    // an admin toggles it, checks the site in the same browser, sees it live,
+    // and concludes nothing happened. The banner below removes that ambiguity.
+    staffPreview = true;
   }
 
   return (
     <SmoothScroll>
       <CustomCursor />
+      <Analytics />
       <a href="#main" className="skip-link">
         {ui(locale).skipToContent}
       </a>
-      <SiteHeader services={serviceLinks} industries={industryLinks} locale={locale} />
+      {staffPreview && <MaintenanceBanner />}
+      <SiteHeader services={serviceLinks} industries={industryLinks} departments={departments} locale={locale} />
       <main id="main" className="min-h-screen">
         {children}
       </main>

@@ -13,6 +13,7 @@ import { tr, trArr, ui } from "@/lib/i18n";
 import { getLocale } from "@/lib/get-locale";
 import type { Credit, Metric } from "@/types";
 import type { Locale } from "@/types";
+import { ProjectStatusDot } from "@/components/work/ProjectStatusDot";
 
 const STORY_LABEL: Record<Locale, Record<"goal" | "problem" | "idea" | "production" | "marketing" | "result", string>> = {
   fa: { goal: "هدف", problem: "چالش", idea: "ایده", production: "تولید", marketing: "بازاریابی", result: "نتیجه" },
@@ -88,9 +89,12 @@ export default async function CaseStudy({ params }: { params: Promise<{ slug: st
             </nav>
           </Reveal>
           <Reveal delay={0.05}>
-            <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/30 px-3 py-1 text-xs text-white backdrop-blur">
-              {category}
-            </span>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/30 px-3 py-1 text-xs text-white backdrop-blur">
+                {category}
+              </span>
+              <ProjectStatusDot status={p.status} locale={locale} onMedia />
+            </div>
           </Reveal>
           <Reveal delay={0.1}>
             <h1 className="mt-4 max-w-4xl font-display text-4xl font-extrabold leading-[1.05] text-white balance md:text-6xl lg:text-7xl">

@@ -7,14 +7,17 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ArrowUpLeft, ChevronDown, Menu, X } from "lucide-react";
 import { Logo } from "@/components/brand/Logo";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
+import { AccentSwitcher } from "@/components/theme/AccentSwitcher";
+import { SiteSearch } from "@/components/search/SiteSearch";
 import { Button } from "@/components/ui/Button";
 import { Magnetic } from "@/components/fx/Magnetic";
 // LanguageSwitcher import removed while multi-language is paused — component kept at
 // components/layout/LanguageSwitcher.tsx for re-enabling later.
-import { NAV, DEPARTMENTS } from "@/lib/constants";
-import { ui } from "@/lib/i18n";
+import { NAV } from "@/lib/constants";
+import { tr, ui } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
-import type { Department, Locale } from "@/types";
+import type { CategoryItem } from "@/lib/queries";
+import type { Locale } from "@/types";
 
 const NAV_KEY: Record<string, string> = {
   "/": "navHome",
@@ -29,10 +32,13 @@ const NAV_KEY: Record<string, string> = {
 export function SiteHeader({
   services,
   industries,
+  departments,
   locale,
 }: {
-  services: { slug: string; title: string; department: Department }[];
+  services: { slug: string; title: string; department: string }[];
   industries: { slug: string; title: string }[];
+  // Editable in /admin/categories (kind DEPARTMENT).
+  departments: CategoryItem[];
   locale: Locale;
 }) {
   const t = ui(locale);
@@ -105,11 +111,13 @@ export function SiteHeader({
           </nav>
 
           {/* actions */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <SiteSearch />
+            <AccentSwitcher className="hidden sm:block" />
             <ThemeToggle />
             <div className="hidden md:block">
               <Magnetic strength={0.4}>
-                <Button href="/contact" size="sm" variant="glow" className="gap-1.5">
+                <Button href="/contact" size="sm" variant="glow" className="gap-1.5" data-track="header-cta">
                   {t.ctaStartProject}
                   <ArrowUpLeft className="h-4 w-4 transition-transform group-hover:-translate-x-0.5 group-hover:-translate-y-0.5" />
                 </Button>
@@ -118,7 +126,7 @@ export function SiteHeader({
             <button
               onClick={() => setOpen((o) => !o)}
               aria-label="منو"
-              className="grid h-10 w-10 place-items-center rounded-full border border-card-border bg-surface/60 text-foreground lg:hidden"
+              className="grid h-11 w-11 place-items-center rounded-full border border-card-border bg-surface/60 text-foreground lg:hidden"
             >
               {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
@@ -139,14 +147,14 @@ export function SiteHeader({
               <div className="glass overflow-hidden rounded-2xl border border-card-border p-2 shadow-2xl">
                 {mega === "services" ? (
                   <div className="grid grid-cols-4 gap-2">
-                    {DEPARTMENTS.map((d) => (
-                      <div key={d.key} className="rounded-xl p-3">
+                    {departments.map((d) => (
+                      <div key={d.slug} className="rounded-xl p-3">
                         <p className="mb-2 flex items-center gap-2 text-xs font-bold text-primary">
                           <span className="h-1.5 w-1.5 rounded-full bg-primary" />
-                          {d.title}
+                          {tr(locale, d.title, d.titleEn, d.titleAr)}
                         </p>
                         <div className="flex flex-col">
-                          {services.filter((s) => s.department === d.key).map((s) => (
+                          {services.filter((s) => s.department === d.slug).map((s) => (
                             <Link
                               key={s.slug}
                               href={`/services/${s.slug}`}
@@ -209,7 +217,11 @@ export function SiteHeader({
                   </Link>
                 </motion.div>
               ))}
-              <Button href="/contact" size="lg" variant="glow" className="mt-6 w-full">
+              <div className="mt-6 flex items-center justify-between gap-3 sm:hidden">
+                <span className="text-sm text-foreground-muted">رنگ هویت سایت</span>
+                <AccentSwitcher />
+              </div>
+              <Button href="/contact" size="lg" variant="glow" className="mt-6 w-full" data-track="mobile-nav-cta">
                 {t.ctaStartProject}
                 <ArrowUpLeft className="h-5 w-5" />
               </Button>

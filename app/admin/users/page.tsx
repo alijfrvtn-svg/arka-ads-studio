@@ -7,6 +7,7 @@ import { AutoRefresh } from "@/components/admin/AutoRefresh";
 import { deleteUser } from "@/lib/actions";
 import { ROLES } from "@/lib/constants";
 import { faDate, faNumber } from "@/lib/utils";
+import { Avatar } from "@/components/ui/Avatar";
 
 const roleLabel = (r: string) => ROLES.find((x) => x.value === r)?.label ?? r;
 // Standard Iranian mobile format after normalization: 09 + 9 digits.
@@ -28,8 +29,8 @@ export default async function UsersList() {
       {users.length === 0 ? (
         <EmptyState icon={Shield} title="کاربری وجود ندارد" />
       ) : (
-        <div className="overflow-hidden rounded-2xl border border-card-border bg-surface">
-          <table className="w-full text-sm">
+        <div className="overflow-x-auto rounded-2xl border border-card-border bg-surface">
+          <table className="w-full min-w-[680px] text-sm">
             <thead>
               <tr className="border-b border-card-border text-right text-xs text-foreground-faint">
                 <th className="px-5 py-3 font-medium">کاربر</th>
@@ -47,7 +48,7 @@ export default async function UsersList() {
                   <td className="px-5 py-3">
                     <div className="flex items-center gap-3">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={u.avatar || `https://i.pravatar.cc/80?u=${u.email}`} alt="" className="h-10 w-10 rounded-full object-cover" />
+                      <Avatar src={u.avatar} name={u.name} className="h-10 w-10 text-base" />
                       <div>
                         <p className="font-semibold text-foreground">{u.name}</p>
                         <p className="text-xs text-foreground-faint ltr-nums">{u.email}</p>

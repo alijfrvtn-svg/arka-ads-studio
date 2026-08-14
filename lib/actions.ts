@@ -6,6 +6,7 @@ import { db } from "./db";
 import { requirePermission, requireUser } from "./auth";
 import { hashPassword } from "./auth";
 import { slugify, parseObj, normalizePhone } from "./utils";
+import { CATEGORY_SEEDS } from "./queries";
 import { sendSms } from "./sms";
 import type { Credit, Metric } from "@/types";
 
@@ -32,6 +33,17 @@ const PL = (fd: FormData, k: string, fields: string[]) =>
     fields.forEach((f, i) => (obj[f] = parts[i] || ""));
     return obj;
   });
+/**
+ * Hero slides, one per line:
+ *   media | title | desc | ctaLabel | ctaHref | badge | poster
+ * Same pipe convention as PL, but slides get their own parser because a slide
+ * with neither media nor title is an empty banner — dropping it here keeps the
+ * public page from having to defend against half-typed rows.
+ */
+const SLIDES = (fd: FormData, k: string) =>
+  PL(fd, k, ["media", "title", "desc", "ctaLabel", "ctaHref", "badge", "poster"]).filter(
+    (s) => s.media || s.title,
+  );
 
 /**
  * Every admin save calls this, but individual paths alone aren't enough now
@@ -61,6 +73,7 @@ export interface ProjectInput {
   category: string;
   categoryEn?: string;
   categoryAr?: string;
+  status: string;
   cover: string;
   poster?: string;
   heroVideo?: string;
@@ -132,6 +145,7 @@ export async function saveProject(input: ProjectInput) {
     category: input.category,
     categoryEn: input.categoryEn || null,
     categoryAr: input.categoryAr || null,
+    status: input.status === "IN_PROGRESS" ? "IN_PROGRESS" : "DONE",
     cover: input.cover,
     poster: input.poster || null,
     heroVideo: input.heroVideo || null,
@@ -518,6 +532,7 @@ export async function saveService(fd: FormData) {
     department: S(fd, "department", "FILM"),
     icon: S(fd, "icon", "Sparkles"),
     cover: S(fd, "cover") || null,
+    heroVideo: S(fd, "heroVideo") || null,
     priceFrom: N(fd, "priceFrom") || null,
     features: J(parseLines("features")),
     featuresEn: parseLines("featuresEn").length ? J(parseLines("featuresEn")) : null,
@@ -579,6 +594,121 @@ export async function deleteIndustry(id: string) {
   await db.industry.delete({ where: { id } });
   revalidateSite("/admin/industries", "/industries");
   return { ok: true };
+}
+
+// ============================================================
+// CATEGORIES (POST / WORK / DEPARTMENT)
+// ============================================================
+
+const CATEGORY_KINDS = new Set(["POST", "WORK", "DEPARTMENT"]);
+/** Which content column stores this kind's slug, for rename propagation. */
+const CATEGORY_PERMISSION: Record<string, string> = {
+  POST: "blog.manage",
+  WORK: "portfolio.manage",
+  DEPARTMENT: "services.manage",
+};
+
+function assertKind(kind: string) {
+  if (!CATEGORY_KINDS.has(kind)) throw new Error("BAD_KIND");
+  return kind;
+}
+
+export async function saveCategory(fd: FormData) {
+  const kind = assertKind(S(fd, "kind"));
+  await requirePermission(CATEGORY_PERMISSION[kind]);
+  const id = S(fd, "id");
+  const title = S(fd, "title");
+  if (!title) throw new Error("TITLE_REQUIRED");
+
+  // DEPARTMENT slugs are the fixed FILM/DIGITAL/DESIGN/STRATEGY keys that
+  // Service.department already stores, so they are never re-derived from a
+  // title. POST/WORK slugs are the Persian label itself (that is what those
+  // columns have always held), so renaming one has to carry existing rows over.
+  const prev = id ? await db.category.findUnique({ where: { id } }) : null;
+  const slug =
+    kind === "DEPARTMENT"
+      ? (S(fd, "slug") || prev?.slug || slugify(title)).toUpperCase()
+      : S(fd, "slug") || prev?.slug || title;
+
+  const data = {
+    kind,
+    slug,
+    title,
+    titleEn: S(fd, "titleEn") || null,
+    titleAr: S(fd, "titleAr") || null,
+    desc: S(fd, "desc") || null,
+    descEn: S(fd, "descEn") || null,
+    descAr: S(fd, "descAr") || null,
+    icon: S(fd, "icon", "Sparkles"),
+    accent: S(fd, "accent", "#6699ff"),
+    order: N(fd, "order", 0),
+    published: B(fd, "published"),
+  };
+
+  if (id) await db.category.update({ where: { id }, data });
+  else await db.category.create({ data });
+
+  // Slug changed on an existing category → repoint the content that referenced
+  // the old value, otherwise those rows silently drop out of every filter.
+  if (prev && prev.slug !== slug) {
+    if (kind === "POST") await db.post.updateMany({ where: { category: prev.slug }, data: { category: slug } });
+    if (kind === "WORK") await db.project.updateMany({ where: { category: prev.slug }, data: { category: slug } });
+    if (kind === "DEPARTMENT") await db.service.updateMany({ where: { department: prev.slug }, data: { department: slug } });
+  }
+
+  revalidateSite("/admin/categories", "/journal", "/work", "/services");
+  redirect("/admin/categories");
+}
+
+export async function deleteCategory(id: string) {
+  const row = await db.category.findUnique({ where: { id } });
+  if (!row) return { ok: true };
+  await requirePermission(CATEGORY_PERMISSION[row.kind] ?? "settings.manage");
+
+  // Refuse rather than orphan: deleting a category that content still points at
+  // would leave those rows filtered into nothing with no way to notice.
+  const inUse =
+    row.kind === "POST"
+      ? await db.post.count({ where: { category: row.slug } })
+      : row.kind === "WORK"
+        ? await db.project.count({ where: { category: row.slug } })
+        : await db.service.count({ where: { department: row.slug } });
+  if (inUse > 0) {
+    return { ok: false, error: `این دسته‌بندی روی ${inUse} مورد استفاده شده — اول آن‌ها را به دسته‌ی دیگری منتقل کنید.` };
+  }
+
+  await db.category.delete({ where: { id } });
+  revalidateSite("/admin/categories", "/journal", "/work", "/services");
+  return { ok: true };
+}
+
+/** One-click seeding of the previously hardcoded lists, so the admin page opens
+ *  with the site's real taxonomy instead of an empty table. */
+export async function seedCategories() {
+  await requirePermission("settings.manage");
+  for (const [kind, items] of Object.entries(CATEGORY_SEEDS)) {
+    for (const [i, c] of items.entries()) {
+      const existing = await db.category.findUnique({ where: { kind_slug: { kind, slug: c.slug } } });
+      if (existing) continue;
+      await db.category.create({
+        data: {
+          kind,
+          slug: c.slug,
+          title: c.title,
+          titleEn: c.titleEn,
+          titleAr: c.titleAr,
+          desc: c.desc,
+          descEn: c.descEn,
+          descAr: c.descAr,
+          icon: c.icon,
+          accent: c.accent,
+          order: i,
+        },
+      });
+    }
+  }
+  revalidateSite("/admin/categories", "/journal", "/work", "/services");
+  redirect("/admin/categories");
 }
 
 /** Sends a real test SMS to the CALLER'S OWN phone (never an arbitrary number) — for diagnosing Kavenegar setup. */
@@ -811,6 +941,25 @@ export async function addTaskComment(taskId: string, body: string) {
 export async function saveHomePage(fd: FormData) {
   await requirePermission("home.manage");
   const data = {
+    heroMode: S(fd, "heroMode", "cinematic"),
+    heroMedia: S(fd, "heroMedia") || null,
+    heroPoster: S(fd, "heroPoster") || null,
+    // Clamped, not trusted: the scrim is what guarantees legible copy over an
+    // arbitrary uploaded image, so 0/100 must stay out of reach.
+    heroOverlay: Math.max(0, Math.min(90, N(fd, "heroOverlay", 55))),
+    heroHeight: S(fd, "heroHeight", "full"),
+    heroAlign: S(fd, "heroAlign", "start"),
+    heroShowStats: B(fd, "heroShowStats"),
+    heroCtaHref: S(fd, "heroCtaHref") || "/contact",
+    heroReelUrl: S(fd, "heroReelUrl") || null,
+    heroTags: J(L(fd, "heroTags")),
+    heroTagsEn: J(L(fd, "heroTagsEn")),
+    heroTagsAr: J(L(fd, "heroTagsAr")),
+    heroSlides: J(SLIDES(fd, "heroSlides")),
+    heroSlidesEn: J(SLIDES(fd, "heroSlidesEn")),
+    heroSlidesAr: J(SLIDES(fd, "heroSlidesAr")),
+    heroSlideDuration: Math.max(2, Math.min(30, N(fd, "heroSlideDuration", 6))),
+    heroScrollLength: Math.max(160, Math.min(1200, N(fd, "heroScrollLength", 640))),
     heroBadge: S(fd, "heroBadge"),
     heroBadgeEn: S(fd, "heroBadgeEn") || null,
     heroBadgeAr: S(fd, "heroBadgeAr") || null,

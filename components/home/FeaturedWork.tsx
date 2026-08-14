@@ -20,6 +20,7 @@ interface P {
   cover: string;
   accent?: string;
   heroVideo?: string | null;
+  status?: string;
   tags?: string;
   tagsEn?: string | null;
   tagsAr?: string | null;

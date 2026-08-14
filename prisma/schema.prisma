@@ -185,6 +185,11 @@ model Project {
   category     String     @default("Film")
   categoryEn   String?
   categoryAr   String?
+  /// Delivery state shown as a coloured dot on portfolio cards — lets visitors
+  /// tell finished work from work still in production, which reads as honesty
+  /// rather than a wall of undated samples.
+  /// DONE | IN_PROGRESS
+  status       String     @default("DONE")
   cover        String
   poster       String?
   heroVideo    String?
@@ -375,15 +380,89 @@ model TeamMember {
   published Boolean @default(true)
 }
 
+/// Site traffic, recorded by a tiny beacon in the public layout.
+///
+/// Deliberately anonymous: path, referrer host and a timestamp — no IP, no
+/// user agent, no cookie, nothing that identifies a visitor. That is enough to
+/// answer "how much traffic, from where, to what" on the dashboard, which used
+/// to display an invented sine wave.
+///
+/// A beacon rather than server-side counting because public pages are served
+/// from the CDN as static HTML — the server never sees most visits.
+model PageView {
+  id        String   @id @default(cuid())
+  path      String
+  kind      String   @default("VIEW") // VIEW | CLICK
+  label     String? // for CLICK: which control was pressed
+  referrer  String? // host only, never the full URL
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([kind, createdAt])
+  @@index([path])
+}
+
 /// Global key/value site settings (JSON values).
 model Setting {
   key   String @id
   value String // JSON
 }
 
+/// Editable taxonomy for the public site. One table, three `kind`s, because all
+/// three behave identically from the admin's point of view (ordered, titled,
+/// translatable) and only differ in which content type points at them:
+///   POST       → Post.category      (ژورنال)
+///   WORK       → Project.category   (نمونه‌کارها)
+///   DEPARTMENT → Service.department (خدمات — header mega-menu groups)
+/// `slug` is the stable key content rows store, so a title can be renamed
+/// freely without orphaning anything. For DEPARTMENT the slug matches the old
+/// hardcoded keys (FILM/DIGITAL/DESIGN/STRATEGY) to stay compatible with rows
+/// created before this table existed.
+model Category {
+  id        String   @id @default(cuid())
+  kind      String // POST | WORK | DEPARTMENT
+  slug      String
+  title     String
+  titleEn   String?
+  titleAr   String?
+  desc      String?
+  descEn    String?
+  descAr    String?
+  icon      String   @default("Sparkles")
+  accent    String   @default("#6699ff")
+  order     Int      @default(0)
+  published Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([kind, slug])
+}
+
 /// Singleton content for the public homepage (one row, id fixed to "home").
 model HomePage {
   id                             String   @id @default("home")
+  // ————— hero presentation —————
+  // `heroMode` picks which hero component renders. "cinematic" is the original
+  // scroll-driven Eye of Creation animation and stays the default so existing
+  // deploys are unchanged; the other modes reuse one shared copy/CTA layer and
+  // only swap what sits behind it.
+  heroMode                       String   @default("cinematic") // cinematic | slider | image | videoLoop | videoScroll
+  heroMedia                      String? // image (image mode) or video (videoLoop/videoScroll)
+  heroPoster                     String? // poster frame shown while a hero video loads
+  heroOverlay                    Int      @default(55) // 0–90 — how much the media is darkened behind the copy
+  heroHeight                     String   @default("full") // full | tall | medium
+  heroAlign                      String   @default("start") // start | center — copy block alignment
+  heroShowStats                  Boolean  @default(true)
+  heroCtaHref                    String   @default("/contact")
+  heroReelUrl                    String? // showreel opened by the play button (was a hardcoded sample clip)
+  heroTags                       String   @default("[]") // JSON string[] — chips under the CTAs
+  heroTagsEn                     String? // JSON string[]
+  heroTagsAr                     String? // JSON string[]
+  heroSlides                     String   @default("[]") // JSON [{media,poster,badge,title,desc,ctaLabel,ctaHref}]
+  heroSlidesEn                   String? // JSON, same shape
+  heroSlidesAr                   String? // JSON, same shape
+  heroSlideDuration              Int      @default(6) // seconds per slide before auto-advance
+  heroScrollLength               Int      @default(640) // vh of scroll runway for the scroll-driven modes
   heroBadge                      String   @default("استودیوی خلاقیت، پروداکشن و دیجیتال مارکتینگ")
   heroBadgeEn                    String?
   heroBadgeAr                    String?

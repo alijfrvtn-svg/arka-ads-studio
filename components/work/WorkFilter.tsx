@@ -3,10 +3,11 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ProjectCard } from "./ProjectCard";
-import { WORK_CATEGORIES, WORK_CATEGORY_LABELS } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { tr, ui } from "@/lib/i18n";
+import type { CategoryItem } from "@/lib/queries";
 import type { Locale } from "@/types";
+import { projectStatus } from "@/lib/constants";
 
 interface P {
   id: string;
@@ -20,6 +21,7 @@ interface P {
   cover: string;
   accent?: string;
   heroVideo?: string | null;
+  status?: string;
   tags?: string;
   tagsEn?: string | null;
   tagsAr?: string | null;
@@ -27,10 +29,31 @@ interface P {
 }
 const ASPECTS = ["aspect-[4/5]", "aspect-[3/4]", "aspect-[4/3]", "aspect-[1/1]", "aspect-[4/5]", "aspect-[3/4]"];
 
-export function WorkFilter({ projects, locale = "fa" }: { projects: P[]; locale?: Locale }) {
-  const [cat, setCat] = useState("همه");
-  const cats = WORK_CATEGORIES.filter((c) => c === "همه" || projects.some((p) => p.category === c));
-  const filtered = cat === "همه" ? projects : projects.filter((p) => p.category === cat);
+export function WorkFilter({
+  projects,
+  categories,
+  locale = "fa",
+}: {
+  projects: P[];
+  // Editable in /admin/categories (kind WORK).
+  categories: CategoryItem[];
+  locale?: Locale;
+}) {
+  const ALL = "همه";
+  const [cat, setCat] = useState(ALL);
+  const [status, setStatus] = useState<"ALL" | "DONE" | "IN_PROGRESS">("ALL");
+  // Only offer a chip that would actually match something.
+  const cats = [ALL, ...categories.filter((c) => projects.some((p) => p.category === c.slug)).map((c) => c.slug)];
+  const labels = new Map(categories.map((c) => [c.slug, c]));
+  // Same rule for the status row — hide it entirely unless the portfolio
+  // actually contains both states, otherwise it is a control that can only
+  // ever return the same list.
+  const hasMixedStatus =
+    projects.some((p) => (p.status ?? "DONE") === "DONE") &&
+    projects.some((p) => p.status === "IN_PROGRESS");
+  const filtered = projects
+    .filter((p) => cat === ALL || p.category === cat)
+    .filter((p) => status === "ALL" || (p.status ?? "DONE") === status);
 
   return (
     <div>
@@ -41,14 +64,39 @@ export function WorkFilter({ projects, locale = "fa" }: { projects: P[]; locale?
               key={c}
               onClick={() => setCat(c)}
               className={cn(
-                "shrink-0 rounded-full px-4 py-2 text-sm font-medium transition-colors",
+                "inline-flex min-h-11 shrink-0 items-center rounded-full px-4 text-sm font-medium transition-colors",
                 cat === c ? "bg-primary text-primary-foreground" : "border border-card-border text-foreground-muted hover:text-foreground",
               )}
             >
-              {c === "همه" ? ui(locale).filterAll : tr(locale, c, WORK_CATEGORY_LABELS[c]?.en, WORK_CATEGORY_LABELS[c]?.ar)}
+              {c === ALL ? ui(locale).filterAll : tr(locale, labels.get(c)?.title ?? c, labels.get(c)?.titleEn, labels.get(c)?.titleAr)}
             </button>
           ))}
         </div>
+        {hasMixedStatus && (
+          <div className="container-x mt-2 flex gap-2 overflow-x-auto">
+            {(["ALL", "DONE", "IN_PROGRESS"] as const).map((v) => {
+              const meta = v === "ALL" ? null : projectStatus(v);
+              return (
+                <button
+                  key={v}
+                  onClick={() => setStatus(v)}
+                  aria-pressed={status === v}
+                  className={cn(
+                    "inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-full border px-3.5 text-xs font-medium transition-colors",
+                    status === v
+                      ? "border-primary text-foreground"
+                      : "border-card-border text-foreground-muted hover:text-foreground",
+                  )}
+                >
+                  {meta && (
+                    <span className="h-2 w-2 rounded-full" style={{ background: meta.color }} aria-hidden />
+                  )}
+                  {v === "ALL" ? ui(locale).filterAll : tr(locale, meta!.label, meta!.labelEn, meta!.labelAr)}
+                </button>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       <div className="container-x">

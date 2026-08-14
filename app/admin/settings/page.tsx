@@ -87,6 +87,10 @@ export default async function SettingsPage() {
             <div className="flex-1">
               <p className="text-sm font-medium text-foreground">حالت تعمیر و نگهداری</p>
               <p className="text-xs text-foreground-muted">با فعال‌سازی، سایت برای بازدیدکنندگان موقتاً بسته می‌شود.</p>
+              <p className="mt-1 text-xs text-amber-400">
+                توجه: شما و بقیه‌ی اعضای پنل چون وارد شده‌اید همچنان سایت را عادی می‌بینید (با یک نوار زرد بالای صفحه).
+                برای تست واقعی، سایت را در پنجره‌ی ناشناس (Incognito) باز کنید.
+              </p>
             </div>
             <Toggle name="maintenance" defaultChecked={s.maintenance} />
           </div>

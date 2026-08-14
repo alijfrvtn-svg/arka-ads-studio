@@ -4,10 +4,11 @@ import { ProjectEditor } from "@/components/admin/ProjectEditor";
 import { parseArr } from "@/lib/utils";
 import type { ProjectInput } from "@/lib/actions";
 import type { Credit, Metric } from "@/types";
+import { getCategories } from "@/lib/queries";
 
 export default async function EditProjectPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const [project, clients, services, industries] = await Promise.all([
+  const [project, clients, services, industries, categories] = await Promise.all([
     db.project.findUnique({
       where: { id },
       include: { services: { select: { slug: true } }, industries: { select: { slug: true } }, seo: true },
@@ -15,6 +16,7 @@ export default async function EditProjectPage({ params }: { params: Promise<{ id
     db.client.findMany({ select: { id: true, name: true }, orderBy: { name: "asc" } }),
     db.service.findMany({ select: { slug: true, title: true }, orderBy: { order: "asc" } }),
     db.industry.findMany({ select: { slug: true, title: true }, orderBy: { order: "asc" } }),
+    getCategories("WORK"),
   ]);
 
   if (!project) notFound();
@@ -29,6 +31,7 @@ export default async function EditProjectPage({ params }: { params: Promise<{ id
     subtitleEn: project.subtitleEn ?? "",
     subtitleAr: project.subtitleAr ?? "",
     category: project.category,
+    status: project.status,
     categoryEn: project.categoryEn ?? "",
     categoryAr: project.categoryAr ?? "",
     cover: project.cover,
@@ -94,6 +97,7 @@ export default async function EditProjectPage({ params }: { params: Promise<{ id
       clients={clients}
       services={services.map((s) => ({ value: s.slug, label: s.title }))}
       industries={industries.map((i) => ({ value: i.slug, label: i.title }))}
+      categories={categories}
     />
   );
 }

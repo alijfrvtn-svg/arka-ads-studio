@@ -6,6 +6,7 @@ import { buildMetadata } from "@/lib/seo";
 import { getLocale } from "@/lib/get-locale";
 import { ui } from "@/lib/i18n";
 import type { Locale } from "@/types";
+import { getCategories } from "@/lib/queries";
 
 const COPY: Record<Locale, { title: string; highlight: string; description: string; metaDescription: string }> = {
   fa: {
@@ -35,11 +36,14 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function JournalPage() {
   const locale = await getLocale();
-  const posts = await db.post.findMany({
-    where: { published: true },
-    orderBy: [{ featured: "desc" }, { publishedAt: "desc" }],
-    include: { author: { select: { name: true, avatar: true } } },
-  });
+  const [posts, categories] = await Promise.all([
+    db.post.findMany({
+      where: { published: true },
+      orderBy: [{ featured: "desc" }, { publishedAt: "desc" }],
+      include: { author: { select: { name: true, avatar: true } } },
+    }),
+    getCategories("POST"),
+  ]);
   const c = COPY[locale];
 
   return (
@@ -51,7 +55,7 @@ export default async function JournalPage() {
         description={c.description}
       />
       <section className="pb-24">
-        <JournalFilter posts={posts} locale={locale} />
+        <JournalFilter posts={posts} categories={categories} locale={locale} />
       </section>
     </>
   );

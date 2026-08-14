@@ -56,6 +56,11 @@
   --primary: #6699ff;
   --primary-foreground: #04060d;
   --accent: #a6c9ff;
+  /* Gradient/glow stops. Default to the static brand tokens so the blue
+     identity is byte-identical to before; the accent switcher below swaps
+     only these, never the brand tokens themselves. */
+  --accent-bright: var(--color-azure-bright);
+  --accent-soft: var(--color-sky);
   --ring: #6699ff;
   --grid-line: rgba(255, 255, 255, 0.045);
   --glass-bg: rgba(255, 255, 255, 0.04);
@@ -83,6 +88,8 @@
   --primary: #2b56d6;
   --primary-foreground: #ffffff;
   --accent: #162d73;
+  --accent-bright: #2b56d6;
+  --accent-soft: #162d73;
   --ring: #2b56d6;
   --grid-line: rgba(22, 45, 115, 0.07);
   --glass-bg: rgba(255, 255, 255, 0.65);
@@ -92,6 +99,338 @@
   --selection-bg: #2b56d6;
   --selection-fg: #ffffff;
   color-scheme: light;
+}
+
+/* ============================================================
+   Identity accent — visitor-selectable (components/theme/AccentProvider.tsx)
+   ------------------------------------------------------------
+   Set as data-accent on <html>. No attribute = the default ARKA blue, whose
+   values live untouched in the :root/.light blocks above — these rules only
+   ever add a *different* identity on top, so the brand default cannot drift.
+
+   Every hue is the brand blue rotated in OKLCH at identical lightness and
+   chroma, so all of them land at the same perceived punch and clear WCAG AA
+   on both backgrounds (verified 5.16:1 – 16.55:1; the weakest is green on
+   light, the rest sit well above). The `.light` pair carries higher
+   specificity, so it wins whenever the day theme is on.
+   ============================================================ */
+html[data-accent="red"] {
+  --primary: #ef6f68;
+  --accent: #fab2ab;
+  --accent-bright: #f3837b;
+  --accent-soft: #ffdfdb;
+  --ring: #ef6f68;
+  --selection-bg: #ef6f68;
+}
+html[data-accent="red"].light {
+  --primary: #bd061f;
+  --accent: #66090f;
+  --accent-bright: #bd061f;
+  --accent-soft: #66090f;
+  --ring: #bd061f;
+  --selection-bg: #bd061f;
+}
+
+html[data-accent="orange"] {
+  --primary: #e67d22;
+  --accent: #f3b992;
+  --accent-bright: #ea8e4a;
+  --accent-soft: #fbe2d1;
+  --ring: #e67d22;
+  --selection-bg: #e67d22;
+}
+html[data-accent="orange"].light {
+  --primary: #994d00;
+  --accent: #532700;
+  --accent-bright: #994d00;
+  --accent-soft: #532700;
+  --ring: #994d00;
+  --selection-bg: #994d00;
+}
+
+html[data-accent="yellow"] {
+  --primary: #b89a00;
+  --accent: #d8c787;
+  --accent-bright: #c3a629;
+  --accent-soft: #efe8cd;
+  --ring: #b89a00;
+  --selection-bg: #b89a00;
+}
+html[data-accent="yellow"].light {
+  --primary: #786300;
+  --accent: #403400;
+  --accent-bright: #786300;
+  --accent-soft: #403400;
+  --ring: #786300;
+  --selection-bg: #786300;
+}
+
+html[data-accent="green"] {
+  --primary: #48b760;
+  --accent: #a2d7a8;
+  --accent-bright: #65c075;
+  --accent-soft: #d8eeda;
+  --ring: #48b760;
+  --selection-bg: #48b760;
+}
+html[data-accent="green"].light {
+  --primary: #007a2e;
+  --accent: #004115;
+  --accent-bright: #007a2e;
+  --accent-soft: #004115;
+  --ring: #007a2e;
+  --selection-bg: #007a2e;
+}
+
+html[data-accent="purple"] {
+  --primary: #b480eb;
+  --accent: #d4baf4;
+  --accent-bright: #bc90ee;
+  --accent-soft: #ede2fb;
+  --ring: #b480eb;
+  --selection-bg: #b480eb;
+}
+html[data-accent="purple"].light {
+  --primary: #8137bf;
+  --accent: #441d66;
+  --accent-bright: #8137bf;
+  --accent-soft: #441d66;
+  --ring: #8137bf;
+  --selection-bg: #8137bf;
+}
+
+html[data-accent="pink"] {
+  --primary: #e46eaa;
+  --accent: #f3b1cf;
+  --accent-bright: #e882b4;
+  --accent-soft: #fbdeeb;
+  --ring: #e46eaa;
+  --selection-bg: #e46eaa;
+}
+html[data-accent="pink"].light {
+  --primary: #b01175;
+  --accent: #5f0b3d;
+  --accent-bright: #b01175;
+  --accent-soft: #5f0b3d;
+  --ring: #b01175;
+  --selection-bg: #b01175;
+}
+
+/* ------------------------------------------------------------
+   Eye of Creation stage palette (components/home/EyeOfCreation.tsx).
+   That hero paints ~90 colour literals through inline styles; exposing them
+   as variables lets the accent follow the visitor's choice without the
+   component re-rendering. The :root block below reproduces the original blue
+   values exactly, so the default identity is unchanged.
+   ------------------------------------------------------------ */
+:root {
+  --eoc-primary: 102, 153, 255;
+  --eoc-accent: 166, 201, 255;
+  --eoc-soft: 211, 235, 254;
+  --eoc-glow: 150, 200, 255;
+  --eoc-glow-2: 120, 180, 255;
+  --eoc-beam: 190, 216, 255;
+  --eoc-sky-2: 180, 215, 255;
+  --eoc-sky-3: 198, 222, 255;
+  --eoc-sky-4: 200, 225, 255;
+  --eoc-glass: 90, 150, 210;
+  --eoc-glass-2: 90, 140, 220;
+  --eoc-glass-3: 120, 180, 240;
+  --eoc-deep: 43, 86, 214;
+  --eoc-navy: #162d73;
+  --eoc-navy-deep: #0d1b4a;
+  --eoc-navy-mid: #1f3a86;
+  --eoc-navy-ink: #0c1226;
+  --eoc-navy-panel: #0d1a44;
+  --eoc-navy-sh: #0a1230;
+  --eoc-navy-sh-2: #0c1740;
+  --eoc-indigo: #2f4a9c;
+  --eoc-glass-bg: #182234;
+  --eoc-glass-ink: #05070c;
+  --eoc-light-1: #f5f8fe;
+  --eoc-light-2: #eef3fc;
+  --eoc-light-3: #dde6f5;
+  --eoc-light-ink: 10, 19, 46;
+}
+
+html[data-accent="red"] {
+  --eoc-primary: 239, 111, 104;
+  --eoc-accent: 250, 178, 171;
+  --eoc-soft: 255, 223, 219;
+  --eoc-glow: 251, 172, 165;
+  --eoc-glow-2: 246, 144, 136;
+  --eoc-beam: 252, 199, 194;
+  --eoc-sky-2: 253, 195, 189;
+  --eoc-sky-3: 253, 207, 203;
+  --eoc-sky-4: 254, 210, 206;
+  --eoc-glass: 204, 118, 111;
+  --eoc-glass-2: 209, 105, 99;
+  --eoc-glass-3: 235, 147, 140;
+  --eoc-deep: 189, 6, 31;
+  --eoc-navy: #66090f;
+  --eoc-navy-deep: #410508;
+  --eoc-navy-mid: #78171a;
+  --eoc-navy-ink: #230b0a;
+  --eoc-navy-panel: #3c0709;
+  --eoc-navy-sh: #2b0606;
+  --eoc-navy-sh-2: #390507;
+  --eoc-indigo: #8e2827;
+  --eoc-glass-bg: #321b19;
+  --eoc-glass-ink: #0b0505;
+  --eoc-light-1: #fef6f5;
+  --eoc-light-2: #fcf0ee;
+  --eoc-light-3: #f4e0de;
+  --eoc-light-ink: 42, 8, 8;
+}
+
+html[data-accent="orange"] {
+  --eoc-primary: 230, 125, 34;
+  --eoc-accent: 243, 185, 146;
+  --eoc-soft: 251, 226, 209;
+  --eoc-glow: 243, 179, 136;
+  --eoc-glow-2: 238, 154, 95;
+  --eoc-beam: 247, 204, 176;
+  --eoc-sky-2: 247, 200, 170;
+  --eoc-sky-3: 248, 212, 188;
+  --eoc-sky-4: 249, 215, 192;
+  --eoc-glass: 197, 126, 76;
+  --eoc-glass-2: 201, 116, 50;
+  --eoc-glass-3: 227, 156, 107;
+  --eoc-deep: 153, 77, 0;
+  --eoc-navy: #532700;
+  --eoc-navy-deep: #351700;
+  --eoc-navy-mid: #663100;
+  --eoc-navy-ink: #210e02;
+  --eoc-navy-panel: #331500;
+  --eoc-navy-sh: #250e00;
+  --eoc-navy-sh-2: #2f1300;
+  --eoc-indigo: #7d3e00;
+  --eoc-glass-bg: #301d10;
+  --eoc-glass-ink: #0b0604;
+  --eoc-light-1: #fdf7f3;
+  --eoc-light-2: #faf1eb;
+  --eoc-light-3: #f2e2d8;
+  --eoc-light-ink: 37, 14, 0;
+}
+
+html[data-accent="yellow"] {
+  --eoc-primary: 184, 154, 0;
+  --eoc-accent: 216, 199, 135;
+  --eoc-soft: 239, 232, 205;
+  --eoc-glow: 214, 195, 123;
+  --eoc-glow-2: 202, 176, 72;
+  --eoc-beam: 226, 214, 169;
+  --eoc-sky-2: 225, 212, 162;
+  --eoc-sky-3: 230, 220, 181;
+  --eoc-sky-4: 232, 223, 186;
+  --eoc-glass: 167, 144, 57;
+  --eoc-glass-2: 166, 138, 0;
+  --eoc-glass-3: 196, 174, 91;
+  --eoc-deep: 120, 99, 0;
+  --eoc-navy: #403400;
+  --eoc-navy-deep: #282000;
+  --eoc-navy-mid: #4e4000;
+  --eoc-navy-ink: #191300;
+  --eoc-navy-panel: #261e00;
+  --eoc-navy-sh: #1b1500;
+  --eoc-navy-sh-2: #221b00;
+  --eoc-indigo: #615000;
+  --eoc-glass-bg: #28220b;
+  --eoc-glass-ink: #080703;
+  --eoc-light-1: #faf8f2;
+  --eoc-light-2: #f5f3e9;
+  --eoc-light-3: #eae6d5;
+  --eoc-light-ink: 27, 21, 0;
+}
+
+html[data-accent="green"] {
+  --eoc-primary: 72, 183, 96;
+  --eoc-accent: 162, 215, 168;
+  --eoc-soft: 216, 238, 218;
+  --eoc-glow: 154, 213, 161;
+  --eoc-glow-2: 118, 199, 131;
+  --eoc-beam: 188, 226, 192;
+  --eoc-sky-2: 182, 224, 187;
+  --eoc-sky-3: 197, 230, 201;
+  --eoc-sky-4: 201, 232, 204;
+  --eoc-glass: 96, 164, 106;
+  --eoc-glass-2: 76, 162, 92;
+  --eoc-glass-3: 126, 194, 136;
+  --eoc-deep: 0, 122, 46;
+  --eoc-navy: #004115;
+  --eoc-navy-deep: #00290a;
+  --eoc-navy-mid: #00501c;
+  --eoc-navy-ink: #051808;
+  --eoc-navy-panel: #002609;
+  --eoc-navy-sh: #001c05;
+  --eoc-navy-sh-2: #002308;
+  --eoc-indigo: #006324;
+  --eoc-glass-bg: #152718;
+  --eoc-glass-ink: #040805;
+  --eoc-light-1: #f4faf5;
+  --eoc-light-2: #edf5ee;
+  --eoc-light-3: #dceadd;
+  --eoc-light-ink: 0, 28, 6;
+}
+
+html[data-accent="purple"] {
+  --eoc-primary: 180, 128, 235;
+  --eoc-accent: 212, 186, 244;
+  --eoc-soft: 237, 226, 251;
+  --eoc-glow: 209, 180, 245;
+  --eoc-glow-2: 195, 156, 241;
+  --eoc-beam: 223, 205, 247;
+  --eoc-sky-2: 221, 201, 248;
+  --eoc-sky-3: 228, 212, 248;
+  --eoc-sky-4: 230, 215, 249;
+  --eoc-glass: 161, 128, 199;
+  --eoc-glass-2: 159, 118, 204;
+  --eoc-glass-3: 190, 157, 229;
+  --eoc-deep: 129, 55, 191;
+  --eoc-navy: #441d66;
+  --eoc-navy-deep: #2a1041;
+  --eoc-navy-mid: #522878;
+  --eoc-navy-ink: #180e22;
+  --eoc-navy-panel: #27113c;
+  --eoc-navy-sh: #1c0c2a;
+  --eoc-navy-sh-2: #240e39;
+  --eoc-indigo: #63388d;
+  --eoc-glass-bg: #261d30;
+  --eoc-glass-ink: #08060b;
+  --eoc-light-1: #f9f7fd;
+  --eoc-light-2: #f5f1fa;
+  --eoc-light-3: #e9e2f2;
+  --eoc-light-ink: 27, 13, 41;
+}
+
+html[data-accent="pink"] {
+  --eoc-primary: 228, 110, 170;
+  --eoc-accent: 243, 177, 207;
+  --eoc-soft: 251, 222, 235;
+  --eoc-glow: 243, 171, 204;
+  --eoc-glow-2: 236, 143, 188;
+  --eoc-beam: 247, 198, 220;
+  --eoc-sky-2: 247, 194, 218;
+  --eoc-sky-3: 248, 206, 225;
+  --eoc-sky-4: 249, 210, 227;
+  --eoc-glass: 196, 116, 155;
+  --eoc-glass-2: 199, 104, 152;
+  --eoc-glass-3: 226, 146, 184;
+  --eoc-deep: 176, 17, 117;
+  --eoc-navy: #5f0b3d;
+  --eoc-navy-deep: #3c0626;
+  --eoc-navy-mid: #70184b;
+  --eoc-navy-ink: #210b16;
+  --eoc-navy-panel: #380824;
+  --eoc-navy-sh: #280719;
+  --eoc-navy-sh-2: #340621;
+  --eoc-indigo: #85285c;
+  --eoc-glass-bg: #301a25;
+  --eoc-glass-ink: #0b0508;
+  --eoc-light-1: #fdf6f9;
+  --eoc-light-2: #faeff4;
+  --eoc-light-3: #f2e0e7;
+  --eoc-light-ink: 39, 8, 25;
 }
 
 /* map semantic vars → tailwind color utilities */
@@ -256,7 +595,7 @@ body {
 }
 
 .text-gradient {
-  background: linear-gradient(100deg, var(--primary) 0%, var(--color-sky) 45%, var(--foreground) 100%);
+  background: linear-gradient(100deg, var(--primary) 0%, var(--accent-soft) 45%, var(--foreground) 100%);
   background-clip: text;
   -webkit-background-clip: text;
   color: transparent;
@@ -622,7 +961,7 @@ body {
   position: absolute;
   inset: 0;
   z-index: -1;
-  background: linear-gradient(120deg, var(--primary), var(--color-azure-bright), var(--primary));
+  background: linear-gradient(120deg, var(--primary), var(--accent-bright), var(--primary));
   background-size: 200% 100%;
   transition: background-position 0.6s var(--ease-out-quint);
 }

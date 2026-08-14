@@ -1,4 +1,24 @@
+import Link from "next/link";
+import { ShieldAlert } from "lucide-react";
 import { Logo } from "@/components/brand/Logo";
+
+/**
+ * Shown to signed-in CMS staff while maintenance mode is on — they are let
+ * through to the real site, so without this there is no on-page signal that
+ * the site is closed to everyone else.
+ */
+export function MaintenanceBanner() {
+  return (
+    <div className="relative z-[60] flex flex-wrap items-center justify-center gap-x-3 gap-y-1 bg-amber-400 px-4 py-2 text-center text-xs font-semibold text-[#04060d] sm:text-sm">
+      <ShieldAlert className="h-4 w-4 shrink-0" aria-hidden />
+      <span>حالت تعمیر و نگهداری روشن است — بازدیدکنندگان صفحه‌ی «در حال تعمیر» را می‌بینند.</span>
+      <span className="opacity-80">شما چون وارد پنل شده‌اید سایت را عادی می‌بینید.</span>
+      <Link href="/admin/settings" className="underline underline-offset-2 hover:opacity-70">
+        خاموش کردن
+      </Link>
+    </div>
+  );
+}
 
 export function MaintenanceScreen() {
   return (

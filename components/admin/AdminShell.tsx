@@ -20,8 +20,9 @@ import {
   Users2,
   Shield,
   Settings,
-  Search,
   Send,
+  Tags,
+  Shapes,
   LogOut,
   ExternalLink,
   Menu,
@@ -31,11 +32,13 @@ import {
 } from "lucide-react";
 import { Logo, LogoMark } from "@/components/brand/Logo";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
+import { AdminSearch } from "./AdminSearch";
 import { NotificationBell, type NotificationItem } from "@/components/notifications/NotificationBell";
 import { IdleLogout } from "@/components/auth/IdleLogout";
 import { ROLES } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import type { Role } from "@/types";
+import { Avatar } from "@/components/ui/Avatar";
 
 interface NavItem {
   label: string;
@@ -55,6 +58,7 @@ const NAV: { group: string; items: NavItem[] }[] = [
       { label: "خدمات", href: "/admin/services", icon: Sparkles, perm: "services.manage" },
       { label: "صنایع", href: "/admin/industries", icon: Building2, perm: "industries.manage" },
       { label: "ژورنال", href: "/admin/journal", icon: Newspaper, perm: "blog.view" },
+      { label: "دسته‌بندی‌ها", href: "/admin/categories", icon: Tags, perm: "blog.view" },
       { label: "کتابخانه رسانه", href: "/admin/media", icon: ImageIcon, perm: "media.manage" },
       { label: "صفحه اصلی", href: "/admin/home", icon: Home, perm: "home.manage" },
       { label: "درباره ما", href: "/admin/about", icon: Info, perm: "about.manage" },
@@ -81,6 +85,7 @@ const NAV: { group: string; items: NavItem[] }[] = [
     group: "سیستم",
     items: [
       { label: "کاربران و نقش‌ها", href: "/admin/users", icon: Shield, perm: "users.manage" },
+      { label: "راهنمای آیکن‌ها", href: "/admin/icons", icon: Shapes, perm: "dashboard.view" },
       { label: "تنظیمات", href: "/admin/settings", icon: Settings, perm: "settings.manage" },
     ],
   },
@@ -163,11 +168,7 @@ export function AdminShell({
 
       <div className="border-t border-card-border p-3">
         <div className="flex items-center gap-3 rounded-xl p-2">
-          <img
-            src={user.avatar || `https://i.pravatar.cc/80?u=${user.email}`}
-            alt={user.name}
-            className="h-10 w-10 rounded-full border border-card-border object-cover"
-          />
+          <Avatar src={user.avatar} name={user.name} className="h-10 w-10 text-base" />
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-semibold text-foreground">{user.name}</p>
             <p className="truncate text-xs text-foreground-faint">{roleLabel}</p>
@@ -206,7 +207,7 @@ export function AdminShell({
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-card-border bg-surface/80 px-4 backdrop-blur-xl md:px-6">
           <button
-            className="grid h-10 w-10 place-items-center rounded-lg border border-card-border lg:hidden"
+            className="grid h-11 w-11 shrink-0 place-items-center rounded-lg border border-card-border lg:hidden"
             onClick={() => setMobileOpen(true)}
             aria-label="منو"
           >
@@ -219,12 +220,8 @@ export function AdminShell({
             <h1 className="font-display text-lg font-bold text-foreground">{current?.label ?? "پنل مدیریت"}</h1>
           </div>
 
-          <div className="relative mx-auto hidden w-full max-w-md md:block">
-            <Search className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-foreground-faint" />
-            <input
-              placeholder="جستجو در پنل…"
-              className="h-10 w-full rounded-xl border border-card-border bg-background/50 pr-10 pl-4 text-sm text-foreground outline-none transition-colors placeholder:text-foreground-faint focus:border-primary"
-            />
+          <div className="mx-auto hidden w-full max-w-md md:block">
+            <AdminSearch />
           </div>
 
           <div className="mr-auto flex items-center gap-1.5 md:mr-0">
@@ -240,6 +237,10 @@ export function AdminShell({
             <ThemeToggle />
           </div>
         </header>
+
+        <div className="border-b border-card-border bg-surface/80 px-4 py-2 backdrop-blur-xl md:hidden">
+          <AdminSearch />
+        </div>
 
         <main className="flex-1 p-4 md:p-6 lg:p-8">{children}</main>
       </div>

@@ -1,12 +1,22 @@
 import { PageHeader } from "@/components/admin/ui";
-import { Field, Input, Textarea, FormSection } from "@/components/admin/form";
+import { Field, Input, Textarea, Select, Toggle, FormSection } from "@/components/admin/form";
 import { LangTabs } from "@/components/admin/LangTabs";
 import { SubmitButton } from "@/components/admin/SubmitButton";
 import { saveHomePage } from "@/lib/actions";
 import { getHomePage } from "@/lib/queries";
 import { db } from "@/lib/db";
 import { parseArr } from "@/lib/utils";
+import type { HeroSlide } from "@/lib/queries";
 import type { WorkflowStep } from "@/types";
+
+/** Kept in sync with the switch in components/home/Hero.tsx. */
+const HERO_MODES = [
+  { value: "cinematic", label: "انیمیشن سینمایی (پیش‌فرض فعلی)", hint: "همان انیمیشن اسکرولی «چشم خلقت». روی موبایل به‌صورت خودکار به نسخه‌ی ساده تبدیل می‌شود." },
+  { value: "slider", label: "بنر اسلایدی", hint: "چند بنر که خودکار عوض می‌شوند؛ هر اسلاید عنوان و دکمه‌ی خودش را دارد." },
+  { value: "image", label: "تصویر ثابت", hint: "یک تصویر تمام‌عرض پشت متن‌ها — سبک‌ترین و سریع‌ترین حالت." },
+  { value: "videoLoop", label: "ویدیو لوپ معمولی", hint: "ویدیو بی‌صدا که مدام تکرار می‌شود." },
+  { value: "videoScroll", label: "ویدیو با اسکرول", hint: "ویدیو با چرخاندن اسکرول جلو و عقب می‌رود. روی موبایل و حالت کاهش انیمیشن، خودکار به لوپ ساده تبدیل می‌شود." },
+] as const;
 
 function lines(v: string | null | undefined) {
   return parseArr<string>(v).join("\n");
@@ -14,6 +24,17 @@ function lines(v: string | null | undefined) {
 function stepsText(v: string | null | undefined) {
   return parseArr<WorkflowStep>(v)
     .map((s) => `${s.step ?? ""} | ${s.title} | ${s.desc}`.replace(/^ \| /, ""))
+    .join("\n");
+}
+/** Round-trips the pipe format the SLIDES parser in lib/actions.ts expects. */
+function slidesText(v: string | null | undefined) {
+  return parseArr<HeroSlide>(v)
+    .map((s) =>
+      [s.media, s.title, s.desc, s.ctaLabel, s.ctaHref, s.badge, s.poster]
+        .map((x) => x ?? "")
+        .join(" | ")
+        .replace(/(\s*\|\s*)+$/, ""),
+    )
     .join("\n");
 }
 
@@ -25,7 +46,82 @@ export default async function HomePageAdmin() {
     <div className="mx-auto max-w-3xl">
       <PageHeader title="صفحه اصلی" description="مدیریت کامل محتوای صفحه‌ی نخست سایت (/)" />
       <form action={saveHomePage} className="space-y-5">
-        <FormSection title="هیرو" description="بک‌گراند انیمیشنی هیرو ثابته؛ فقط متن‌های زیر قابل ویرایشن">
+        <FormSection
+          title="حالت نمایش هیرو"
+          description="انتخاب کنید بخش اول صفحه اصلی چطور نمایش داده شود. با تغییر حالت، فقط فیلدهای مربوط به همان حالت اثر می‌گذارند — بقیه دست‌نخورده باقی می‌مانند."
+        >
+          <Field label="حالت">
+            <Select name="heroMode" defaultValue={row?.heroMode ?? "cinematic"}>
+              {HERO_MODES.map((m) => (
+                <option key={m.value} value={m.value}>
+                  {m.label}
+                </option>
+              ))}
+            </Select>
+          </Field>
+          <ul className="space-y-1.5 rounded-xl border border-card-border bg-background/40 p-4 text-xs leading-relaxed text-foreground-muted">
+            {HERO_MODES.map((m) => (
+              <li key={m.value}>
+                <span className="font-semibold text-foreground">{m.label}</span> — {m.hint}
+              </li>
+            ))}
+          </ul>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field
+              label="فایل رسانه هیرو"
+              hint="تصویر (jpg/webp) برای حالت «تصویر ثابت»، ویدیو (mp4/webm) برای حالت‌های ویدیویی. آدرس را از کتابخانه رسانه بردارید."
+            >
+              <Input name="heroMedia" defaultValue={row?.heroMedia ?? ""} dir="ltr" className="text-left" placeholder="/api/media/…" />
+            </Field>
+            <Field label="تصویر پوستر ویدیو" hint="فریم ثابتی که تا لود شدن ویدیو نمایش داده می‌شود">
+              <Input name="heroPoster" defaultValue={row?.heroPoster ?? ""} dir="ltr" className="text-left" placeholder="/api/media/…" />
+            </Field>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-3">
+            <Field label="ارتفاع هیرو">
+              <Select name="heroHeight" defaultValue={row?.heroHeight ?? "full"}>
+                <option value="full">تمام‌صفحه</option>
+                <option value="tall">بلند (۸۰٪)</option>
+                <option value="medium">متوسط (۶۲٪)</option>
+              </Select>
+            </Field>
+            <Field label="چیدمان متن">
+              <Select name="heroAlign" defaultValue={row?.heroAlign ?? "start"}>
+                <option value="start">راست‌چین (پیش‌فرض)</option>
+                <option value="center">وسط‌چین</option>
+              </Select>
+            </Field>
+            <Field label="تیرگی روی رسانه" hint="۰ تا ۹۰ — هرچه بیشتر، متن روی تصویر خواناتر">
+              <Input name="heroOverlay" type="number" min={0} max={90} defaultValue={row?.heroOverlay ?? 55} dir="ltr" className="text-left" />
+            </Field>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field label="مدت هر اسلاید (ثانیه)" hint="فقط در حالت بنر اسلایدی">
+              <Input name="heroSlideDuration" type="number" min={2} max={30} defaultValue={row?.heroSlideDuration ?? 6} dir="ltr" className="text-left" />
+            </Field>
+            <Field label="طول مسیر اسکرول (vh)" hint="فقط در حالت ویدیو با اسکرول — عدد بزرگ‌تر یعنی اسکرول طولانی‌تر و آهسته‌تر">
+              <Input name="heroScrollLength" type="number" min={160} max={1200} step={20} defaultValue={row?.heroScrollLength ?? 640} dir="ltr" className="text-left" />
+            </Field>
+          </div>
+
+          <Field
+            label="اسلایدهای بنر"
+            hint="هر خط یک اسلاید: آدرس تصویر یا ویدیو | عنوان | توضیح | متن دکمه | لینک دکمه | نشان | پوستر — فیلدهای انتهایی اختیاری‌اند."
+          >
+            <LangTabs
+              tabs={[
+                { locale: "fa", content: <Textarea name="heroSlides" defaultValue={slidesText(row?.heroSlides)} className="min-h-32" dir="ltr" /> },
+                { locale: "en", content: <Textarea name="heroSlidesEn" defaultValue={slidesText(row?.heroSlidesEn)} className="min-h-32" dir="ltr" /> },
+                { locale: "ar", content: <Textarea name="heroSlidesAr" defaultValue={slidesText(row?.heroSlidesAr)} className="min-h-32" dir="rtl" /> },
+              ]}
+            />
+          </Field>
+        </FormSection>
+
+        <FormSection title="متن‌ها و دکمه‌های هیرو" description="در همه‌ی حالت‌ها به‌جز بنر اسلایدی استفاده می‌شوند (اسلایدها متن خودشان را دارند)">
           <Field label="نشان (badge) بالای هیرو">
             <LangTabs
               tabs={[
@@ -73,6 +169,30 @@ export default async function HomePageAdmin() {
               />
             </Field>
           </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field label="لینک دکمه اصلی">
+              <Input name="heroCtaHref" defaultValue={row?.heroCtaHref ?? "/contact"} dir="ltr" className="text-left" />
+            </Field>
+            <Field
+              label="ویدیو شوریل"
+              hint="لینک مستقیم mp4 یا صفحه‌ی آپارات/یوتیوب. تا وقتی خالی باشد، دکمه‌ی پخش اصلاً نمایش داده نمی‌شود."
+            >
+              <Input name="heroReelUrl" defaultValue={row?.heroReelUrl ?? ""} dir="ltr" className="text-left" />
+            </Field>
+          </div>
+
+          <Field label="تگ‌های زیر دکمه‌ها" hint="هر تگ در یک سطر — مثال: تیزر تبلیغاتی">
+            <LangTabs
+              tabs={[
+                { locale: "fa", content: <Textarea name="heroTags" defaultValue={lines(row?.heroTags)} /> },
+                { locale: "en", content: <Textarea name="heroTagsEn" defaultValue={lines(row?.heroTagsEn)} dir="ltr" /> },
+                { locale: "ar", content: <Textarea name="heroTagsAr" defaultValue={lines(row?.heroTagsAr)} dir="rtl" /> },
+              ]}
+            />
+          </Field>
+
+          <Toggle name="heroShowStats" defaultChecked={row?.heroShowStats ?? true} label="نمایش آمار زیر هیرو" />
         </FormSection>
 
         <FormSection title="نوار اعتماد برندها">

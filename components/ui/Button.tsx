@@ -12,8 +12,10 @@ const variants: Record<Variant, string> = {
   ghost: "text-foreground hover:bg-card-hover",
   dark: "bg-foreground text-background hover:opacity-90",
 };
+// Heights are tap targets first: `sm` was 36px, below the 44px floor, and it is
+// what the header CTA uses — on a tablet that is a touch target, not a mouse one.
 const sizes: Record<Size, string> = {
-  sm: "h-9 px-4 text-[13px] gap-1.5",
+  sm: "h-10 px-4 text-[13px] gap-1.5 sm:h-11",
   md: "h-11 px-6 text-sm gap-2",
   lg: "h-14 px-8 text-base gap-2.5",
 };

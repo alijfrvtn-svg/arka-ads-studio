@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { PageHero } from "@/components/ui/PageHero";
 import { WorkFilter } from "@/components/work/WorkFilter";
-import { getAllProjects } from "@/lib/queries";
+import { getAllProjects, getCategories } from "@/lib/queries";
 import { buildMetadata } from "@/lib/seo";
 import { breadcrumbJsonLd } from "@/lib/seo";
 import { getLocale } from "@/lib/get-locale";
@@ -36,7 +36,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function WorkPage() {
   const locale = await getLocale();
-  const projects = await getAllProjects();
+  const [projects, categories] = await Promise.all([getAllProjects(), getCategories("WORK")]);
   const c = COPY[locale];
   return (
     <>
@@ -56,7 +56,7 @@ export default async function WorkPage() {
         description={c.description}
       />
       <section className="pb-24">
-        <WorkFilter projects={projects} locale={locale} />
+        <WorkFilter projects={projects} categories={categories} locale={locale} />
       </section>
     </>
   );

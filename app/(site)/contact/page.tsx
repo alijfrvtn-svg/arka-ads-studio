@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Mail, MapPin, Phone, Clock } from "lucide-react";
 import { PageHero } from "@/components/ui/PageHero";
 import { Section, Container } from "@/components/ui/Section";
@@ -38,7 +39,14 @@ export default async function ContactPage() {
           <div className="grid gap-8 lg:grid-cols-[1.2fr_1fr]">
             <Reveal>
               <div className="rounded-2xl border border-card-border bg-surface/50 p-6 md:p-8">
-                <ContactForm serviceOptions={c.serviceOptions} budgetOptions={c.budgetOptions} locale={locale} />
+                {/* ContactForm reads ?plan=/?service= via useSearchParams. Now
+                    that this page prerenders (it stopped being forced-dynamic
+                    when the site layout's cookie read went away), that hook
+                    needs its own boundary or the whole route bails out of
+                    static generation. */}
+                <Suspense fallback={<div className="min-h-[32rem]" />}>
+                  <ContactForm serviceOptions={c.serviceOptions} budgetOptions={c.budgetOptions} locale={locale} />
+                </Suspense>
               </div>
             </Reveal>
 

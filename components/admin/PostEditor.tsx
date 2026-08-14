@@ -12,9 +12,17 @@ import { SerpPreview } from "./SerpPreview";
 import { savePost, deletePost, type PostInput } from "@/lib/actions";
 import { cn, readingTime, slugify } from "@/lib/utils";
 
-const CATEGORIES = ["استراتژی برند", "دیجیتال مارکتینگ", "پروداکشن", "برندینگ", "طراحی", "سوشال مدیا", "سئو"];
-
-export function PostEditor({ initial, authors }: { initial: PostInput; authors: { id: string; name: string }[] }) {
+export function PostEditor({
+  initial,
+  authors,
+  categories,
+}: {
+  initial: PostInput;
+  authors: { id: string; name: string }[];
+  // Managed in /admin/categories — the list used to be hardcoded here, which
+  // meant adding a journal category required a code change.
+  categories: { slug: string; title: string }[];
+}) {
   const router = useRouter();
   const [p, setP] = useState<PostInput>(initial);
   const [tab, setTab] = useState<"write" | "preview">("write");
@@ -177,7 +185,7 @@ export function PostEditor({ initial, authors }: { initial: PostInput; authors: 
             <Field label="دسته‌بندی">
               <LangTabs
                 tabs={[
-                  { locale: "fa", content: <Select value={p.category} onChange={(e) => set({ category: e.target.value })}>{CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}</Select> },
+                  { locale: "fa", content: <Select value={p.category} onChange={(e) => set({ category: e.target.value })}>{categories.map((c) => <option key={c.slug} value={c.slug}>{c.title}</option>)}</Select> },
                   { locale: "en", content: <Input value={p.categoryEn ?? ""} onChange={(e) => set({ categoryEn: e.target.value })} dir="ltr" className="text-left" /> },
                   { locale: "ar", content: <Input value={p.categoryAr ?? ""} onChange={(e) => set({ categoryAr: e.target.value })} dir="rtl" /> },
                 ]}

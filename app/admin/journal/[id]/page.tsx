@@ -3,12 +3,14 @@ import { db } from "@/lib/db";
 import { PostEditor } from "@/components/admin/PostEditor";
 import { parseArr } from "@/lib/utils";
 import type { PostInput } from "@/lib/actions";
+import { getCategories } from "@/lib/queries";
 
 export default async function EditPostPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const post = await db.post.findUnique({ where: { id } });
   if (!post) notFound();
 
+  const categories = await getCategories("POST");
   const authors = await db.user.findMany({
     where: { OR: [{ role: { in: ["SUPER_ADMIN", "ADMIN", "EDITOR", "AUTHOR"] } }, ...(post.authorId ? [{ id: post.authorId }] : [])] },
     select: { id: true, name: true },
@@ -50,5 +52,5 @@ export default async function EditPostPage({ params }: { params: Promise<{ id: s
     keywordsAr: parseArr<string>(post.keywordsAr),
   };
 
-  return <PostEditor initial={initial} authors={authors} />;
+  return <PostEditor initial={initial} authors={authors} categories={categories} />;
 }

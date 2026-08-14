@@ -94,7 +94,10 @@ export default async function ServiceForm({ params }: { params: Promise<{ id: st
             <Field label="آیکن (Lucide)"><Input name="icon" defaultValue={s?.icon ?? "Sparkles"} dir="ltr" className="text-left" /></Field>
             <Field label="قیمت پایه (تومان)"><Input name="priceFrom" type="number" defaultValue={s?.priceFrom ?? ""} dir="ltr" className="text-left" /></Field>
           </div>
-          <Field label="تصویر کاور"><Input name="cover" defaultValue={s?.cover ?? ""} dir="ltr" className="text-left" placeholder="https://…" /></Field>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field label="تصویر کاور"><Input name="cover" defaultValue={s?.cover ?? ""} dir="ltr" className="text-left" placeholder="https://…" /></Field>
+            <Field label="ویدیو معرفی" hint="لینک مستقیم mp4 یا صفحه‌ی آپارات/یوتیوب — زیر معرفی خدمت پخش می‌شود"><Input name="heroVideo" defaultValue={s?.heroVideo ?? ""} dir="ltr" className="text-left" placeholder="https://aparat.com/v/… یا https://…/clip.mp4" /></Field>
+          </div>
           <Field label="ویژگی‌ها" hint="هر ویژگی در یک خط">
             <LangTabs
               tabs={[

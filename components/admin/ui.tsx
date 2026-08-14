@@ -79,10 +79,13 @@ export function StatCard({
 }: {
   label: string;
   value: string | number;
-  delta?: number;
+  // `null` means "measured, but there is no prior period to compare with" —
+  // rendered as no arrow at all. `undefined` means the metric has no trend.
+  delta?: number | null;
   icon: LucideIcon;
   hint?: string;
 }) {
+  const showDelta = typeof delta === "number";
   const up = (delta ?? 0) >= 0;
   return (
     <div className="group relative overflow-hidden rounded-2xl border border-card-border bg-surface p-5 transition-colors hover:border-primary/40">
@@ -98,11 +101,11 @@ export function StatCard({
           <Icon className="h-5 w-5" />
         </div>
       </div>
-      {(delta !== undefined || hint) && (
-        <div className="relative mt-3 flex items-center gap-2 text-xs">
-          {delta !== undefined && (
+      {(showDelta || hint) && (
+        <div className="relative mt-3 flex flex-wrap items-center gap-2 text-xs">
+          {showDelta && (
             <span className={cn("font-semibold", up ? "text-emerald-400" : "text-rose-400")}>
-              {up ? "▲" : "▼"} {toFa(Math.abs(delta))}٪
+              {up ? "▲" : "▼"} {toFa(Math.abs(delta as number))}٪
             </span>
           )}
           {hint && <span className="text-foreground-faint">{hint}</span>}

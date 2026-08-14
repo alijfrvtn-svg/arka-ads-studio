@@ -4,12 +4,20 @@ import { Section, Container, SectionHeading } from "@/components/ui/Section";
 import { Reveal } from "@/components/fx/Reveal";
 import { Icon } from "@/components/ui/Icon";
 import { HighlightedTitle } from "@/components/ui/HighlightedTitle";
-import { DEPARTMENTS } from "@/lib/constants";
 import { tr } from "@/lib/i18n";
-import type { HomeContent } from "@/lib/queries";
+import type { CategoryItem, HomeContent } from "@/lib/queries";
 import type { Locale } from "@/types";
 
-export function Departments({ content, locale = "fa" }: { content: HomeContent; locale?: Locale }) {
+export function Departments({
+  content,
+  departments,
+  locale = "fa",
+}: {
+  content: HomeContent;
+  // Editable in /admin/categories (kind DEPARTMENT); was a hardcoded list.
+  departments: CategoryItem[];
+  locale?: Locale;
+}) {
   return (
     <Section id="departments">
       <Container>
@@ -22,8 +30,8 @@ export function Departments({ content, locale = "fa" }: { content: HomeContent; 
         </div>
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          {DEPARTMENTS.map((d, i) => (
-            <Reveal key={d.key} delay={i * 0.08}>
+          {departments.map((d, i) => (
+            <Reveal key={d.slug} delay={i * 0.08}>
               <Link
                 href="/services"
                 className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-card-border bg-surface/40 p-7 transition-all duration-500 hover:-translate-y-1 hover:border-primary/50"
@@ -36,10 +44,10 @@ export function Departments({ content, locale = "fa" }: { content: HomeContent; 
                   <Icon name={d.icon} className="h-6 w-6" />
                 </div>
                 <h3 className="font-display text-xl font-bold text-foreground">{tr(locale, d.title, d.titleEn, d.titleAr)}</h3>
-                {locale === "fa" && (
+                {locale === "fa" && d.titleEn && (
                   <p className="mt-1 text-xs uppercase tracking-widest text-foreground-faint">{d.titleEn}</p>
                 )}
-                <p className="mt-4 flex-1 text-sm leading-relaxed text-foreground-muted">{tr(locale, d.desc, d.descEn, d.descAr)}</p>
+                <p className="mt-4 flex-1 text-sm leading-relaxed text-foreground-muted">{tr(locale, d.desc ?? "", d.descEn, d.descAr)}</p>
                 <span className="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold text-primary">
                   {content.departmentsCtaLabel}
                   <ArrowUpLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1 group-hover:-translate-y-1" />

@@ -9,9 +9,9 @@ import { LangTabs } from "./LangTabs";
 import { TagInput, MultiSelect, ImageInput } from "./client-fields";
 import { SerpPreview } from "./SerpPreview";
 import { saveProject, deleteProject, type ProjectInput } from "@/lib/actions";
-import { WORK_CATEGORIES } from "@/lib/constants";
 import { cn, slugify } from "@/lib/utils";
 import type { Credit, Metric } from "@/types";
+import { PROJECT_STATUSES } from "@/lib/constants";
 
 type Opt = { value: string; label: string };
 
@@ -20,11 +20,14 @@ export function ProjectEditor({
   clients,
   services,
   industries,
+  categories,
 }: {
   initial: ProjectInput;
   clients: { id: string; name: string }[];
   services: Opt[];
   industries: Opt[];
+  // Managed in /admin/categories (kind WORK) rather than lib/constants.
+  categories: { slug: string; title: string }[];
 }) {
   const router = useRouter();
   const [p, setP] = useState<ProjectInput>(initial);
@@ -135,8 +138,8 @@ export function ProjectEditor({
                       locale: "fa",
                       content: (
                         <Select value={p.category} onChange={(e) => set({ category: e.target.value })}>
-                          {WORK_CATEGORIES.slice(1).map((c) => (
-                            <option key={c} value={c}>{c}</option>
+                          {categories.map((c) => (
+                            <option key={c.slug} value={c.slug}>{c.title}</option>
                           ))}
                         </Select>
                       ),
@@ -145,6 +148,15 @@ export function ProjectEditor({
                     { locale: "ar", content: <Input value={p.categoryAr ?? ""} onChange={(e) => set({ categoryAr: e.target.value })} dir="rtl" /> },
                   ]}
                 />
+              </Field>
+              <Field label="وضعیت پروژه" hint="کنار هر نمونه‌کار با یک نقطه‌ی رنگی نمایش داده می‌شود">
+                <Select value={p.status} onChange={(e) => set({ status: e.target.value })}>
+                  {PROJECT_STATUSES.map((s) => (
+                    <option key={s.value} value={s.value}>
+                      {s.label}
+                    </option>
+                  ))}
+                </Select>
               </Field>
               <Field label="سال">
                 <Input type="number" value={p.year} onChange={(e) => set({ year: Number(e.target.value) })} />

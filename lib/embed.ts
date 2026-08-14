@@ -44,7 +44,13 @@ export function getEmbedUrl(url: string | null | undefined, opts: EmbedOptions =
     if (platform === "aparat") {
       let embedBase = url;
       if (!url.includes("/embed/")) {
-        const match = url.match(/aparat\.com\/(?:v|video\/video)\/([a-zA-Z0-9_-]+)/);
+        // Aparat hands out several shapes for the same clip: /v/<hash>,
+        // /video/video/<hash>, and a bare /<hash> when sharing from the app.
+        // Accept all of them — a link that silently fell through to `null` here
+        // used to render as an empty <video> with no hint why.
+        const match =
+          url.match(/aparat\.com\/(?:v|video\/video)\/([a-zA-Z0-9_-]+)/) ??
+          url.match(/aparat\.com\/([a-zA-Z0-9_-]{5,})\/?(?:[?#]|$)/);
         if (!match) return null;
         embedBase = `https://www.aparat.com/video/video/embed/videohash/${match[1]}/vt/frame`;
       }

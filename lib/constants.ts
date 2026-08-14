@@ -126,6 +126,19 @@ export const WORK_CATEGORY_LABELS: Record<string, { en: string; ar: string }> = 
   "موشن‌گرافیک": { en: "Motion Graphics", ar: "الموشن غرافيك" },
 };
 
+/** Delivery state of a portfolio project (`Project.status`). The dot colour is
+ *  never the only signal — every surface pairs it with the label — so the
+ *  distinction survives colour blindness and greyscale printing. */
+export const PROJECT_STATUSES = [
+  { value: "DONE", label: "انجام‌شده", labelEn: "Completed", labelAr: "مكتمل", color: "#34d399" },
+  { value: "IN_PROGRESS", label: "در حال اجرا", labelEn: "In progress", labelAr: "قيد التنفيذ", color: "#f59e0b" },
+] as const;
+
+export type ProjectStatus = (typeof PROJECT_STATUSES)[number]["value"];
+
+export const projectStatus = (value: string) =>
+  PROJECT_STATUSES.find((s) => s.value === value) ?? PROJECT_STATUSES[0];
+
 // ————— RBAC —————
 
 export const ROLES: { value: Role; label: string; desc: string }[] = [

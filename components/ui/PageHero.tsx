@@ -32,13 +32,13 @@ export function PageHero({
       <Container className="relative">
         {breadcrumb && (
           <Reveal>
-            <nav className="mb-5 flex items-center gap-1.5 text-xs text-foreground-faint">
+            <nav className="mb-5 -mx-2 flex flex-wrap items-center text-xs text-foreground-faint">
               {breadcrumb.map((b, i) => (
                 <span key={i} className="flex items-center gap-1.5">
                   {b.href ? (
-                    <Link href={b.href} className="hover:text-primary">{b.label}</Link>
+                    <Link href={b.href} className="inline-flex min-h-11 items-center px-2 hover:text-primary">{b.label}</Link>
                   ) : (
-                    <span className="text-foreground-muted">{b.label}</span>
+                    <span className="inline-flex min-h-11 items-center px-2 text-foreground-muted">{b.label}</span>
                   )}
                   {i < breadcrumb.length - 1 && <ChevronLeft className="h-3 w-3" />}
                 </span>

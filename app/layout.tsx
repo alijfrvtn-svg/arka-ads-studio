@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Vazirmatn, Syne } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
+import { AccentProvider } from "@/components/theme/AccentProvider";
 import { SITE } from "@/lib/constants";
 import { organizationJsonLd } from "@/lib/seo";
 import { getContactPage } from "@/lib/queries";
@@ -57,11 +58,17 @@ export const viewport: Viewport = {
   ],
 };
 
-// Prevent theme flash: set the class before first paint.
+// Prevent theme flash: set the class before first paint. Same pass applies the
+// visitor's saved identity colour — 'blue' is the brand default and is encoded
+// as *no* data-accent attribute, so an unset/invalid value paints the real
+// ARKA blue with zero overrides.
 const themeScript = `
 (function(){try{var t=localStorage.getItem('arka-theme');
 if(t!=='light'&&t!=='dark'){t=window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark';}
-var e=document.documentElement;e.classList.remove('light','dark');e.classList.add(t);e.style.colorScheme=t;}catch(e){document.documentElement.classList.add('dark');}})();
+var e=document.documentElement;e.classList.remove('light','dark');e.classList.add(t);e.style.colorScheme=t;
+var a=localStorage.getItem('arka-accent');
+if(a&&a!=='blue'&&['red','orange','yellow','green','purple','pink'].indexOf(a)>-1){e.setAttribute('data-accent',a);}
+}catch(e){document.documentElement.classList.add('dark');}})();
 `;
 
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
@@ -73,7 +80,9 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body className="font-sans antialiased">
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          <AccentProvider>{children}</AccentProvider>
+        </ThemeProvider>
         <div className="global-grain" aria-hidden />
         <script
           type="application/ld+json"

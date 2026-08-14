@@ -2,6 +2,7 @@ import { db } from "./db";
 import { parseArr } from "./utils";
 import { SAMPLE } from "./media";
 import { tr, trArr } from "./i18n";
+import { DEPARTMENTS, WORK_CATEGORIES, WORK_CATEGORY_LABELS } from "./constants";
 import type { Locale } from "@/types";
 
 // Reusable read queries shared across public pages.
@@ -50,10 +51,123 @@ export const getTeam = () =>
   db.teamMember.findMany({ where: { published: true }, orderBy: { order: "asc" } });
 
 // ============================================================
+// CATEGORIES (editable taxonomy — /admin/categories)
+// ============================================================
+export type CategoryKind = "POST" | "WORK" | "DEPARTMENT";
+
+export interface CategoryItem {
+  slug: string;
+  title: string;
+  titleEn: string | null;
+  titleAr: string | null;
+  desc: string | null;
+  descEn: string | null;
+  descAr: string | null;
+  icon: string;
+  accent: string;
+}
+
+/** Seeds used the first time /admin/categories is opened, and the fallback any
+ *  time the table is still empty — so the site keeps the exact taxonomy it had
+ *  when these lists were hardcoded in lib/constants.ts. */
+export const CATEGORY_SEEDS: Record<CategoryKind, CategoryItem[]> = {
+  DEPARTMENT: DEPARTMENTS.map((d) => ({
+    slug: d.key,
+    title: d.title,
+    titleEn: d.titleEn,
+    titleAr: d.titleAr,
+    desc: d.desc,
+    descEn: d.descEn,
+    descAr: d.descAr,
+    icon: d.icon,
+    accent: d.accent,
+  })),
+  WORK: WORK_CATEGORIES.filter((c) => c !== "همه").map((c) => ({
+    slug: c,
+    title: c,
+    titleEn: WORK_CATEGORY_LABELS[c]?.en ?? null,
+    titleAr: WORK_CATEGORY_LABELS[c]?.ar ?? null,
+    desc: null,
+    descEn: null,
+    descAr: null,
+    icon: "Clapperboard",
+    accent: "#6699ff",
+  })),
+  POST: ["استراتژی برند", "دیجیتال مارکتینگ", "پروداکشن", "برندینگ", "طراحی", "سوشال مدیا", "سئو"].map((c) => ({
+    slug: c,
+    title: c,
+    titleEn: null,
+    titleAr: null,
+    desc: null,
+    descEn: null,
+    descAr: null,
+    icon: "Sparkles",
+    accent: "#6699ff",
+  })),
+};
+
+/**
+ * Published categories of one kind. Falls back to CATEGORY_SEEDS while the
+ * table is empty, so a deploy that lands before anyone has opened the new admin
+ * page still renders the same filters and mega-menu as before.
+ */
+export async function getCategories(kind: CategoryKind, includeHidden = false): Promise<CategoryItem[]> {
+  const rows = await db.category.findMany({
+    where: { kind, ...(includeHidden ? {} : { published: true }) },
+    orderBy: [{ order: "asc" }, { createdAt: "asc" }],
+  });
+  if (!rows.length) return CATEGORY_SEEDS[kind];
+  return rows.map((r) => ({
+    slug: r.slug,
+    title: r.title,
+    titleEn: r.titleEn,
+    titleAr: r.titleAr,
+    desc: r.desc,
+    descEn: r.descEn,
+    descAr: r.descAr,
+    icon: r.icon,
+    accent: r.accent,
+  }));
+}
+
+/** Localised label for a category, by kind + slug. Content rows store the slug,
+ *  so renaming a category never orphans a post/project. */
+export function categoryLabel(locale: Locale, cats: CategoryItem[], slug: string) {
+  const c = cats.find((x) => x.slug === slug);
+  return c ? tr(locale, c.title, c.titleEn, c.titleAr) : slug;
+}
+
+// ============================================================
 // HOMEPAGE (singleton, id "home") — same in-code-default fallback pattern as
 // About/Contact below, seeded from the site's current hardcoded copy.
 // ============================================================
+/** One banner in the `slider` hero mode. */
+export interface HeroSlide {
+  media: string;
+  poster?: string;
+  badge?: string;
+  title: string;
+  desc?: string;
+  ctaLabel?: string;
+  ctaHref?: string;
+}
+
+export type HeroMode = "cinematic" | "slider" | "image" | "videoLoop" | "videoScroll";
+
 export interface HomeContent {
+  heroMode: HeroMode;
+  heroMedia: string;
+  heroPoster: string;
+  heroOverlay: number;
+  heroHeight: string;
+  heroAlign: string;
+  heroShowStats: boolean;
+  heroCtaHref: string;
+  heroReelUrl: string;
+  heroTags: string[];
+  heroSlides: HeroSlide[];
+  heroSlideDuration: number;
+  heroScrollLength: number;
   heroBadge: string;
   heroHeadline: string[];
   heroDescription: string;
@@ -86,6 +200,19 @@ export interface HomeContent {
 }
 
 const HOME_DEFAULTS: HomeContent = {
+  heroMode: "cinematic",
+  heroMedia: "",
+  heroPoster: "",
+  heroOverlay: 55,
+  heroHeight: "full",
+  heroAlign: "start",
+  heroShowStats: true,
+  heroCtaHref: "/contact",
+  heroReelUrl: "",
+  heroTags: [],
+  heroSlides: [],
+  heroSlideDuration: 6,
+  heroScrollLength: 640,
   heroBadge: "استودیوی خلاقیت، پروداکشن و دیجیتال مارکتینگ",
   heroHeadline: ["طراحی کن.", "خلق کن.", "تأثیر بگذار."],
   heroDescription:
@@ -124,6 +251,19 @@ const HOME_DEFAULTS: HomeContent = {
 };
 
 const HOME_DEFAULTS_EN: HomeContent = {
+  heroMode: "cinematic",
+  heroMedia: "",
+  heroPoster: "",
+  heroOverlay: 55,
+  heroHeight: "full",
+  heroAlign: "start",
+  heroShowStats: true,
+  heroCtaHref: "/contact",
+  heroReelUrl: "",
+  heroTags: [],
+  heroSlides: [],
+  heroSlideDuration: 6,
+  heroScrollLength: 640,
   heroBadge: "Creative, Production & Digital Marketing Studio",
   heroHeadline: ["Design.", "Create.", "Impact."],
   heroDescription:
@@ -162,6 +302,19 @@ const HOME_DEFAULTS_EN: HomeContent = {
 };
 
 const HOME_DEFAULTS_AR: HomeContent = {
+  heroMode: "cinematic",
+  heroMedia: "",
+  heroPoster: "",
+  heroOverlay: 55,
+  heroHeight: "full",
+  heroAlign: "start",
+  heroShowStats: true,
+  heroCtaHref: "/contact",
+  heroReelUrl: "",
+  heroTags: [],
+  heroSlides: [],
+  heroSlideDuration: 6,
+  heroScrollLength: 640,
   heroBadge: "استوديو الإبداع والإنتاج والتسويق الرقمي",
   heroHeadline: ["صمّم.", "ابتكر.", "أثّر."],
   heroDescription:
@@ -211,7 +364,23 @@ export async function getHomePage(locale: Locale = "fa"): Promise<HomeContent> {
     row.workflowStepsEn,
     row.workflowStepsAr,
   );
+  const slides = trArr<HeroSlide>(locale, row.heroSlides, row.heroSlidesEn, row.heroSlidesAr);
   return {
+    heroMode: (row.heroMode as HeroMode) || "cinematic",
+    heroMedia: row.heroMedia ?? "",
+    heroPoster: row.heroPoster ?? "",
+    heroOverlay: row.heroOverlay,
+    heroHeight: row.heroHeight,
+    heroAlign: row.heroAlign,
+    heroShowStats: row.heroShowStats,
+    heroCtaHref: row.heroCtaHref || "/contact",
+    heroReelUrl: row.heroReelUrl ?? "",
+    heroTags: trArr<string>(locale, row.heroTags, row.heroTagsEn, row.heroTagsAr),
+    // A slide with no title would render an empty banner, so drop those rather
+    // than let a half-filled admin row reach the page.
+    heroSlides: slides.filter((s) => s && (s.title || s.media)),
+    heroSlideDuration: row.heroSlideDuration,
+    heroScrollLength: row.heroScrollLength,
     heroBadge: tr(locale, row.heroBadge, row.heroBadgeEn, row.heroBadgeAr),
     heroHeadline: headline.length ? headline : HOME_DEFAULTS_BY_LOCALE[locale].heroHeadline,
     heroDescription: tr(locale, row.heroDescription, row.heroDescriptionEn, row.heroDescriptionAr),

@@ -8,6 +8,7 @@ import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { NotificationBell, type NotificationItem } from "@/components/notifications/NotificationBell";
 import { IdleLogout } from "@/components/auth/IdleLogout";
 import { cn } from "@/lib/utils";
+import { Avatar } from "@/components/ui/Avatar";
 
 export function PortalShell({
   user,
@@ -55,12 +56,7 @@ export function PortalShell({
           <NotificationBell initial={notifications} />
           <ThemeToggle />
           <p className="hidden text-sm font-semibold text-foreground sm:block">{user.name}</p>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={user.avatar || `https://i.pravatar.cc/80?u=${user.email}`}
-            alt={user.name}
-            className="h-9 w-9 rounded-full border border-card-border object-cover"
-          />
+          <Avatar src={user.avatar} name={user.name} className="h-9 w-9 text-sm" />
           <button
             onClick={logout}
             aria-label="خروج"

@@ -4,6 +4,7 @@ import { ArrowUpLeft, Play } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { tr, trArr } from "@/lib/i18n";
 import type { Locale } from "@/types";
+import { ProjectStatusDot } from "./ProjectStatusDot";
 
 interface CardProject {
   slug: string;
@@ -16,6 +17,7 @@ interface CardProject {
   cover: string;
   accent?: string;
   heroVideo?: string | null;
+  status?: string;
   tags?: string;
   tagsEn?: string | null;
   tagsAr?: string | null;
@@ -65,6 +67,12 @@ export function ProjectCard({
         <span className="absolute right-4 top-4 rounded-full border border-white/15 bg-black/30 px-3 py-1 text-xs font-medium text-white backdrop-blur">
           {category}
         </span>
+        <ProjectStatusDot
+          status={project.status ?? "DONE"}
+          locale={locale}
+          onMedia
+          className="absolute bottom-4 right-4 z-10"
+        />
         {project.heroVideo && (
           <span className="absolute left-4 top-4 grid h-9 w-9 place-items-center rounded-full border border-white/20 bg-black/30 text-white backdrop-blur">
             <Play className="h-4 w-4 translate-x-0.5 fill-current" />

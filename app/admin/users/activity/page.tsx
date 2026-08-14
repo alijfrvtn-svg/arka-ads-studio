@@ -5,6 +5,7 @@ import { EmptyState } from "@/components/admin/ui";
 import { AutoRefresh } from "@/components/admin/AutoRefresh";
 import { jalaliWeekRange, gregorianToJalali, JALALI_MONTHS } from "@/lib/jalali";
 import { toFa, faDate } from "@/lib/utils";
+import { Avatar } from "@/components/ui/Avatar";
 
 const rawStamp = (d: Date) => faDate(d, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit", second: "2-digit" });
 
@@ -106,7 +107,7 @@ export default async function UserActivityPage({ searchParams }: { searchParams:
               <div className="mb-2 flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={r.avatar || `https://i.pravatar.cc/80?u=${r.email}`} alt="" className="h-9 w-9 rounded-full object-cover" />
+                  <Avatar src={r.avatar} name={r.name} className="h-9 w-9 text-sm" />
                   <span className="text-sm font-semibold text-foreground">{r.name}</span>
                 </div>
                 <span className="text-sm font-semibold text-primary ltr-nums">{formatDuration(r.ms)}</span>
@@ -124,8 +125,8 @@ export default async function UserActivityPage({ searchParams }: { searchParams:
         {recentSessions.length === 0 ? (
           <p className="text-sm text-foreground-faint">هنوز هیچ ورودی ثبت نشده.</p>
         ) : (
-          <div className="overflow-hidden overflow-x-auto rounded-2xl border border-card-border bg-surface">
-            <table className="w-full text-xs">
+          <div className="overflow-x-auto rounded-2xl border border-card-border bg-surface">
+            <table className="w-full min-w-[640px] text-xs">
               <thead>
                 <tr className="border-b border-card-border text-right text-foreground-faint">
                   <th className="px-4 py-2.5 font-medium">کاربر</th>

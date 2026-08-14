@@ -15,7 +15,10 @@ export function emptyPost(): PostInput {
     excerpt: "",
     excerptEn: "",
     excerptAr: "",
-    cover: "https://picsum.photos/seed/new-post/1600/900",
+    // Left blank rather than seeded with a picsum.photos placeholder — that
+    // host is unreachable from Iran, so the "default" cover was a guaranteed
+    // broken image for the audience this site serves.
+    cover: "",
     content: "## مقدمه\n\nمتن مطلب را اینجا بنویسید…",
     contentEn: "",
     contentAr: "",
@@ -51,6 +54,7 @@ export function emptyProject(): ProjectInput {
     subtitleEn: "",
     subtitleAr: "",
     category: "فیلم تبلیغاتی",
+    status: "DONE",
     categoryEn: "",
     categoryAr: "",
     cover: "",

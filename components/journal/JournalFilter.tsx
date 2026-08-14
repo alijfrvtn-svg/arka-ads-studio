@@ -6,6 +6,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Clock } from "lucide-react";
 import { cn, localeDate, localeNumber } from "@/lib/utils";
 import { tr, ui } from "@/lib/i18n";
+import type { CategoryItem } from "@/lib/queries";
 import type { Locale } from "@/types";
 
 interface Post {
@@ -26,11 +27,25 @@ interface Post {
   author?: { name: string; avatar: string | null } | null;
 }
 
-export function JournalFilter({ posts, locale = "fa" }: { posts: Post[]; locale?: Locale }) {
-  const cats = ["همه", ...Array.from(new Set(posts.map((p) => p.category)))];
-  const catLabels = new Map(posts.map((p) => [p.category, { en: p.categoryEn, ar: p.categoryAr }]));
-  const [cat, setCat] = useState("همه");
-  const list = cat === "همه" ? posts : posts.filter((p) => p.category === cat);
+export function JournalFilter({
+  posts,
+  categories,
+  locale = "fa",
+}: {
+  posts: Post[];
+  // Editable in /admin/categories (kind POST) — the chip order follows the
+  // admin's ordering instead of whatever order posts happen to come back in.
+  categories: CategoryItem[];
+  locale?: Locale;
+}) {
+  const ALL = "همه";
+  const known = categories.filter((c) => posts.some((p) => p.category === c.slug)).map((c) => c.slug);
+  // A post whose category was removed from the taxonomy still needs a home.
+  const orphans = Array.from(new Set(posts.map((p) => p.category))).filter((c) => !known.includes(c));
+  const cats = [ALL, ...known, ...orphans];
+  const labels = new Map(categories.map((c) => [c.slug, c]));
+  const [cat, setCat] = useState(ALL);
+  const list = cat === ALL ? posts : posts.filter((p) => p.category === cat);
 
   return (
     <div>
@@ -41,11 +56,11 @@ export function JournalFilter({ posts, locale = "fa" }: { posts: Post[]; locale?
               key={c}
               onClick={() => setCat(c)}
               className={cn(
-                "shrink-0 rounded-full px-4 py-2 text-sm font-medium transition-colors",
+                "inline-flex min-h-11 shrink-0 items-center rounded-full px-4 text-sm font-medium transition-colors",
                 cat === c ? "bg-primary text-primary-foreground" : "border border-card-border text-foreground-muted hover:text-foreground",
               )}
             >
-              {c === "همه" ? ui(locale).filterAll : tr(locale, c, catLabels.get(c)?.en, catLabels.get(c)?.ar)}
+              {c === ALL ? ui(locale).filterAll : tr(locale, labels.get(c)?.title ?? c, labels.get(c)?.titleEn, labels.get(c)?.titleAr)}
             </button>
           ))}
         </div>
@@ -67,7 +82,7 @@ export function JournalFilter({ posts, locale = "fa" }: { posts: Post[]; locale?
                   <div className="relative aspect-[16/10] overflow-hidden">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={p.cover} alt="" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
-                    <span className="absolute right-3 top-3 rounded-full bg-black/40 px-3 py-1 text-xs text-white backdrop-blur">{tr(locale, p.category, p.categoryEn, p.categoryAr)}</span>
+                    <span className="absolute right-3 top-3 rounded-full bg-black/40 px-3 py-1 text-xs text-white backdrop-blur">{tr(locale, labels.get(p.category)?.title ?? p.category, labels.get(p.category)?.titleEn, labels.get(p.category)?.titleAr)}</span>
                   </div>
                   <div className="flex flex-1 flex-col p-5">
                     <h3 className="font-display text-lg font-bold leading-snug text-foreground transition-colors group-hover:text-primary">{tr(locale, p.title, p.titleEn, p.titleAr)}</h3>

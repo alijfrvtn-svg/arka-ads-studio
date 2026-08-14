@@ -12,7 +12,7 @@ export function ThemeToggle({ className }: { className?: string }) {
       onClick={toggle}
       aria-label={theme === "dark" ? "روشن کردن حالت روز" : "روشن کردن حالت شب"}
       className={cn(
-        "relative grid h-10 w-10 place-items-center rounded-full border border-card-border bg-surface/60 text-foreground transition-colors hover:border-primary/50 hover:text-primary",
+        "relative grid h-11 w-11 place-items-center rounded-full border border-card-border bg-surface/60 text-foreground transition-colors hover:border-primary/50 hover:text-primary",
         className,
       )}
     >

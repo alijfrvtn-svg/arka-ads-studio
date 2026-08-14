@@ -7,6 +7,7 @@ import { PageHero } from "@/components/ui/PageHero";
 import { Section, Container, SectionHeading } from "@/components/ui/Section";
 import { Reveal } from "@/components/fx/Reveal";
 import { Accordion } from "@/components/ui/Accordion";
+import { VideoPlayer } from "@/components/work/VideoPlayer";
 import { ProjectCard } from "@/components/work/ProjectCard";
 import { buildMetadata, breadcrumbJsonLd, serviceJsonLd, faqPageJsonLd } from "@/lib/seo";
 import { localeNumber } from "@/lib/utils";
@@ -89,6 +90,20 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
           )}
         </div>
       </PageHero>
+
+      {/* intro video — a direct file or an Aparat/YouTube link; VideoPlayer
+          picks the right renderer for each. */}
+      {s.heroVideo && (
+        <Section>
+          <Container>
+            <Reveal>
+              <div className="mx-auto aspect-video w-full max-w-4xl overflow-hidden rounded-2xl border border-card-border bg-black">
+                <VideoPlayer src={s.heroVideo} poster={s.cover || ""} />
+              </div>
+            </Reveal>
+          </Container>
+        </Section>
+      )}
 
       {/* features */}
       {features.length > 0 && (

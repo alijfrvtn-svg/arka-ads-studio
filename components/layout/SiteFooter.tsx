@@ -89,7 +89,7 @@ export function SiteFooter({
                   target="_blank"
                   rel="noreferrer"
                   aria-label={s.label}
-                  className="grid h-10 w-10 place-items-center rounded-full border border-card-border text-foreground-muted transition-all hover:border-primary hover:text-primary"
+                  className="grid h-11 w-11 place-items-center rounded-full border border-card-border text-foreground-muted transition-all hover:border-primary hover:text-primary"
                 >
                   <SocialIcon platform={s.platform} className="h-[18px] w-[18px]" />
                 </a>
@@ -108,11 +108,14 @@ export function SiteFooter({
               </li>
               <li className="flex items-center gap-2.5">
                 <Phone className="h-4 w-4 shrink-0 text-primary" />
-                <span className="ltr-nums">{contact.phoneDisplay}</span>
+                {/* A phone number on a phone should be tappable. */}
+                <a href={`tel:${contact.phone}`} className="ltr-nums inline-flex min-h-11 items-center hover:text-primary">
+                  {contact.phoneDisplay}
+                </a>
               </li>
               <li className="flex items-center gap-2.5">
                 <Mail className="h-4 w-4 shrink-0 text-primary" />
-                <a href={`mailto:${contact.email}`} className="ltr-nums hover:text-primary">
+                <a href={`mailto:${contact.email}`} className="ltr-nums inline-flex min-h-11 items-center hover:text-primary">
                   {contact.email}
                 </a>
               </li>
@@ -125,13 +128,20 @@ export function SiteFooter({
           <p>
             © {year} {SITE.legalName}. {copyright}
           </p>
-          <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-0 md:justify-start">
             {NAV.slice(1).map((n) => (
-              <Link key={n.href} href={n.href} className="hover:text-foreground">
+              <Link
+                key={n.href}
+                href={n.href}
+                className="inline-flex min-h-11 items-center px-1 hover:text-foreground"
+              >
                 {navLabel(n.href)}
               </Link>
             ))}
-            <Link href="/admin" className="text-primary/80 hover:text-primary">
+            <Link
+              href="/admin"
+              className="inline-flex min-h-11 items-center px-1 text-primary/80 hover:text-primary"
+            >
               {t.footerAdminLogin}
             </Link>
           </div>
@@ -145,10 +155,12 @@ function FooterCol({ title, links }: { title: string; links: { label: string; hr
   return (
     <div>
       <h4 className="mb-4 text-sm font-bold text-foreground">{title}</h4>
-      <ul className="flex flex-col gap-2.5 text-sm text-foreground-muted">
+      {/* min-h-11 on the link itself (not the li) keeps the underline hugging
+          the text while the tap area reaches the 44px floor. */}
+      <ul className="flex flex-col text-sm text-foreground-muted">
         {links.map((l) => (
           <li key={l.href}>
-            <Link href={l.href} className="link-underline hover:text-primary">
+            <Link href={l.href} className="link-underline inline-flex min-h-11 items-center hover:text-primary">
               {l.label}
             </Link>
           </li>

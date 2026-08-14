@@ -89,28 +89,35 @@ export function Testimonials({ items, content, locale = "fa" }: { items: T[]; co
             </AnimatePresence>
           </div>
 
-          <div className="mt-10 flex items-center justify-center gap-4">
+          <div className="mt-10 flex items-center justify-center gap-2 sm:gap-4">
             <button
               onClick={() => go(-1)}
               aria-label={ui(locale).testimonialPrev}
-              className="grid h-11 w-11 place-items-center rounded-full border border-card-border text-foreground transition-colors hover:border-primary hover:text-primary"
+              className="grid h-11 w-11 shrink-0 place-items-center rounded-full border border-card-border text-foreground transition-colors hover:border-primary hover:text-primary"
             >
               <ChevronRight className="h-5 w-5" />
             </button>
-            <div className="flex gap-2">
+            {/* The dot stays 8px for looks, but the button around it is a full
+                44px target — an 8px tap target is unusable on a phone. */}
+            <div className="flex max-w-[55vw] overflow-x-auto sm:max-w-none">
               {items.map((_, k) => (
                 <button
                   key={k}
                   onClick={() => setI(k)}
                   aria-label={`${REVIEW_WORD[locale]} ${localeDigits(locale, k + 1)}`}
-                  className={`h-2 rounded-full transition-all ${k === i ? "w-6 bg-primary" : "w-2 bg-card-border"}`}
-                />
+                  aria-current={k === i}
+                  className="grid h-11 w-8 place-items-center"
+                >
+                  <span
+                    className={`block h-2 rounded-full transition-all ${k === i ? "w-6 bg-primary" : "w-2 bg-card-border"}`}
+                  />
+                </button>
               ))}
             </div>
             <button
               onClick={() => go(1)}
               aria-label={ui(locale).testimonialNext}
-              className="grid h-11 w-11 place-items-center rounded-full border border-card-border text-foreground transition-colors hover:border-primary hover:text-primary"
+              className="grid h-11 w-11 shrink-0 place-items-center rounded-full border border-card-border text-foreground transition-colors hover:border-primary hover:text-primary"
             >
               <ChevronLeft className="h-5 w-5" />
             </button>
