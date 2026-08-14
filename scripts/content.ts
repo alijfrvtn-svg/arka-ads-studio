@@ -152,7 +152,16 @@ async function set(name: string, key: string, pairs: string[]) {
   return row;
 }
 
-/** Bulk upsert. Keys off slug (content models) or id, so imports are idempotent. */
+/**
+ * Bulk create-or-update. Keys off slug (content models) or id, so imports are
+ * idempotent.
+ *
+ * Deliberately not a single `upsert`: Prisma type-checks the `create` branch of
+ * an upsert even when the row already exists, so a partial payload (say, adding
+ * FAQs to a service that already has a title and description) was rejected for
+ * "missing title". Looking the row up first means an import file only has to
+ * carry the fields it actually wants to change.
+ */
 async function importFile(file: string) {
   const payload = JSON.parse(readFileSync(file, "utf8")) as Record<string, Record<string, unknown>[]>;
   const PLURAL: Record<string, ModelName> = {
@@ -168,8 +177,14 @@ async function importFile(file: string) {
       if (k === "slug" && !data.slug && typeof data.title === "string") data.slug = slugify(data.title);
       const where = { [k]: data[k] } as Record<string, unknown>;
       if (where[k] == null) { console.warn(`  skipping ${name} without ${k}`); continue; }
-      await model(name).upsert({ where, create: data, update: data });
-      console.log(`  ✓ ${name} ${where[k]}`);
+      const existing = await model(name).findUnique({ where });
+      if (existing) {
+        await model(name).update({ where, data });
+        console.log(`  ✓ updated ${name} ${where[k]} (${Object.keys(item).length} fields)`);
+      } else {
+        await model(name).create({ data });
+        console.log(`  ✓ created ${name} ${where[k]}`);
+      }
     }
   }
 }
