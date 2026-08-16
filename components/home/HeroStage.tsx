@@ -189,14 +189,11 @@ export function ScrollCue({ locale = "fa" }: { locale?: Locale }) {
 export function HeroScrim({ strength = 55 }: { strength?: number }) {
   const a = Math.max(0, Math.min(90, strength)) / 100;
   return (
-    <>
-      <div
-        className="absolute inset-0"
-        style={{
-          background: `linear-gradient(to bottom, color-mix(in srgb, var(--background) ${(a * 100).toFixed(0)}%, transparent), color-mix(in srgb, var(--background) ${(a * 72).toFixed(0)}%, transparent) 55%, var(--background))`,
-        }}
-      />
-      <div className="absolute inset-0 hero-grid opacity-70" />
-    </>
+    <div
+      className="absolute inset-0"
+      style={{
+        background: `linear-gradient(to bottom, color-mix(in srgb, var(--background) ${(a * 100).toFixed(0)}%, transparent), color-mix(in srgb, var(--background) ${(a * 72).toFixed(0)}%, transparent) 55%, var(--background))`,
+      }}
+    />
   );
 }

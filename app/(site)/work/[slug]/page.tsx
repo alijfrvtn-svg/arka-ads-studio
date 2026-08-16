@@ -265,7 +265,7 @@ export default async function CaseStudy({ params }: { params: Promise<{ slug: st
           <Container className="relative py-32 text-center">
             <p className="text-[0.7rem] uppercase tracking-[0.3em] text-foreground-faint">{ui(locale).nextProject}</p>
             <h2 className="mx-auto mt-4 max-w-3xl font-display text-3xl font-extrabold tracking-[-0.03em] text-foreground md:text-5xl">{tr(locale, next.title, next.titleEn, next.titleAr)}</h2>
-            <span className="liquid liquid-ink mt-10 inline-flex items-center gap-2 rounded-full px-8 py-4 font-semibold">
+            <span className="liquid liquid-raised mt-10 inline-flex items-center gap-2 rounded-full px-8 py-4 font-semibold">
               <span className="inline-flex items-center gap-2">
                 {ui(locale).viewProject} <ArrowUpLeft className="h-5 w-5 transition-transform duration-500 group-hover:-translate-x-1 group-hover:-translate-y-1" />
               </span>

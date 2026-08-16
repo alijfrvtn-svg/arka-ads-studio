@@ -72,7 +72,6 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
 
       {/* hero */}
       <header className="relative overflow-hidden pb-14 pt-40 md:pt-52">
-        <div className="hero-grid absolute inset-0 opacity-60" />
         <Container className="relative max-w-4xl">
           <nav className="mb-5 text-xs text-foreground-muted">
             <Link href="/" className="transition-colors hover:text-foreground">{ui(locale).navHome}</Link> ‹ <Link href="/journal" className="transition-colors hover:text-foreground">{ui(locale).navJournal}</Link>
@@ -110,7 +109,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
               <div className="mt-8 rounded-[1.25rem] border border-card-border bg-surface-2 p-6">
                 <p className="font-display font-bold text-foreground">{c.ctaTitle}</p>
                 <p className="mt-1 text-sm text-foreground-muted">{c.ctaBody}</p>
-                <Link href="/contact" className="liquid liquid-ink mt-5 inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl px-4 text-sm font-semibold">
+                <Link href="/contact" className="liquid liquid-raised mt-5 inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl px-4 text-sm font-semibold">
                   <span className="inline-flex items-center gap-2">
                     {ui(locale).ctaStartProject} <ArrowUpLeft className="h-4 w-4" />
                   </span>

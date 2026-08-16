@@ -27,7 +27,6 @@ export function PageHero({
           <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/80 to-background" />
         </>
       )}
-      <div className="hero-grid absolute inset-0 opacity-70" />
       <div className="aurora animate-aurora-1 -left-32 -top-24 h-96 w-96 bg-foreground/[0.06]" />
       <Container className="relative">
         {breadcrumb && (

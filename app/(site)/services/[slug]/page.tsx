@@ -80,7 +80,7 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
         image={s.cover}
       >
         <div className="mt-8 flex flex-wrap gap-4">
-          <Link href="/contact" className="liquid liquid-ink inline-flex items-center gap-2 rounded-full px-8 py-4 font-semibold">
+          <Link href="/contact" className="liquid liquid-raised inline-flex items-center gap-2 rounded-full px-8 py-4 font-semibold">
             <span className="inline-flex items-center gap-2">
               {ui(locale).ctaRequestConsult} <ArrowUpLeft className="h-5 w-5" />
             </span>
@@ -155,31 +155,33 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
             <div className="grid min-w-0 gap-5 md:grid-cols-3">
               {pricing.map((tier, i) => (
                 <Reveal key={i} delay={i * 0.08}>
+                  {/* The featured tier used to be a dark card carrying white
+                      type. Now it is the same glass as its neighbours, lifted:
+                      elevation marks the recommended plan, so every tier keeps
+                      ink on white and stays readable. */}
                   <div
                     className={`relative flex h-full min-w-0 flex-col overflow-hidden rounded-[1.5rem] p-8 transition-all duration-700 [transition-timing-function:var(--ease-apple)] ${
-                      tier.featured
-                        ? "glass-ink border-transparent shadow-[0_2px_4px_rgba(0,0,0,0.2),0_36px_70px_-30px_rgba(0,0,0,0.55)]"
-                        : "glass border-card-border hover:-translate-y-1"
+                      tier.featured ? "glass-raised -translate-y-2" : "glass border-card-border hover:-translate-y-1"
                     }`}
                   >
                     {tier.featured && (
-                      <span className="absolute left-5 top-5 rounded-full bg-white px-3 py-1 text-xs font-semibold text-black">{ui(locale).pricingFeaturedBadge}</span>
+                      <span className="absolute left-5 top-5 rounded-full bg-foreground px-3 py-1 text-xs font-semibold text-background">{ui(locale).pricingFeaturedBadge}</span>
                     )}
-                    <h3 className={`font-display break-words text-lg font-bold tracking-tight ${tier.featured ? "text-white" : "text-foreground"}`}>{tier.name}</h3>
+                    <h3 className="font-display break-words text-lg font-bold tracking-tight text-foreground">{tier.name}</h3>
                     <div className="mt-4 flex items-end gap-1">
-                      <span className={`font-display break-words text-3xl font-extrabold tracking-tight ltr-nums ${tier.featured ? "text-white" : "text-foreground"}`}>{tier.price}</span>
-                      {tier.unit && <span className={`mb-1 text-sm ${tier.featured ? "text-white/60" : "text-foreground-muted"}`}>{tier.unit}</span>}
+                      <span className="font-display break-words text-3xl font-extrabold tracking-tight text-foreground ltr-nums">{tier.price}</span>
+                      {tier.unit && <span className="mb-1 text-sm text-foreground-muted">{tier.unit}</span>}
                     </div>
                     <ul className="mt-6 flex-1 space-y-3">
                       {tier.features.map((f, k) => (
-                        <li key={k} className={`flex items-center gap-2.5 text-sm ${tier.featured ? "text-white/75" : "text-foreground-muted"}`}>
-                          <Check className={`h-4 w-4 shrink-0 ${tier.featured ? "text-white" : "text-foreground"}`} /> <span className="break-words">{f}</span>
+                        <li key={k} className="flex items-center gap-2.5 text-sm text-foreground-muted">
+                          <Check className="h-4 w-4 shrink-0 text-foreground" /> <span className="break-words">{f}</span>
                         </li>
                       ))}
                     </ul>
                     <Link
                       href={`/contact?plan=${encodeURIComponent(`${tier.name} (${title})`)}`}
-                      className={`liquid mt-8 inline-flex h-12 items-center justify-center rounded-2xl font-semibold ${tier.featured ? "bg-white text-black hover:bg-white/90" : "liquid-clear"}`}
+                      className={`liquid mt-8 inline-flex h-12 items-center justify-center rounded-2xl font-semibold ${tier.featured ? "liquid-raised" : "liquid-clear"}`}
                     >
                       {ui(locale).selectPlan}
                     </Link>
@@ -219,10 +221,9 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
       <Section>
         <Container>
           <div className="relative overflow-hidden rounded-[2.5rem] border border-card-border bg-surface-2 p-16 text-center">
-            <div className="absolute inset-0 dotgrid opacity-50" />
             <div className="relative">
               <h2 className="font-display text-3xl font-extrabold tracking-[-0.03em] text-foreground md:text-4xl">{c.readyHeading(title)}</h2>
-              <Link href="/contact" className="liquid liquid-ink mt-10 inline-flex items-center gap-2 rounded-full px-9 py-4 font-semibold">
+              <Link href="/contact" className="liquid liquid-raised mt-10 inline-flex items-center gap-2 rounded-full px-9 py-4 font-semibold">
                 <span className="inline-flex items-center gap-2">
                   {ui(locale).serviceCtaTalk} <ArrowUpLeft className="h-5 w-5" />
                 </span>

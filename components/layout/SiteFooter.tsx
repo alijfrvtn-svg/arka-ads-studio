@@ -66,7 +66,7 @@ export function SiteFooter({
           </div>
           <Link
             href="/contact"
-            className="liquid liquid-ink group inline-flex shrink-0 items-center gap-2 rounded-full px-8 py-4 font-semibold"
+            className="liquid liquid-raised group inline-flex shrink-0 items-center gap-2 rounded-full px-8 py-4 font-semibold"
           >
             <span className="inline-flex items-center gap-2">
               {ctaButton}

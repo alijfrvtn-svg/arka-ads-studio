@@ -6,7 +6,6 @@ import type { Locale } from "@/types";
 export function StatsBar({ stats, locale = "fa" }: { stats: { label: string; value: number; suffix: string }[]; locale?: Locale }) {
   return (
     <section className="relative overflow-hidden border-y border-card-border py-24">
-      <div className="absolute inset-0 dotgrid opacity-60" />
       <Container className="relative">
         <div className="grid grid-cols-2 gap-y-14 md:grid-cols-4 lg:grid-cols-5">
           {stats.map((s, i) => (

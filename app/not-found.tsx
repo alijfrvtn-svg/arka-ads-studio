@@ -4,7 +4,6 @@ import { LogoMark } from "@/components/brand/Logo";
 export default function NotFound() {
   return (
     <div className="grid min-h-screen place-items-center overflow-hidden px-6 text-center">
-      <div className="hero-grid absolute inset-0 opacity-40" />
       <div className="relative">
         <LogoMark className="mx-auto h-16 w-16" />
         <h1 className="mt-8 font-display text-8xl font-extrabold text-gradient md:text-9xl">۴۰۴</h1>
@@ -12,7 +11,7 @@ export default function NotFound() {
         <p className="mt-2 text-foreground-muted">شاید صفحه جابه‌جا شده یا هرگز وجود نداشته است.</p>
         <Link
           href="/"
-          className="liquid liquid-ink mt-10 inline-flex items-center gap-2 rounded-full px-8 py-4 font-semibold"
+          className="liquid liquid-raised mt-10 inline-flex items-center gap-2 rounded-full px-8 py-4 font-semibold"
         >
           بازگشت به خانه
         </Link>

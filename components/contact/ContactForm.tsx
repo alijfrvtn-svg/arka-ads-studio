@@ -110,7 +110,7 @@ export function ContactForm({
         </div>
       )}
 
-      <button type="submit" disabled={loading} className="liquid liquid-ink inline-flex h-14 w-full items-center justify-center gap-2 rounded-[14px] font-semibold disabled:opacity-60">
+      <button type="submit" disabled={loading} className="liquid liquid-raised inline-flex h-14 w-full items-center justify-center gap-2 rounded-[14px] font-semibold disabled:opacity-60">
         {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <><Send className="h-5 w-5" /> {t.contactSubmit}</>}
       </button>
     </form>

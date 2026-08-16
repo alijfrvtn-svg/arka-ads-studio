@@ -115,11 +115,10 @@ export default async function IndustryPage({ params }: { params: Promise<{ slug:
       <Section>
         <Container>
           <div className="relative overflow-hidden rounded-[2.5rem] border border-card-border bg-surface-2 p-16 text-center">
-            <div className="absolute inset-0 dotgrid opacity-50" />
             <div className="relative">
               <h2 className="font-display text-3xl font-extrabold tracking-[-0.03em] text-foreground md:text-4xl">{c.ctaHeading(title)}</h2>
               <p className="mx-auto mt-4 max-w-xl text-foreground-muted">{c.ctaBody}</p>
-              <Link href="/contact" className="liquid liquid-ink mt-10 inline-flex items-center gap-2 rounded-full px-9 py-4 font-semibold">
+              <Link href="/contact" className="liquid liquid-raised mt-10 inline-flex items-center gap-2 rounded-full px-9 py-4 font-semibold">
                 <span className="inline-flex items-center gap-2">
                   {c.ctaButton} <ArrowUpLeft className="h-5 w-5" />
                 </span>

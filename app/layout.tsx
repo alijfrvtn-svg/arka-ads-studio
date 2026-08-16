@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
-import { Vazirmatn, Syne } from "next/font/google";
+import { Vazirmatn } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { GlassFilters } from "@/components/fx/GlassFilters";
@@ -13,11 +14,30 @@ const vazir = Vazirmatn({
   display: "swap",
 });
 
-const syne = Syne({
-  subsets: ["latin"],
-  variable: "--font-syne",
-  weight: ["600", "700", "800"],
+/**
+ * Display face — Estedad, self-hosted.
+ *
+ * Replaces Syne, which was Latin-only: on a Persian site its headings fell back
+ * to the body font for every word that mattered, so the "display face" was
+ * decorative on the English fragments and invisible everywhere else. Estedad
+ * covers both scripts (all 32 core Persian letters, ZWNJ, Latin, and Persian
+ * *and* ASCII digits), so a heading is finally set in one voice.
+ *
+ * Three weights only — 500/700/900 are what the headings actually ask for, and
+ * shipping Thin/Light too would be ~63KB nobody renders. Converted to woff2,
+ * which is ~40% of the source TTF.
+ */
+const estedad = localFont({
+  src: [
+    { path: "./fonts/Estedad-Medium.woff2", weight: "500", style: "normal" },
+    { path: "./fonts/Estedad-Bold.woff2", weight: "700", style: "normal" },
+    { path: "./fonts/Estedad-Black.woff2", weight: "900", style: "normal" },
+  ],
+  variable: "--font-estedad",
   display: "swap",
+  // The body face already covers this script, so a slow font file should never
+  // hold the page hostage — swap in when it lands.
+  fallback: ["Vazirmatn", "system-ui", "sans-serif"],
 });
 
 export const metadata: Metadata = {
@@ -76,7 +96,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   const contact = await getContactPage("fa");
 
   return (
-    <html lang="fa" dir="rtl" suppressHydrationWarning className={`${vazir.variable} ${syne.variable}`}>
+    <html lang="fa" dir="rtl" suppressHydrationWarning className={`${vazir.variable} ${estedad.variable}`}>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>

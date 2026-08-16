@@ -39,7 +39,10 @@
   --color-ink-black: #000000;
 
   --font-sans: var(--font-vazir), "Vazirmatn", ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-syne), "Syne", var(--font-vazir), sans-serif;
+  /* Estedad, self-hosted (see app/layout.tsx). It covers Persian and Latin, so
+     unlike the Syne it replaces, a heading no longer changes typeface halfway
+     through a bilingual line. */
+  --font-display: var(--font-estedad), var(--font-vazir), "Vazirmatn", sans-serif;
   --font-mono: ui-monospace, "SFMono-Regular", "Menlo", monospace;
 
   /* Left at the project's original values on purpose. These feed every
@@ -103,20 +106,37 @@
   --grid-line: rgba(0, 0, 0, 0.05);
   --hairline: rgba(0, 0, 0, 0.09);
 
-  /* Liquid glass — light (clear) variant. */
-  --glass-bg: rgba(255, 255, 255, 0.62);
+  /* Liquid glass — clear (flat) variant. Secondary actions and chips: it sits
+     ON the page rather than above it, which is what leaves room for the raised
+     variant below to read as primary. */
+  --glass-bg: rgba(255, 255, 255, 0.55);
   --glass-bg-strong: rgba(255, 255, 255, 0.82);
   --glass-border: rgba(0, 0, 0, 0.08);
   --glass-blur: 24px;
-  --glass-highlight: rgba(255, 255, 255, 0.95);
-  --glass-shade: rgba(0, 0, 0, 0.05);
-  --glass-shadow: 0 1px 1px rgba(0, 0, 0, 0.04), 0 10px 30px -12px rgba(0, 0, 0, 0.22);
+  --glass-highlight: rgba(255, 255, 255, 0.9);
+  --glass-shade: rgba(0, 0, 0, 0.04);
+  --glass-shadow: 0 1px 1px rgba(0, 0, 0, 0.03), 0 4px 12px -6px rgba(0, 0, 0, 0.1);
 
-  /* Liquid glass — dark (ink) variant, used for primary actions. */
-  --glass-ink-bg: rgba(17, 17, 17, 0.86);
-  --glass-ink-border: rgba(255, 255, 255, 0.14);
-  --glass-ink-highlight: rgba(255, 255, 255, 0.4);
-  --glass-ink-shadow: 0 1px 2px rgba(0, 0, 0, 0.2), 0 14px 34px -14px rgba(0, 0, 0, 0.5);
+  /* Liquid glass — raised. The primary action.
+
+     With no colour to spend, rank is told by *elevation*: this is the same
+     clear glass, but domed and lifted. The body is a top-lit gradient (a convex
+     surface is brightest where it faces the light), the rim is doubled so the
+     glass reads as thick, and three stacked ambient shadows put real space
+     between it and the page. */
+  --glass-raised-bg: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.95) 0%,
+    rgba(255, 255, 255, 0.62) 54%,
+    rgba(255, 255, 255, 0.78) 100%
+  );
+  --glass-raised-border: rgba(0, 0, 0, 0.11);
+  --glass-raised-bevel: inset 0 1px 0 rgba(255, 255, 255, 1), inset 0 -1px 1px rgba(0, 0, 0, 0.07),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.5);
+  --glass-raised-lift: 0 1px 1px rgba(0, 0, 0, 0.04), 0 4px 10px -2px rgba(0, 0, 0, 0.08),
+    0 16px 36px -10px rgba(0, 0, 0, 0.18);
+  --glass-raised-lift-hover: 0 1px 1px rgba(0, 0, 0, 0.05), 0 8px 18px -4px rgba(0, 0, 0, 0.11),
+    0 28px 56px -14px rgba(0, 0, 0, 0.24);
 
   --scrollbar-track: #ffffff;
   --scrollbar-thumb: #d4d4d4;
@@ -409,8 +429,13 @@ body {
    translucent box. Write the standard property only; the prefix, where a target
    still needs one, is added during the build.
    ============================================================ */
+/* No `position` here on purpose. A bare class and a Tailwind utility have the
+   same specificity, so whichever is written later wins — and this file loads
+   after Tailwind. Setting position:relative made `.glass sticky top-[72px]`
+   compute to *relative*, and `top` then offset the element 72px down into the
+   content instead of pinning it (that is what broke the journal filter bar).
+   Nothing in this rule needs a positioned box, so the utility decides. */
 .glass {
-  position: relative;
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
   backdrop-filter: blur(var(--glass-blur)) saturate(180%);
@@ -426,18 +451,13 @@ body {
   backdrop-filter: blur(32px) saturate(190%);
 }
 
-/* Ink glass — the same physics, dark. Used for primary actions so they hold
-   contrast on a white page. */
-.glass-ink {
-  position: relative;
-  background: var(--glass-ink-bg);
-  border: 1px solid var(--glass-ink-border);
-  backdrop-filter: blur(18px) saturate(160%);
-  box-shadow:
-    inset 0 1px 0 var(--glass-ink-highlight),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.4),
-    var(--glass-ink-shadow);
-  color: #ffffff;
+/* Raised glass — the same material, domed and lifted off the page. */
+.glass-raised {
+  background: var(--glass-raised-bg);
+  border: 1px solid var(--glass-raised-border);
+  color: var(--foreground);
+  backdrop-filter: blur(20px) saturate(185%);
+  box-shadow: var(--glass-raised-bevel), var(--glass-raised-lift);
 }
 
 /* ------------------------------------------------------------
@@ -525,34 +545,33 @@ body {
     0 16px 40px -14px rgba(0, 0, 0, 0.26);
 }
 
-/* Ink liquid glass — the primary action. */
-.liquid-ink {
-  background: var(--glass-ink-bg);
-  border: 1px solid var(--glass-ink-border);
-  color: #ffffff;
-  backdrop-filter: blur(18px) saturate(160%);
-  box-shadow:
-    inset 0 1px 0 var(--glass-ink-highlight),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.5),
-    var(--glass-ink-shadow);
+/* Raised liquid glass — the primary action.
+
+   Deliberately NOT a filled dark pill. On a white page a black button is the
+   heaviest possible mark and it fought the whitespace everywhere it appeared;
+   this is the same glass as `.liquid-clear`, distinguished by how far it stands
+   off the page rather than by how dark it is. Ink stays where it belongs —
+   in the type. */
+.liquid-raised {
+  background: var(--glass-raised-bg);
+  border: 1px solid var(--glass-raised-border);
+  color: var(--foreground);
+  backdrop-filter: blur(20px) saturate(185%);
+  box-shadow: var(--glass-raised-bevel), var(--glass-raised-lift);
 }
-.liquid-ink:hover {
-  background: rgba(0, 0, 0, 0.94);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.5),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.5),
-    0 1px 2px rgba(0, 0, 0, 0.24),
-    0 20px 44px -16px rgba(0, 0, 0, 0.55);
+.liquid-raised:hover {
+  border-color: rgba(0, 0, 0, 0.16);
+  box-shadow: var(--glass-raised-bevel), var(--glass-raised-lift-hover);
 }
-/* On ink the sweep has to be gentler or it reads as a flash. */
-.liquid-ink::after {
-  background: linear-gradient(
-    105deg,
-    transparent 32%,
-    rgba(255, 255, 255, 0.3) 48%,
-    rgba(255, 255, 255, 0.08) 57%,
-    transparent 72%
-  );
+/* It rises further than a flat control, because the shadow is doing the work
+   that a colour change used to do. */
+.liquid-raised:hover {
+  transform: translateY(-2px);
+}
+.liquid-raised:active {
+  transform: translateY(0) scale(0.985);
+  box-shadow: var(--glass-raised-bevel), 0 1px 1px rgba(0, 0, 0, 0.05),
+    0 2px 6px -2px rgba(0, 0, 0, 0.1);
 }
 
 /* ------------------------------------------------------------
@@ -632,7 +651,10 @@ body {
    ============================================================ */
 .font-display {
   font-family: var(--font-display);
-  font-feature-settings: "ss01";
+  /* Only 500/700/900 are shipped. CSS weight matching resolves the in-between
+     requests upward (600 -> 700, 800 -> 900), which is the direction that helps
+     a display face anyway. `ss01` is gone with Syne — it was that font's
+     alternate set and means nothing to Estedad. */
 }
 
 h1,
@@ -693,14 +715,12 @@ h3 {
   background-size: 150px 150px;
 }
 
-.hero-grid {
-  background-image: linear-gradient(var(--grid-line) 1px, transparent 1px),
-    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
-  background-size: 80px 80px;
-  mask-image: radial-gradient(ellipse 92% 72% at 50% 34%, black 22%, transparent 78%);
-  -webkit-mask-image: radial-gradient(ellipse 92% 72% at 50% 34%, black 22%, transparent 78%);
-}
+/* .hero-grid is gone: the ruled "blueprint" grid behind every hero was the last
+   thing on the page pretending to be a technical readout. Whitespace is the
+   backdrop now — an empty white field, not a field with a grid drawn on it.
 
+   .dotgrid survives only because /portal/login still paints one, and the CMS is
+   out of scope for the whitespace pass. Nothing on the public site uses it. */
 .dotgrid {
   background-image: radial-gradient(var(--grid-line) 1.2px, transparent 1.2px);
   background-size: 24px 24px;
@@ -1009,25 +1029,22 @@ h3 {
    Buttons
    ------------------------------------------------------------
    .btn-glow kept its name (it is the `glow` Button variant) but is now the
-   ink liquid-glass pill: the strongest thing on a white page.
+   raised liquid-glass pill — frosted and domed, not filled.
    ============================================================ */
 .btn-glow {
   position: relative;
   isolation: isolate;
   overflow: hidden;
   contain: paint;
-  background: var(--glass-ink-bg);
-  border: 1px solid var(--glass-ink-border);
-  color: #ffffff;
-  backdrop-filter: blur(18px) saturate(160%);
-  box-shadow:
-    inset 0 1px 0 var(--glass-ink-highlight),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.5),
-    var(--glass-ink-shadow);
+  background: var(--glass-raised-bg);
+  border: 1px solid var(--glass-raised-border);
+  color: var(--foreground);
+  backdrop-filter: blur(20px) saturate(185%);
+  box-shadow: var(--glass-raised-bevel), var(--glass-raised-lift);
   transition:
     transform 0.45s var(--ease-apple),
     box-shadow 0.45s var(--ease-apple),
-    background-color 0.45s var(--ease-apple);
+    border-color 0.45s var(--ease-apple);
 }
 .btn-glow::after {
   content: "";
@@ -1037,10 +1054,10 @@ h3 {
   pointer-events: none;
   background: linear-gradient(
     105deg,
-    transparent 32%,
-    rgba(255, 255, 255, 0.32) 48%,
-    rgba(255, 255, 255, 0.08) 57%,
-    transparent 72%
+    transparent 34%,
+    rgba(255, 255, 255, 0.75) 48%,
+    rgba(255, 255, 255, 0.25) 56%,
+    transparent 68%
   );
   transform: translateX(-120%);
   opacity: 0;
@@ -1054,13 +1071,14 @@ h3 {
   opacity: 1;
 }
 .btn-glow:hover {
-  transform: translateY(-1px);
-  background: rgba(0, 0, 0, 0.94);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.5),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.5),
-    0 1px 2px rgba(0, 0, 0, 0.24),
-    0 20px 44px -16px rgba(0, 0, 0, 0.55);
+  transform: translateY(-2px);
+  border-color: rgba(0, 0, 0, 0.16);
+  box-shadow: var(--glass-raised-bevel), var(--glass-raised-lift-hover);
+}
+.btn-glow:active {
+  transform: translateY(0) scale(0.985);
+  box-shadow: var(--glass-raised-bevel), 0 1px 1px rgba(0, 0, 0, 0.05),
+    0 2px 6px -2px rgba(0, 0, 0, 0.1);
 }
 .btn-glow > * {
   position: relative;

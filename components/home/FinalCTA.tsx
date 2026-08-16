@@ -18,7 +18,6 @@ export function FinalCTA({
     <section className="section">
       <Container>
         <div className="relative overflow-hidden rounded-[2.5rem] border border-card-border bg-surface-2 px-6 py-24 text-center md:px-16 md:py-32">
-          <div className="absolute inset-0 dotgrid opacity-50" />
           <div className="pointer-events-none absolute left-1/2 top-1/2 h-[30rem] w-[30rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-foreground/[0.04] blur-[130px]" />
           <div className="relative">
             <Reveal>
@@ -36,7 +35,7 @@ export function FinalCTA({
               <div className="mt-12 flex flex-wrap items-center justify-center gap-4">
                 <Link
                   href="/contact"
-                  className="liquid liquid-ink group inline-flex items-center gap-2 rounded-full px-9 py-4 text-base font-semibold"
+                  className="liquid liquid-raised group inline-flex items-center gap-2 rounded-full px-9 py-4 text-base font-semibold"
                 >
                   <span className="inline-flex items-center gap-2">
                     {content.finalCtaLabel}
