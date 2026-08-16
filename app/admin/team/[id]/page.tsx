@@ -5,6 +5,7 @@ import { db } from "@/lib/db";
 import { Field, Input, Textarea, Toggle, FormSection } from "@/components/admin/form";
 import { LangTabs } from "@/components/admin/LangTabs";
 import { SubmitButton } from "@/components/admin/SubmitButton";
+import { Repeater } from "@/components/admin/Repeater";
 import { saveTeamMember } from "@/lib/actions";
 import { parseArr } from "@/lib/utils";
 import type { Social } from "@/types";
@@ -14,9 +15,10 @@ export default async function TeamMemberForm({ params }: { params: Promise<{ id:
   const isNew = id === "new";
   const m = isNew ? null : await db.teamMember.findUnique({ where: { id } });
   if (!isNew && !m) notFound();
-  const socials = parseArr<Social>(m?.socials)
-    .map((s) => `${s.platform} | ${s.href}`)
-    .join("\n");
+  const socialRows = parseArr<Social>(m?.socials).map((s) => ({
+    platform: s.platform ?? "",
+    href: s.href ?? "",
+  }));
 
   return (
     <div className="mx-auto max-w-2xl">
@@ -53,8 +55,17 @@ export default async function TeamMemberForm({ params }: { params: Promise<{ id:
             />
           </Field>
           <Field label="آواتار (URL)"><Input name="avatar" defaultValue={m?.avatar ?? ""} dir="ltr" className="text-left" placeholder="https://…" /></Field>
-          <Field label="شبکه‌های اجتماعی" hint="هر خط: پلتفرم | لینک — مثال: instagram | https://instagram.com/...">
-            <Textarea name="socials" defaultValue={socials} dir="ltr" className="text-left" />
+          <Field label="شبکه‌های اجتماعی">
+            <Repeater
+              name="socials"
+              initial={socialRows}
+              addLabel="افزودن شبکه"
+              rowLabel={(r, i) => r.platform || `شبکه ${i + 1}`}
+              fields={[
+                { key: "platform", label: "پلتفرم", placeholder: "instagram" },
+                { key: "href", label: "لینک", type: "url" as const, placeholder: "https://instagram.com/…" },
+              ]}
+            />
           </Field>
           <Field label="ترتیب نمایش"><Input name="order" type="number" defaultValue={m?.order ?? 0} dir="ltr" className="text-left" /></Field>
         </FormSection>

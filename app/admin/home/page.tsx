@@ -1,33 +1,72 @@
 import { PageHeader } from "@/components/admin/ui";
 import { Field, Input, Textarea, Select, Toggle, FormSection } from "@/components/admin/form";
 import { LangTabs } from "@/components/admin/LangTabs";
+import { Repeater } from "@/components/admin/Repeater";
 import { SubmitButton } from "@/components/admin/SubmitButton";
 import { saveHomePage } from "@/lib/actions";
 import { getHomePage } from "@/lib/queries";
 import { db } from "@/lib/db";
 import { parseArr } from "@/lib/utils";
+import { DEPARTMENTS } from "@/lib/constants";
 import type { ShowcaseSlideCopy } from "@/lib/queries";
-import type { WorkflowStep } from "@/types";
 
 function lines(v: string | null | undefined) {
   return parseArr<string>(v).join("\n");
 }
-function stepsText(v: string | null | undefined) {
-  return parseArr<WorkflowStep>(v)
-    .map((s) => `${s.step ?? ""} | ${s.title} | ${s.desc}`.replace(/^ \| /, ""))
-    .join("\n");
+
+/**
+ * Homepage workflow steps as repeater rows.
+ *
+ * Note the shape: the homepage's steps are {icon, title, desc} and are numbered
+ * automatically by their position, while a *service* page's WorkflowStep is
+ * {step, title, desc} with the number typed by hand. Same word, two structures —
+ * this file only ever deals with the homepage one.
+ */
+function stepRows(v: string | null | undefined) {
+  return parseArr<{ icon?: string; title?: string; desc?: string }>(v).map((s) => ({
+    icon: s.icon ?? "",
+    title: s.title ?? "",
+    desc: s.desc ?? "",
+  }));
 }
-/** Round-trips the pipe format the SHOWCASE parser in lib/actions.ts expects. */
-function showcaseText(v: string | null | undefined) {
-  return parseArr<ShowcaseSlideCopy>(v)
-    .map((s) =>
-      [s.department, s.title, s.tagline, s.ctaLabel, s.ctaHref]
-        .map((x) => x ?? "")
-        .join(" | ")
-        .replace(/(\s*\|\s*)+$/, ""),
-    )
-    .join("\n");
+
+/**
+ * One repeater row per department, always all four and always in hero order.
+ *
+ * Saved copy is merged onto the department list rather than replacing it, so
+ * the editor always sees four labelled rows even before anything is written —
+ * and a department can never go missing because nobody typed a line for it.
+ */
+function showcaseRows(v: string | null | undefined) {
+  const saved = parseArr<ShowcaseSlideCopy>(v);
+  return DEPARTMENTS.map((d) => {
+    const row = saved.find((x) => x.department === d.key);
+    return {
+      department: d.key,
+      title: row?.title ?? "",
+      tagline: row?.tagline ?? "",
+      ctaLabel: row?.ctaLabel ?? "",
+      ctaHref: row?.ctaHref ?? "",
+    };
+  });
 }
+
+const DEPT_LABEL: Record<string, string> = Object.fromEntries(
+  DEPARTMENTS.map((d) => [d.key, d.title]),
+);
+
+const SHOWCASE_FIELDS = [
+  { key: "title", label: "تیتر بالای کارت‌ها", placeholder: "برندینگ و طراحی گرافیک", wide: true },
+  { key: "tagline", label: "شعار زیر کارت‌ها", type: "area" as const },
+  { key: "ctaLabel", label: "متن دکمه", placeholder: "خدمات برندینگ" },
+  { key: "ctaHref", label: "لینک دکمه", type: "url" as const, placeholder: "/services" },
+];
+
+const STEP_FIELDS = [
+  { key: "icon", label: "آیکن", placeholder: "Target", hint: "نام آیکن از صفحه‌ی «آیکن‌ها»" },
+  { key: "title", label: "عنوان گام", placeholder: "کشف و استراتژی" },
+  { key: "desc", label: "توضیح", type: "area" as const },
+];
 
 export default async function HomePageAdmin() {
   const h = await getHomePage();
@@ -53,15 +92,48 @@ export default async function HomePageAdmin() {
             </p>
           </div>
 
-          <Field
-            label="متن چهار اسلاید"
-            hint="هر خط یک دسته: شناسه | تیتر بالای کارت‌ها | شعار زیر کارت‌ها | متن دکمه | لینک دکمه — شناسه‌های مجاز: DESIGN، FILM، DIGITAL، STRATEGY. هر فیلدی را خالی بگذارید، از خود دسته‌بندی پر می‌شود."
-          >
+          {/* Four locked rows — one per department. Locked because each row's
+              `department` maps to a real id the public query looks up; an
+              eighth row or a deleted one could only ever be a mistake. */}
+          <Field label="متن اسلایدها" hint="هر فیلدی را خالی بگذارید، خودکار از خود دسته‌بندی پر می‌شود.">
             <LangTabs
               tabs={[
-                { locale: "fa", content: <Textarea name="heroShowcase" defaultValue={showcaseText(row?.heroShowcase)} className="min-h-32" /> },
-                { locale: "en", content: <Textarea name="heroShowcaseEn" defaultValue={showcaseText(row?.heroShowcaseEn)} className="min-h-32" dir="ltr" /> },
-                { locale: "ar", content: <Textarea name="heroShowcaseAr" defaultValue={showcaseText(row?.heroShowcaseAr)} className="min-h-32" dir="rtl" /> },
+                {
+                  locale: "fa",
+                  content: (
+                    <Repeater
+                      name="heroShowcase"
+                      locked
+                      initial={showcaseRows(row?.heroShowcase)}
+                      rowLabel={(r) => DEPT_LABEL[r.department] ?? r.department}
+                      fields={SHOWCASE_FIELDS}
+                    />
+                  ),
+                },
+                {
+                  locale: "en",
+                  content: (
+                    <Repeater
+                      name="heroShowcaseEn"
+                      locked
+                      initial={showcaseRows(row?.heroShowcaseEn)}
+                      rowLabel={(r) => DEPT_LABEL[r.department] ?? r.department}
+                      fields={SHOWCASE_FIELDS}
+                    />
+                  ),
+                },
+                {
+                  locale: "ar",
+                  content: (
+                    <Repeater
+                      name="heroShowcaseAr"
+                      locked
+                      initial={showcaseRows(row?.heroShowcaseAr)}
+                      rowLabel={(r) => DEPT_LABEL[r.department] ?? r.department}
+                      fields={SHOWCASE_FIELDS}
+                    />
+                  ),
+                },
               ]}
             />
           </Field>
@@ -218,25 +290,45 @@ export default async function HomePageAdmin() {
               ]}
             />
           </Field>
-          <Field
-            label="۴ گام فرایند"
-            hint="هر خط: نام آیکن Lucide | عنوان | توضیح — مثال: Target | کشف و استراتژی | شناخت عمیق برند، بازار و اهداف."
-          >
+          <Field label="گام‌های فرایند" hint="ترتیب ردیف‌ها همان ترتیب نمایش است.">
             <LangTabs
               tabs={[
                 {
                   locale: "fa",
                   content: (
-                    <Textarea
+                    <Repeater
                       name="workflowSteps"
-                      defaultValue={h.workflowSteps.map((s) => `${s.icon} | ${s.title} | ${s.desc}`).join("\n")}
-                      className="min-h-32"
-                      dir="ltr"
+                      initial={stepRows(row?.workflowSteps)}
+                      fields={STEP_FIELDS}
+                      addLabel="افزودن گام"
+                      rowLabel={(r, i) => r.title || `گام ${i + 1}`}
                     />
                   ),
                 },
-                { locale: "en", content: <Textarea name="workflowStepsEn" defaultValue={stepsText(row?.workflowStepsEn)} className="min-h-32" dir="ltr" /> },
-                { locale: "ar", content: <Textarea name="workflowStepsAr" defaultValue={stepsText(row?.workflowStepsAr)} className="min-h-32" dir="rtl" /> },
+                {
+                  locale: "en",
+                  content: (
+                    <Repeater
+                      name="workflowStepsEn"
+                      initial={stepRows(row?.workflowStepsEn)}
+                      fields={STEP_FIELDS}
+                      addLabel="Add step"
+                      rowLabel={(r, i) => r.title || `Step ${i + 1}`}
+                    />
+                  ),
+                },
+                {
+                  locale: "ar",
+                  content: (
+                    <Repeater
+                      name="workflowStepsAr"
+                      initial={stepRows(row?.workflowStepsAr)}
+                      fields={STEP_FIELDS}
+                      addLabel="إضافة خطوة"
+                      rowLabel={(r, i) => r.title || `خطوة ${i + 1}`}
+                    />
+                  ),
+                },
               ]}
             />
           </Field>

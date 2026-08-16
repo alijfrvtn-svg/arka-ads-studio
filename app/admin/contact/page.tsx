@@ -1,6 +1,7 @@
 import { PageHeader } from "@/components/admin/ui";
 import { Field, Input, Textarea, FormSection } from "@/components/admin/form";
 import { LangTabs } from "@/components/admin/LangTabs";
+import { Repeater } from "@/components/admin/Repeater";
 import { SubmitButton } from "@/components/admin/SubmitButton";
 import { saveContactPage } from "@/lib/actions";
 import { getContactPage } from "@/lib/queries";
@@ -12,9 +13,19 @@ interface SocialItem { platform: string; href: string; label: string }
 function lines(v: string | null | undefined) {
   return parseArr<string>(v).join("\n");
 }
-function socialsText(v: string | null | undefined) {
-  return parseArr<SocialItem>(v).map((s) => `${s.platform} | ${s.href} | ${s.label}`).join("\n");
+function socialRows(v: string | null | undefined) {
+  return parseArr<{ platform?: string; href?: string; label?: string }>(v).map((x) => ({
+    platform: x.platform ?? "",
+    href: x.href ?? "",
+    label: x.label ?? "",
+  }));
 }
+
+const SOCIAL_FIELDS = [
+  { key: "platform", label: "پلتفرم", placeholder: "instagram", hint: "instagram، linkedin، youtube، telegram، whatsapp، x، aparat" },
+  { key: "href", label: "لینک", type: "url" as const, placeholder: "https://instagram.com/…" },
+  { key: "label", label: "برچسب", placeholder: "اینستاگرام" },
+];
 
 export default async function ContactPageAdmin() {
   const c = await getContactPage();
@@ -111,12 +122,12 @@ export default async function ContactPageAdmin() {
         </FormSection>
 
         <FormSection title="شبکه‌های اجتماعی">
-          <Field label="لینک‌ها" hint="هر خط: پلتفرم | لینک | برچسب — مثال: instagram | https://instagram.com/arka.studio | اینستاگرام">
+          <Field label="لینک‌ها" hint="ترتیب ردیف‌ها همان ترتیب نمایش است.">
             <LangTabs
               tabs={[
-                { locale: "fa", content: <Textarea name="socials" defaultValue={c.socials.map((s) => `${s.platform} | ${s.href} | ${s.label}`).join("\n")} className="min-h-28" dir="ltr" /> },
-                { locale: "en", content: <Textarea name="socialsEn" defaultValue={socialsText(row?.socialsEn)} className="min-h-28" dir="ltr" /> },
-                { locale: "ar", content: <Textarea name="socialsAr" defaultValue={socialsText(row?.socialsAr)} className="min-h-28" dir="ltr" /> },
+                { locale: "fa", content: <Repeater name="socials" initial={socialRows(row?.socials)} fields={SOCIAL_FIELDS} addLabel="افزودن شبکه" rowLabel={(r, i) => r.label || r.platform || `شبکه ${i + 1}`} /> },
+                { locale: "en", content: <Repeater name="socialsEn" initial={socialRows(row?.socialsEn)} fields={SOCIAL_FIELDS} addLabel="Add network" rowLabel={(r, i) => r.label || r.platform || `Network ${i + 1}`} /> },
+                { locale: "ar", content: <Repeater name="socialsAr" initial={socialRows(row?.socialsAr)} fields={SOCIAL_FIELDS} addLabel="إضافة شبكة" rowLabel={(r, i) => r.label || r.platform || `شبكة ${i + 1}`} /> },
               ]}
             />
           </Field>

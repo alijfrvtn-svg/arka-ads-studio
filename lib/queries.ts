@@ -837,3 +837,24 @@ export async function getServiceDeck(slug: string, locale: Locale = "fa") {
   const all = await getHeroShowcase(locale);
   return all.find((s) => s.department === service.department) ?? null;
 }
+
+/**
+ * Every published service as a marquee card, in department order.
+ *
+ * Feeds the band above the footer. Ordered by department then `order` so the
+ * belt reads as the four groups in sequence rather than a shuffle — the card
+ * artwork is numbered, and a visitor who has just seen the hero recognises the
+ * run.
+ */
+export async function getMarqueeCards(locale: Locale = "fa") {
+  const rows = await db.service.findMany({
+    where: { published: true },
+    orderBy: [{ order: "asc" }],
+    select: { slug: true, title: true, titleEn: true, titleAr: true, cover: true },
+  });
+  return rows.map((s) => ({
+    slug: s.slug,
+    title: tr(locale, s.title, s.titleEn, s.titleAr),
+    image: s.cover || null,
+  }));
+}

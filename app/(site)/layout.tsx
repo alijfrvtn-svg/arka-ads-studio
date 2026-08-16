@@ -3,8 +3,9 @@ import CustomCursor from "@/components/fx/CustomCursor";
 import { Analytics } from "@/components/fx/Analytics";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
+import { ServiceMarquee } from "@/components/home/ServiceMarquee";
 import { MaintenanceScreen, MaintenanceBanner } from "@/components/layout/MaintenanceScreen";
-import { getServices, getIndustries, getContactPage, getCategories } from "@/lib/queries";
+import { getServices, getIndustries, getContactPage, getCategories, getMarqueeCards } from "@/lib/queries";
 import { db } from "@/lib/db";
 import { getSessionUser } from "@/lib/auth";
 import { parseObj } from "@/lib/utils";
@@ -37,12 +38,13 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
   // there (and stale slugs could 404) — fetch the live, published rows here
   // once and pass down instead.
   const locale = await getLocale();
-  const [services, industries, settingRow, contact, departments] = await Promise.all([
+  const [services, industries, settingRow, contact, departments, marqueeCards] = await Promise.all([
     getServices(),
     getIndustries(),
     db.setting.findUnique({ where: { key: "site" } }),
     getContactPage(locale),
     getCategories("DEPARTMENT"),
+    getMarqueeCards(locale),
   ]);
   const footer: FooterSettings = { ...FOOTER_DEFAULTS, ...parseObj<Partial<FooterSettings>>(settingRow?.value, {}) };
   const serviceLinks = services.map((s) => ({
@@ -86,6 +88,15 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
       <main id="main" className="min-h-screen">
         {children}
       </main>
+      {/* Closing band, above the footer on every page: the whole catalogue
+          drifting past with one way to start in the middle of it. It lives in
+          the layout rather than in each page so no route can forget it. */}
+      <ServiceMarquee
+        cards={marqueeCards}
+        heading={ui(locale).marqueeHeading}
+        body={ui(locale).marqueeBody}
+        ctaLabel={ui(locale).marqueeCta}
+      />
       <SiteFooter services={serviceLinks} industries={industryLinks} locale={locale} footer={footer} contact={contact} />
     </SmoothScroll>
   );

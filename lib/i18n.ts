@@ -61,6 +61,10 @@ export const UI = {
     // Prefixes the department name on the homepage hero button, e.g.
     // "خدمات عکاسی و تصویربرداری". Overridden per slide from the CMS.
     heroShowcaseCta: "خدمات",
+    // Closing band above the footer, on every page.
+    marqueeHeading: "هر چه برند شما لازم دارد، زیر یک سقف",
+    marqueeBody: "بیست و هشت خدمت تخصصی در چهار دپارتمان؛ از اولین طرح تا آخرین گزارش.",
+    marqueeCta: "همهٔ خدمات",
     ctaRequestConsult: "درخواست مشاوره",
     ctaWatchReel: "تماشای شوریل ۲۰۲۵",
     footerFollowUs: "ما را دنبال کنید",
@@ -139,6 +143,9 @@ export const UI = {
     navContact: "Contact",
     ctaStartProject: "Start a Project",
     heroShowcaseCta: "Explore",
+    marqueeHeading: "Everything your brand needs, under one roof",
+    marqueeBody: "Twenty-eight specialist services across four departments — from the first sketch to the final report.",
+    marqueeCta: "All services",
     ctaRequestConsult: "Request a Consultation",
     ctaWatchReel: "Watch 2025 Reel",
     footerFollowUs: "Follow us",
@@ -217,6 +224,9 @@ export const UI = {
     navContact: "تواصل معنا",
     ctaStartProject: "ابدأ مشروعك",
     heroShowcaseCta: "خدمات",
+    marqueeHeading: "كل ما تحتاجه علامتك التجاري، تحت سقف واحد",
+    marqueeBody: "ثمانٍ وعشرون خدمة متخصصة في أربعة أقسام؛ من أول رسم إلى آخر تقرير.",
+    marqueeCta: "جميع الخدمات",
     ctaRequestConsult: "اطلب استشارة",
     ctaWatchReel: "شاهد عرض ٢٠٢٥",
     footerFollowUs: "تابعنا",

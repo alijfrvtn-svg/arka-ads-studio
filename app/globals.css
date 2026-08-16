@@ -3,15 +3,23 @@
 /* ============================================================
    ARKA — Whitespace Design System
    ------------------------------------------------------------
-   One theme. No dark/light switch, no identity colour cycle, no hue at all:
-   every value below is achromatic (R = G = B), so the site is built entirely
-   out of paper white, ink black and the grey ramp between them. Hierarchy that
-   used to be carried by colour is now carried by weight, size, opacity and —
-   above all — empty space.
+   One theme, no dark/light switch, no identity colour cycle. The page is paper
+   white, ink black and the grey ramp between them: every surface, every rule
+   and all body copy is achromatic (R = G = B). Hierarchy that used to be
+   carried by colour is carried by weight, size, opacity and — above all —
+   empty space.
 
-   Depth comes from glass instead of colour: translucent panels that blur and
+   Colour is not banned, it is *budgeted*. ARKA blue is spent in six places and
+   nowhere else — the brand mark (full strength), focus rings, section eyebrows,
+   links inside prose, the live-project marker, and text selection. Every one is
+   something the eye has to *find* rather than read through; none of them is
+   body copy, which stays ink everywhere. See the "Brand mark" block for why the
+   navy and not the azure.
+
+   Depth comes from glass rather than colour: translucent panels that blur and
    refract whatever sits behind them, lit by a specular hairline along the top
-   edge (see the "Liquid glass" section).
+   edge (see the "Liquid glass" section). The primary action is a black pill —
+   on a page this empty, ink is the loudest thing available.
 
    The legacy .dark / .light token blocks are still here, but they are now only
    ever applied to /admin and /portal (see the pre-paint script in
@@ -94,14 +102,26 @@
   --foreground-muted: #545454;
   --foreground-faint: #6e6e6e;
 
-  /* "primary" is now ink. Emphasis is the darkest thing on the page rather
-     than the most saturated one. */
+  /* "primary" is ink: the primary action is a solid black pill, and body copy
+     is black everywhere. Emphasis comes from darkness, not saturation. */
   --primary: #000000;
   --primary-foreground: #ffffff;
-  --accent: #111111;
-  --accent-bright: #2c2c2c;
-  --accent-soft: #6b6b6b;
-  --ring: #000000;
+
+  /* ARKA blue, back as an accent only.
+     ------------------------------------------------------------
+     The palette is still ink-on-paper; blue is spent, sparingly, where a mark
+     has to be *found* rather than merely read — a focus ring, an active state,
+     a live indicator. It never carries body text.
+
+     --accent is the deep navy because that is the one that survives on white:
+     #162d73 on #ffffff is 11.4:1, so it clears AA even at small sizes and AAA
+     at large. The bright azure #6699ff is 2.3:1 on white and is therefore only
+     ever used as a fill or a border, never as text on paper. */
+  --accent: #162d73;
+  --accent-bright: #2b56d6;
+  --accent-soft: #6699ff;
+  /* Focus rings are the one place the eye must not have to search. */
+  --ring: #2b56d6;
 
   --grid-line: rgba(0, 0, 0, 0.05);
   --hairline: rgba(0, 0, 0, 0.09);
@@ -117,76 +137,50 @@
   --glass-shade: rgba(0, 0, 0, 0.04);
   --glass-shadow: 0 1px 1px rgba(0, 0, 0, 0.03), 0 4px 12px -6px rgba(0, 0, 0, 0.1);
 
-  /* Liquid glass — raised. The primary action.
+  /* Liquid glass — raised. The primary action: black.
 
-     With no colour to spend, rank is told by *elevation*: this is the same
-     clear glass, but domed and lifted. The body is a top-lit gradient (a convex
-     surface is brightest where it faces the light), the rim is doubled so the
-     glass reads as thick, and three stacked ambient shadows put real space
-     between it and the page. */
+     The glass physics are unchanged — domed body, doubled rim, stacked ambient
+     shadows — but the body is ink now rather than frosted white. On a page this
+     empty a black pill is unmissable, and the top-lit gradient keeps it reading
+     as a curved object catching light rather than a flat filled rectangle. */
   --glass-raised-bg: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.95) 0%,
-    rgba(255, 255, 255, 0.62) 54%,
-    rgba(255, 255, 255, 0.78) 100%
+    #2a2a2a 0%,
+    #0d0d0d 55%,
+    #000000 100%
   );
-  --glass-raised-border: rgba(0, 0, 0, 0.11);
-  --glass-raised-bevel: inset 0 1px 0 rgba(255, 255, 255, 1), inset 0 -1px 1px rgba(0, 0, 0, 0.07),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.5);
-  --glass-raised-lift: 0 1px 1px rgba(0, 0, 0, 0.04), 0 4px 10px -2px rgba(0, 0, 0, 0.08),
-    0 16px 36px -10px rgba(0, 0, 0, 0.18);
-  --glass-raised-lift-hover: 0 1px 1px rgba(0, 0, 0, 0.05), 0 8px 18px -4px rgba(0, 0, 0, 0.11),
-    0 28px 56px -14px rgba(0, 0, 0, 0.24);
+  --glass-raised-fg: #ffffff;
+  --glass-raised-border: rgba(0, 0, 0, 0.9);
+  --glass-raised-bevel: inset 0 1px 0 rgba(255, 255, 255, 0.34), inset 0 -1px 1px rgba(0, 0, 0, 0.6),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+  /* Darker and deeper than the white version — a black object on white casts a
+     shadow you can actually see, so the lift can be honest about it. */
+  --glass-raised-lift: 0 1px 2px rgba(0, 0, 0, 0.2), 0 6px 14px -3px rgba(0, 0, 0, 0.22),
+    0 20px 42px -12px rgba(0, 0, 0, 0.4);
+  --glass-raised-lift-hover: 0 1px 2px rgba(0, 0, 0, 0.24), 0 10px 22px -5px rgba(0, 0, 0, 0.28),
+    0 32px 62px -16px rgba(0, 0, 0, 0.5);
 
   --scrollbar-track: #ffffff;
   --scrollbar-thumb: #d4d4d4;
-  --selection-bg: #111111;
+  --selection-bg: var(--accent);
   --selection-fg: #ffffff;
   color-scheme: light;
 }
 
 /* ============================================================
-   Eye of Creation stage palette (components/home/EyeOfCreation.tsx)
+   Brand mark
    ------------------------------------------------------------
-   That hero paints ~90 colour literals through inline styles. Every stop is
-   now a grey, so the lens, beams and flood read as light and shadow instead of
-   brand blue. Kept as variables rather than inlined so the component keeps its
-   original shape.
+   The only place ARKA blue appears at full strength. A logo is an identity, not
+   a UI element — draining it to grey would have meant redrawing the brand, not
+   restyling the site — so the mark keeps its real gradient while everything
+   around it stays ink on paper. These replace the old --eoc-* variables, which
+   were named after a hero component that no longer exists.
    ============================================================ */
 :root {
-  --eoc-primary: 17, 17, 17;
-  --eoc-accent: 90, 90, 90;
-  --eoc-soft: 200, 200, 200;
-  --eoc-glow: 150, 150, 150;
-  --eoc-glow-2: 120, 120, 120;
-  --eoc-beam: 190, 190, 190;
-  --eoc-sky-2: 180, 180, 180;
-  --eoc-sky-3: 198, 198, 198;
-  --eoc-sky-4: 210, 210, 210;
-  --eoc-glass: 150, 150, 150;
-  --eoc-glass-2: 140, 140, 140;
-  --eoc-glass-3: 180, 180, 180;
-  --eoc-deep: 34, 34, 34;
-  --eoc-navy: #2b2b2b;
-  --eoc-navy-deep: #1a1a1a;
-  --eoc-navy-mid: #3d3d3d;
-  --eoc-navy-ink: #141414;
-  --eoc-navy-panel: #1f1f1f;
-  --eoc-navy-sh: #171717;
-  --eoc-navy-sh-2: #1d1d1d;
-  --eoc-indigo: #4a4a4a;
-  --eoc-glass-bg: #242424;
-  --eoc-glass-ink: #0a0a0a;
-  --eoc-light-1: #ffffff;
-  --eoc-light-2: #f7f7f7;
-  --eoc-light-3: #ebebeb;
-  --eoc-bright: #3d3d3d;
-  --eoc-box-end: #5a5a5a;
-  --eoc-navy-darkest: #121212;
-  --eoc-royal: #383838;
-  --eoc-primary-c: #111111;
-  --eoc-accent-c: #6b6b6b;
-  --eoc-light-ink: 17, 17, 17;
+  --brand-azure: #6699ff;
+  --brand-sky: #a6c9ff;
+  --brand-navy: #162d73;
+  --brand-royal: #2b56d6;
 }
 
 /* ============================================================
@@ -384,6 +378,9 @@ body {
 
 /* Swiss editorial eyebrow — now grey uppercase micro-type instead of a
    coloured label. */
+/* Navy, not grey. The eyebrow is a signpost rather than something you read
+   through, and at 11.4:1 on white it stays well clear of AA even at 0.7rem —
+   which grey micro-type at this size does not. */
 .eyebrow {
   display: inline-flex;
   align-items: center;
@@ -392,7 +389,7 @@ body {
   font-size: 0.7rem;
   letter-spacing: 0.3em;
   text-transform: uppercase;
-  color: var(--foreground-muted);
+  color: var(--accent);
 }
 .eyebrow::before {
   content: "";
@@ -455,7 +452,7 @@ body {
 .glass-raised {
   background: var(--glass-raised-bg);
   border: 1px solid var(--glass-raised-border);
-  color: var(--foreground);
+  color: var(--glass-raised-fg);
   backdrop-filter: blur(20px) saturate(185%);
   box-shadow: var(--glass-raised-bevel), var(--glass-raised-lift);
 }
@@ -555,12 +552,12 @@ body {
 .liquid-raised {
   background: var(--glass-raised-bg);
   border: 1px solid var(--glass-raised-border);
-  color: var(--foreground);
+  color: var(--glass-raised-fg);
   backdrop-filter: blur(20px) saturate(185%);
   box-shadow: var(--glass-raised-bevel), var(--glass-raised-lift);
 }
 .liquid-raised:hover {
-  border-color: rgba(0, 0, 0, 0.16);
+  background: linear-gradient(180deg, #3a3a3a 0%, #161616 55%, #0a0a0a 100%);
   box-shadow: var(--glass-raised-bevel), var(--glass-raised-lift-hover);
 }
 /* It rises further than a flat control, because the shadow is doing the work
@@ -774,6 +771,46 @@ h3 {
     transform: translateX(50%);
   }
 }
+
+/* Service marquee (components/home/ServiceMarquee.tsx).
+   ------------------------------------------------------------
+   -50% is not a stylistic choice: the track renders its cards twice, so half
+   the track is exactly one full set. Landing on -50% puts the second copy
+   precisely where the first started, which is what makes the reset invisible.
+   Any other value tears.
+
+   `translate3d` rather than `translateX` keeps the track on its own compositor
+   layer — with ~28 images per row, animating on the main thread drops frames
+   the moment anything else on the page does work. */
+@keyframes marquee-x {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+@keyframes marquee-x-reverse {
+  from {
+    transform: translate3d(-50%, 0, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+.animate-marquee-x {
+  animation: marquee-x 68s linear infinite;
+  will-change: transform;
+}
+.animate-marquee-x-reverse {
+  animation: marquee-x-reverse 84s linear infinite;
+  will-change: transform;
+}
+/* Slow to a halt on hover so a card can actually be clicked. */
+.animate-marquee-x:hover,
+.animate-marquee-x-reverse:hover {
+  animation-play-state: paused;
+}
 @keyframes reel-pan {
   0% {
     background-position: 0% 50%;
@@ -872,7 +909,8 @@ h3 {
   animation: spin-slow 22s linear infinite;
 }
 
-/* Eye of Creation — scroll hero (components/home/EyeOfCreation.tsx) */
+/* Caret for the typewriter effect (components/fx/Typewriter.tsx). The other
+   eoc-* keyframes went with the hero they animated. */
 @keyframes eoc-cursor {
   0%,
   49% {
@@ -881,84 +919,6 @@ h3 {
   50%,
   100% {
     opacity: 0;
-  }
-}
-@keyframes eoc-shimmer {
-  to {
-    transform: rotate(360deg);
-  }
-}
-@keyframes eoc-flicker {
-  0%,
-  100% {
-    opacity: 0.9;
-  }
-  43% {
-    opacity: 0.75;
-  }
-  47% {
-    opacity: 1;
-  }
-  62% {
-    opacity: 0.82;
-  }
-}
-@keyframes eoc-drift1 {
-  0% {
-    transform: translate(0, 0);
-  }
-  50% {
-    transform: translate(22px, -34px);
-  }
-  100% {
-    transform: translate(0, 0);
-  }
-}
-@keyframes eoc-drift2 {
-  0% {
-    transform: translate(0, 0);
-  }
-  50% {
-    transform: translate(-28px, 26px);
-  }
-  100% {
-    transform: translate(0, 0);
-  }
-}
-@keyframes eoc-rotorL {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.2;
-  }
-}
-@keyframes eoc-electric {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  8% {
-    opacity: 0.35;
-  }
-  12% {
-    opacity: 1;
-  }
-  40% {
-    opacity: 0.7;
-  }
-  44% {
-    opacity: 1;
-  }
-  68% {
-    opacity: 0.5;
-  }
-  72% {
-    opacity: 1;
-  }
-  90% {
-    opacity: 0.85;
   }
 }
 
@@ -1038,7 +998,7 @@ h3 {
   contain: paint;
   background: var(--glass-raised-bg);
   border: 1px solid var(--glass-raised-border);
-  color: var(--foreground);
+  color: var(--glass-raised-fg);
   backdrop-filter: blur(20px) saturate(185%);
   box-shadow: var(--glass-raised-bevel), var(--glass-raised-lift);
   transition:
@@ -1052,11 +1012,13 @@ h3 {
   inset: 0;
   z-index: 1;
   pointer-events: none;
+  /* Gentler than the clear variant: the same alpha that reads as a gloss on
+     white reads as a flashbulb on ink. */
   background: linear-gradient(
     105deg,
     transparent 34%,
-    rgba(255, 255, 255, 0.75) 48%,
-    rgba(255, 255, 255, 0.25) 56%,
+    rgba(255, 255, 255, 0.3) 48%,
+    rgba(255, 255, 255, 0.1) 56%,
     transparent 68%
   );
   transform: translateX(-120%);
@@ -1072,7 +1034,7 @@ h3 {
 }
 .btn-glow:hover {
   transform: translateY(-2px);
-  border-color: rgba(0, 0, 0, 0.16);
+  background: linear-gradient(180deg, #3a3a3a 0%, #161616 55%, #0a0a0a 100%);
   box-shadow: var(--glass-raised-bevel), var(--glass-raised-lift-hover);
 }
 .btn-glow:active {
@@ -1139,15 +1101,18 @@ h3 {
 .prose-arka p {
   margin-block: 1.25rem;
 }
+/* Body copy stays ink; a link inside it does not. Underline plus navy is two
+   independent signals, so the link survives both greyscale printing and the
+   readers who cannot separate it by colour alone. */
 .prose-arka a {
-  color: var(--foreground);
+  color: var(--accent);
   text-decoration: underline;
-  text-decoration-color: rgba(0, 0, 0, 0.3);
+  text-decoration-color: color-mix(in srgb, var(--accent) 40%, transparent);
   text-underline-offset: 4px;
   transition: text-decoration-color 0.3s var(--ease-apple);
 }
 .prose-arka a:hover {
-  text-decoration-color: var(--foreground);
+  text-decoration-color: var(--accent);
 }
 .prose-arka ul,
 .prose-arka ol {

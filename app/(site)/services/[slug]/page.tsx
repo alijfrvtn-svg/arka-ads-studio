@@ -153,6 +153,26 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
         </PageHero>
       )}
 
+      {/* The full service description.
+          ------------------------------------------------------------
+          The showcase deck replaced PageHero on these pages and PageHero was
+          what used to render this text, so it silently disappeared — the hero
+          only carries the short tagline. It gets its own section here, on the
+          editorial measure rather than the full 1240px, because it is the one
+          long-form paragraph on the page and a 1240px line of Persian is
+          unreadable. */}
+      {description && (
+        <Section className="!pb-0">
+          <div className="container-narrow">
+            <Reveal>
+              <p className="text-lg leading-[2.1] text-foreground-muted md:text-xl md:leading-[2.05]">
+                {description}
+              </p>
+            </Reveal>
+          </div>
+        </Section>
+      )}
+
       {/* intro video — a direct file or an Aparat/YouTube link; VideoPlayer
           picks the right renderer for each. */}
       {s.heroVideo && (

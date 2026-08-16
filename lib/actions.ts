@@ -24,26 +24,39 @@ const J = (x: unknown) => JSON.stringify(x ?? []);
 // One item per line.
 const L = (fd: FormData, k: string) =>
   S(fd, k).split("\n").map((l) => l.trim()).filter(Boolean);
-// One item per line, `field1 | field2 | ...` — for simple multi-field lists
-// (values cards, timeline entries, social links) without a dynamic add/remove UI.
-const PL = (fd: FormData, k: string, fields: string[]) =>
-  L(fd, k).map((line) => {
-    const parts = line.split("|").map((p) => p.trim());
-    const obj: Record<string, string> = {};
-    fields.forEach((f, i) => (obj[f] = parts[i] || ""));
-    return obj;
-  });
 /**
- * Hero slides, one per line:
- *   media | title | desc | ctaLabel | ctaHref | badge | poster
- * Same pipe convention as PL, but slides get their own parser because a slide
- * with neither media nor title is an empty banner — dropping it here keeps the
- * public page from having to defend against half-typed rows.
+ * Rows from the <Repeater> editor (components/admin/Repeater.tsx), which posts
+ * a JSON array in one hidden input.
+ *
+ * This replaced the pipe convention the CMS used to run on — `Target | عنوان |
+ * توضیح` in a textarea, where the editor had to hold the column order in their
+ * head, count separators by eye, and never type a `|` inside their own copy.
+ *
+ * Everything is coerced to a trimmed string and keys outside `fields` are
+ * dropped, so nothing a browser or a stale form can post ends up written to the
+ * database verbatim. Malformed JSON yields an empty list rather than throwing:
+ * a save that silently drops one list is recoverable, a 500 on the whole form
+ * is not.
  */
-const SLIDES = (fd: FormData, k: string) =>
-  PL(fd, k, ["media", "title", "desc", "ctaLabel", "ctaHref", "badge", "poster"]).filter(
-    (s) => s.media || s.title,
-  );
+const ROWS = (fd: FormData, k: string, fields: string[]): Record<string, string>[] => {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(S(fd, k) || "[]");
+  } catch {
+    return [];
+  }
+  if (!Array.isArray(parsed)) return [];
+  return parsed
+    .map((raw) => {
+      const row: Record<string, string> = {};
+      for (const f of fields) {
+        const v = (raw as Record<string, unknown>)?.[f];
+        row[f] = v == null ? "" : String(v).trim();
+      }
+      return row;
+    })
+    .filter((row) => Object.values(row).some(Boolean));
+};
 
 /** Department ids the showcase hero can address. Anything else is a typo. */
 const SHOWCASE_DEPARTMENTS = ["DESIGN", "FILM", "DIGITAL", "STRATEGY"];
@@ -58,7 +71,7 @@ const SHOWCASE_DEPARTMENTS = ["DESIGN", "FILM", "DIGITAL", "STRATEGY"];
  */
 const SHOWCASE = (fd: FormData, k: string) => {
   const seen = new Set<string>();
-  return PL(fd, k, ["department", "title", "tagline", "ctaLabel", "ctaHref"])
+  return ROWS(fd, k, ["department", "title", "tagline", "ctaLabel", "ctaHref"])
     .map((r) => ({ ...r, department: String(r.department ?? "").trim().toUpperCase() }))
     .filter((r) => {
       if (!SHOWCASE_DEPARTMENTS.includes(r.department) || seen.has(r.department)) return false;
@@ -524,18 +537,22 @@ export async function saveService(fd: FormData) {
       .split("\n")
       .map((l) => l.trim())
       .filter(Boolean);
+  /**
+   * Pricing tiers from the <Repeater>. `features` is still newline-separated
+   * *within* its own textarea — one plan's feature list is a list of sentences,
+   * and giving each bullet its own input would make a five-bullet plan a
+   * five-click affair. `featured` is a checkbox value, not a word to be matched
+   * against three languages' spellings of "yes".
+   */
   const parsePricing = (k: string) =>
     J(
-      parseLines(k).map((line) => {
-        const [name, price, unit, featuresRaw, featuredRaw] = line.split("|").map((p) => p.trim());
-        return {
-          name: name || "",
-          price: price || "",
-          unit: unit || "",
-          features: (featuresRaw || "").split(";").map((f) => f.trim()).filter(Boolean),
-          featured: /^(بله|نعم|true|yes|1)$/i.test((featuredRaw || "").trim()),
-        };
-      }),
+      ROWS(fd, k, ["name", "price", "unit", "features", "featured"]).map((r) => ({
+        name: r.name,
+        price: r.price,
+        unit: r.unit,
+        features: r.features.split("\n").map((f) => f.trim()).filter(Boolean),
+        featured: r.featured === "1",
+      })),
     );
   const data = {
     slug: slugify(S(fd, "slug") || S(fd, "title")),
@@ -560,8 +577,8 @@ export async function saveService(fd: FormData) {
     featuresEn: parseLines("featuresEn").length ? J(parseLines("featuresEn")) : null,
     featuresAr: parseLines("featuresAr").length ? J(parseLines("featuresAr")) : null,
     pricing: parsePricing("pricing"),
-    pricingEn: parseLines("pricingEn").length ? parsePricing("pricingEn") : null,
-    pricingAr: parseLines("pricingAr").length ? parsePricing("pricingAr") : null,
+    pricingEn: ROWS(fd, "pricingEn", ["name"]).length ? parsePricing("pricingEn") : null,
+    pricingAr: ROWS(fd, "pricingAr", ["name"]).length ? parsePricing("pricingAr") : null,
     published: B(fd, "published"),
     metaTitle: S(fd, "metaTitle") || null,
     metaTitleEn: S(fd, "metaTitleEn") || null,
@@ -845,9 +862,9 @@ export async function saveFooterSettings(fd: FormData) {
 
 export async function saveStats(fd: FormData) {
   await requirePermission("settings.manage");
-  const rows = PL(fd, "stats", ["label", "value", "suffix"]);
-  const rowsEn = PL(fd, "statsEn", ["label", "value", "suffix"]);
-  const rowsAr = PL(fd, "statsAr", ["label", "value", "suffix"]);
+  const rows = ROWS(fd, "stats", ["label", "value", "suffix"]);
+  const rowsEn = ROWS(fd, "statsEn", ["label", "value", "suffix"]);
+  const rowsAr = ROWS(fd, "statsAr", ["label", "value", "suffix"]);
   await db.$transaction([
     db.stat.deleteMany({}),
     db.stat.createMany({
@@ -1015,9 +1032,9 @@ export async function saveHomePage(fd: FormData) {
     workflowDescription: S(fd, "workflowDescription"),
     workflowDescriptionEn: S(fd, "workflowDescriptionEn") || null,
     workflowDescriptionAr: S(fd, "workflowDescriptionAr") || null,
-    workflowSteps: J(PL(fd, "workflowSteps", ["icon", "title", "desc"])),
-    workflowStepsEn: J(PL(fd, "workflowStepsEn", ["icon", "title", "desc"])),
-    workflowStepsAr: J(PL(fd, "workflowStepsAr", ["icon", "title", "desc"])),
+    workflowSteps: J(ROWS(fd, "workflowSteps", ["icon", "title", "desc"])),
+    workflowStepsEn: J(ROWS(fd, "workflowStepsEn", ["icon", "title", "desc"])),
+    workflowStepsAr: J(ROWS(fd, "workflowStepsAr", ["icon", "title", "desc"])),
     testimonialsEyebrow: S(fd, "testimonialsEyebrow"),
     testimonialsEyebrowEn: S(fd, "testimonialsEyebrowEn") || null,
     testimonialsEyebrowAr: S(fd, "testimonialsEyebrowAr") || null,
@@ -1083,9 +1100,9 @@ export async function saveAboutPage(fd: FormData) {
     valuesHeading: S(fd, "valuesHeading"),
     valuesHeadingEn: S(fd, "valuesHeadingEn") || null,
     valuesHeadingAr: S(fd, "valuesHeadingAr") || null,
-    values: J(PL(fd, "values", ["icon", "title", "desc"])),
-    valuesEn: J(PL(fd, "valuesEn", ["icon", "title", "desc"])),
-    valuesAr: J(PL(fd, "valuesAr", ["icon", "title", "desc"])),
+    values: J(ROWS(fd, "values", ["icon", "title", "desc"])),
+    valuesEn: J(ROWS(fd, "valuesEn", ["icon", "title", "desc"])),
+    valuesAr: J(ROWS(fd, "valuesAr", ["icon", "title", "desc"])),
     teamEyebrow: S(fd, "teamEyebrow"),
     teamEyebrowEn: S(fd, "teamEyebrowEn") || null,
     teamEyebrowAr: S(fd, "teamEyebrowAr") || null,
@@ -1098,9 +1115,9 @@ export async function saveAboutPage(fd: FormData) {
     timelineHeading: S(fd, "timelineHeading"),
     timelineHeadingEn: S(fd, "timelineHeadingEn") || null,
     timelineHeadingAr: S(fd, "timelineHeadingAr") || null,
-    timeline: J(PL(fd, "timeline", ["year", "title", "desc"])),
-    timelineEn: J(PL(fd, "timelineEn", ["year", "title", "desc"])),
-    timelineAr: J(PL(fd, "timelineAr", ["year", "title", "desc"])),
+    timeline: J(ROWS(fd, "timeline", ["year", "title", "desc"])),
+    timelineEn: J(ROWS(fd, "timelineEn", ["year", "title", "desc"])),
+    timelineAr: J(ROWS(fd, "timelineAr", ["year", "title", "desc"])),
     galleryEyebrow: S(fd, "galleryEyebrow"),
     galleryEyebrowEn: S(fd, "galleryEyebrowEn") || null,
     galleryEyebrowAr: S(fd, "galleryEyebrowAr") || null,
@@ -1153,9 +1170,9 @@ export async function saveContactPage(fd: FormData) {
     officeHoursAr: S(fd, "officeHoursAr") || null,
     mapLat: N(fd, "mapLat", 35.7448),
     mapLng: N(fd, "mapLng", 51.4101),
-    socials: J(PL(fd, "socials", ["platform", "href", "label"])),
-    socialsEn: J(PL(fd, "socialsEn", ["platform", "href", "label"])),
-    socialsAr: J(PL(fd, "socialsAr", ["platform", "href", "label"])),
+    socials: J(ROWS(fd, "socials", ["platform", "href", "label"])),
+    socialsEn: J(ROWS(fd, "socialsEn", ["platform", "href", "label"])),
+    socialsAr: J(ROWS(fd, "socialsAr", ["platform", "href", "label"])),
     serviceOptions: J(L(fd, "serviceOptions")),
     serviceOptionsEn: J(L(fd, "serviceOptionsEn")),
     serviceOptionsAr: J(L(fd, "serviceOptionsAr")),
@@ -1190,7 +1207,7 @@ export async function saveTeamMember(fd: FormData) {
     bioEn: S(fd, "bioEn") || null,
     bioAr: S(fd, "bioAr") || null,
     avatar: S(fd, "avatar") || null,
-    socials: J(PL(fd, "socials", ["platform", "href"])),
+    socials: J(ROWS(fd, "socials", ["platform", "href"])),
     order: N(fd, "order"),
     published: B(fd, "published"),
   };

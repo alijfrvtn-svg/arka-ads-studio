@@ -2,10 +2,11 @@ import { cn } from "@/lib/utils";
 
 /** ARKA fast-forward / double-play mark, recreated from the brand sheet.
  *
- * Gradient stops read the --eoc-* variables rather than literals, so the mark
- * follows the site's palette. On the whitespace site those variables are all
- * greys, which turns the two chevrons into a graphite-to-ink gradient — the
- * brand shape is untouched, only its fill is achromatic. */
+ * This is the one element on the public site that keeps ARKA blue at full
+ * strength. Everything around it is ink on paper; the mark is the identity
+ * itself, and draining it to grey would be redrawing the brand rather than
+ * restyling the site. `mono` still forces currentColor for the places that need
+ * a single-colour mark (the client marquee, print, favicons). */
 export function LogoMark({
   className,
   mono = false,
@@ -26,16 +27,16 @@ export function LogoMark({
     >
       <defs>
         <linearGradient id={`arka-a-${id}`} x1="6" y1="10" x2="40" y2="56" gradientUnits="userSpaceOnUse">
-          <stop stopColor="var(--eoc-accent-c)" />
-          <stop offset="1" stopColor="var(--eoc-primary-c)" />
+          <stop stopColor="var(--brand-sky)" />
+          <stop offset="1" stopColor="var(--brand-azure)" />
         </linearGradient>
         <linearGradient id={`arka-b-${id}`} x1="26" y1="10" x2="58" y2="56" gradientUnits="userSpaceOnUse">
-          <stop stopColor="var(--eoc-primary-c)" />
-          <stop offset="1" stopColor="var(--eoc-navy)" />
+          <stop stopColor="var(--brand-azure)" />
+          <stop offset="1" stopColor="var(--brand-navy)" />
         </linearGradient>
         <linearGradient id={`arka-box-${id}`} x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
-          <stop stopColor="var(--eoc-bright)" />
-          <stop offset="1" stopColor="var(--eoc-box-end)" />
+          <stop stopColor="var(--brand-azure)" />
+          <stop offset="1" stopColor="var(--brand-royal)" />
         </linearGradient>
       </defs>
       {boxed && <rect width="64" height="64" rx="18" fill={`url(#arka-box-${id})`} />}

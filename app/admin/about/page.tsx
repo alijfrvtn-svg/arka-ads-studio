@@ -1,6 +1,7 @@
 import { PageHeader } from "@/components/admin/ui";
 import { Field, Input, Textarea, FormSection } from "@/components/admin/form";
 import { LangTabs } from "@/components/admin/LangTabs";
+import { Repeater } from "@/components/admin/Repeater";
 import { SubmitButton } from "@/components/admin/SubmitButton";
 import { saveAboutPage } from "@/lib/actions";
 import { getAboutPage } from "@/lib/queries";
@@ -13,12 +14,31 @@ interface TimelineItem { year: string; title: string; desc: string }
 function lines(v: string | null | undefined) {
   return parseArr<string>(v).join("\n");
 }
-function valuesText(v: string | null | undefined) {
-  return parseArr<ValueItem>(v).map((x) => `${x.icon} | ${x.title} | ${x.desc}`).join("\n");
+function valueRows(v: string | null | undefined) {
+  return parseArr<{ icon?: string; title?: string; desc?: string }>(v).map((x) => ({
+    icon: x.icon ?? "",
+    title: x.title ?? "",
+    desc: x.desc ?? "",
+  }));
 }
-function timelineText(v: string | null | undefined) {
-  return parseArr<TimelineItem>(v).map((x) => `${x.year} | ${x.title} | ${x.desc}`).join("\n");
+function timelineRows(v: string | null | undefined) {
+  return parseArr<{ year?: string; title?: string; desc?: string }>(v).map((x) => ({
+    year: x.year ?? "",
+    title: x.title ?? "",
+    desc: x.desc ?? "",
+  }));
 }
+
+const VALUE_FIELDS = [
+  { key: "icon", label: "آیکن", placeholder: "Target", hint: "نام آیکن از صفحه‌ی «آیکن‌ها»" },
+  { key: "title", label: "عنوان", placeholder: "استراتژی‌محور" },
+  { key: "desc", label: "توضیح", type: "area" as const },
+];
+const TIMELINE_FIELDS = [
+  { key: "year", label: "سال", placeholder: "۱۳۹۶" },
+  { key: "title", label: "عنوان رویداد", placeholder: "تولد آرکا" },
+  { key: "desc", label: "توضیح", type: "area" as const },
+];
 
 export default async function AboutPageAdmin() {
   const a = await getAboutPage();
@@ -126,12 +146,12 @@ export default async function AboutPageAdmin() {
               />
             </Field>
           </div>
-          <Field label="کارت‌های ارزش" hint="هر خط: نام آیکن Lucide | عنوان | توضیح — مثال: Target | استراتژی‌محور | هر تصمیم خلاقانه ریشه در داده دارد.">
+          <Field label="کارت‌های ارزش" hint="ترتیب ردیف‌ها همان ترتیب نمایش است.">
             <LangTabs
               tabs={[
-                { locale: "fa", content: <Textarea name="values" defaultValue={a.values.map((v) => `${v.icon} | ${v.title} | ${v.desc}`).join("\n")} className="min-h-32" dir="ltr" /> },
-                { locale: "en", content: <Textarea name="valuesEn" defaultValue={valuesText(row?.valuesEn)} className="min-h-32" dir="ltr" /> },
-                { locale: "ar", content: <Textarea name="valuesAr" defaultValue={valuesText(row?.valuesAr)} className="min-h-32" dir="rtl" /> },
+                { locale: "fa", content: <Repeater name="values" initial={valueRows(row?.values)} fields={VALUE_FIELDS} addLabel="افزودن ارزش" rowLabel={(r, i) => r.title || `ارزش ${i + 1}`} /> },
+                { locale: "en", content: <Repeater name="valuesEn" initial={valueRows(row?.valuesEn)} fields={VALUE_FIELDS} addLabel="Add value" rowLabel={(r, i) => r.title || `Value ${i + 1}`} /> },
+                { locale: "ar", content: <Repeater name="valuesAr" initial={valueRows(row?.valuesAr)} fields={VALUE_FIELDS} addLabel="إضافة قيمة" rowLabel={(r, i) => r.title || `قيمة ${i + 1}`} /> },
               ]}
             />
           </Field>
@@ -181,12 +201,12 @@ export default async function AboutPageAdmin() {
               />
             </Field>
           </div>
-          <Field label="رویدادها" hint="هر خط: سال | عنوان | توضیح — مثال: ۱۳۹۶ | تولد آرکا | با یک دوربین و یک رؤیا کار را آغاز کردیم.">
+          <Field label="رویدادها" hint="ترتیب ردیف‌ها همان ترتیب نمایش است.">
             <LangTabs
               tabs={[
-                { locale: "fa", content: <Textarea name="timeline" defaultValue={a.timeline.map((t) => `${t.year} | ${t.title} | ${t.desc}`).join("\n")} className="min-h-32" dir="ltr" /> },
-                { locale: "en", content: <Textarea name="timelineEn" defaultValue={timelineText(row?.timelineEn)} className="min-h-32" dir="ltr" /> },
-                { locale: "ar", content: <Textarea name="timelineAr" defaultValue={timelineText(row?.timelineAr)} className="min-h-32" dir="rtl" /> },
+                { locale: "fa", content: <Repeater name="timeline" initial={timelineRows(row?.timeline)} fields={TIMELINE_FIELDS} addLabel="افزودن رویداد" rowLabel={(r, i) => r.title || `رویداد ${i + 1}`} /> },
+                { locale: "en", content: <Repeater name="timelineEn" initial={timelineRows(row?.timelineEn)} fields={TIMELINE_FIELDS} addLabel="Add milestone" rowLabel={(r, i) => r.title || `Milestone ${i + 1}`} /> },
+                { locale: "ar", content: <Repeater name="timelineAr" initial={timelineRows(row?.timelineAr)} fields={TIMELINE_FIELDS} addLabel="إضافة حدث" rowLabel={(r, i) => r.title || `حدث ${i + 1}`} /> },
               ]}
             />
           </Field>

@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { PageHeader } from "@/components/admin/ui";
 import { Field, Input, Textarea, Select, Toggle, FormSection } from "@/components/admin/form";
 import { LangTabs } from "@/components/admin/LangTabs";
+import { Repeater } from "@/components/admin/Repeater";
 import { SubmitButton } from "@/components/admin/SubmitButton";
 import { saveSettings, saveStats, saveFooterSettings } from "@/lib/actions";
 import { parseObj } from "@/lib/utils";
@@ -20,6 +21,12 @@ interface SiteSettings {
   footerDescription: string;
   footerCopyright: string;
 }
+
+const STAT_FIELDS = [
+  { key: "label", label: "برچسب", placeholder: "پروژه موفق", wide: true },
+  { key: "value", label: "عدد", type: "number" as const, placeholder: "480" },
+  { key: "suffix", label: "پسوند", placeholder: "+" },
+];
 
 export default async function SettingsPage() {
   const [row, stats] = await Promise.all([
@@ -43,9 +50,11 @@ export default async function SettingsPage() {
     footerCopyright: "تمام حقوق محفوظ است.",
     ...parseObj<Partial<SiteSettings>>(row?.value, {}),
   };
-  const statsText = stats.map((st) => `${st.label} | ${st.value} | ${st.suffix}`).join("\n");
-  const statsTextEn = stats.map((st) => `${st.labelEn ?? ""} | ${st.value} | ${st.suffix}`).join("\n");
-  const statsTextAr = stats.map((st) => `${st.labelAr ?? ""} | ${st.value} | ${st.suffix}`).join("\n");
+  // Number and suffix are read from the Persian column only (see saveStats), so
+  // the other locales edit the label and leave the figure alone.
+  const statRows = stats.map((st) => ({ label: st.label, value: String(st.value), suffix: st.suffix ?? "" }));
+  const statRowsEn = stats.map((st) => ({ label: st.labelEn ?? "", value: String(st.value), suffix: st.suffix ?? "" }));
+  const statRowsAr = stats.map((st) => ({ label: st.labelAr ?? "", value: String(st.value), suffix: st.suffix ?? "" }));
 
   return (
     <div className="mx-auto max-w-3xl">
@@ -106,15 +115,12 @@ export default async function SettingsPage() {
           title="آمار سایت"
           description="اعداد نمایش داده‌شده در صفحه اول و درباره ما (مثل «۴۸۰+ پروژه موفق»)"
         >
-          <Field
-            label="آمار"
-            hint="هر خط یک آیتم: برچسب | عدد | پسوند — مثال: پروژه موفق | 480 | + — ترتیب خطوط، ترتیب نمایش است (فقط برچسب بین زبان‌ها فرق می‌کند؛ عدد و پسوند از ستون فارسی خوانده می‌شود)"
-          >
+          <Field label="آمار" hint="ترتیب ردیف‌ها همان ترتیب نمایش است. عدد و پسوند از ستون فارسی خوانده می‌شود.">
             <LangTabs
               tabs={[
-                { locale: "fa", content: <Textarea name="stats" defaultValue={statsText} className="min-h-32" /> },
-                { locale: "en", content: <Textarea name="statsEn" defaultValue={statsTextEn} className="min-h-32" dir="ltr" /> },
-                { locale: "ar", content: <Textarea name="statsAr" defaultValue={statsTextAr} className="min-h-32" dir="rtl" /> },
+                { locale: "fa", content: <Repeater name="stats" initial={statRows} fields={STAT_FIELDS} addLabel="افزودن آمار" rowLabel={(r, i) => r.label || `آمار ${i + 1}`} /> },
+                { locale: "en", content: <Repeater name="statsEn" initial={statRowsEn} fields={STAT_FIELDS} addLabel="Add stat" rowLabel={(r, i) => r.label || `Stat ${i + 1}`} /> },
+                { locale: "ar", content: <Repeater name="statsAr" initial={statRowsAr} fields={STAT_FIELDS} addLabel="إضافة رقم" rowLabel={(r, i) => r.label || `رقم ${i + 1}`} /> },
               ]}
             />
           </Field>

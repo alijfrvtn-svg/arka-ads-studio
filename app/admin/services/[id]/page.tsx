@@ -4,17 +4,33 @@ import { ArrowRight } from "lucide-react";
 import { db } from "@/lib/db";
 import { Field, Input, Textarea, Select, Toggle, FormSection } from "@/components/admin/form";
 import { LangTabs } from "@/components/admin/LangTabs";
+import { Repeater } from "@/components/admin/Repeater";
 import { SubmitButton } from "@/components/admin/SubmitButton";
 import { saveService } from "@/lib/actions";
 import { DEPARTMENTS } from "@/lib/constants";
 import { parseArr } from "@/lib/utils";
 import type { PricingTier } from "@/types";
 
-function pricingText(json: string | null | undefined, yes = "بله", no = "خیر") {
-  return parseArr<PricingTier>(json)
-    .map((t) => `${t.name} | ${t.price} | ${t.unit ?? ""} | ${(t.features ?? []).join(";")} | ${t.featured ? yes : no}`)
-    .join("\n");
+function pricingRows(json: string | null | undefined) {
+  return parseArr<PricingTier>(json).map((t) => ({
+    name: t.name ?? "",
+    price: t.price ?? "",
+    unit: t.unit ?? "",
+    // One bullet per line inside this plan's own box: a feature list is a list
+    // of sentences, and one input per bullet would make a five-bullet plan a
+    // five-click affair.
+    features: (t.features ?? []).join("\n"),
+    featured: t.featured ? "1" : "",
+  }));
 }
+
+const PRICING_FIELDS = [
+  { key: "name", label: "نام پلن", placeholder: "حرفه‌ای" },
+  { key: "price", label: "قیمت", placeholder: "۲۵,۰۰۰,۰۰۰" },
+  { key: "unit", label: "واحد", placeholder: "تومان" },
+  { key: "featured", label: "پلن پیشنهادی", type: "check" as const },
+  { key: "features", label: "ویژگی‌ها", type: "area" as const, hint: "هر ویژگی در یک سطر" },
+];
 
 export default async function ServiceForm({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -24,16 +40,9 @@ export default async function ServiceForm({ params }: { params: Promise<{ id: st
   const features = parseArr<string>(s?.features).join("\n");
   const featuresEn = parseArr<string>(s?.featuresEn).join("\n");
   const featuresAr = parseArr<string>(s?.featuresAr).join("\n");
-  const pricing = pricingText(s?.pricing);
-  const pricingEn = pricingText(s?.pricingEn, "yes", "no");
-  const pricingAr = pricingText(s?.pricingAr, "نعم", "لا");
-  const pricingHint =
-    "هر خط یک پلن: نام | قیمت | واحد | ویژگی۱;ویژگی۲;ویژگی۳ | بله/خیر (پیشنهادی) — مثال: حرفه‌ای | ۲۵,۰۰۰,۰۰۰ | تومان | استراتژی اختصاصی;سه راند بازنگری | بله";
-  const pricingHintEn =
-    "One plan per line: name | price | unit | feature1;feature2;feature3 | yes/no (recommended) — e.g. Professional | 25,000,000 | Toman | Dedicated strategy;Three revision rounds | yes";
-  const pricingHintAr =
-    "كل سطر باقة واحدة: الاسم | السعر | الوحدة | ميزة1;ميزة2;ميزة3 | نعم/لا (موصى به) — مثال: الاحترافية | 25,000,000 | تومان | استراتيجية مخصصة;ثلاث جولات مراجعة | نعم";
-
+  const pricingRowsFa = pricingRows(s?.pricing);
+  const pricingRowsEn = pricingRows(s?.pricingEn);
+  const pricingRowsAr = pricingRows(s?.pricingAr);
   return (
     <div className="mx-auto max-w-3xl">
       <div className="mb-6 flex items-center gap-3">
@@ -113,9 +122,9 @@ export default async function ServiceForm({ params }: { params: Promise<{ id: st
           <Field label="پلن‌ها">
             <LangTabs
               tabs={[
-                { locale: "fa", content: <Field hint={pricingHint}><Textarea name="pricing" defaultValue={pricing} className="min-h-32" dir="rtl" /></Field> },
-                { locale: "en", content: <Field hint={pricingHintEn}><Textarea name="pricingEn" defaultValue={pricingEn} className="min-h-32" dir="ltr" /></Field> },
-                { locale: "ar", content: <Field hint={pricingHintAr}><Textarea name="pricingAr" defaultValue={pricingAr} className="min-h-32" dir="rtl" /></Field> },
+                { locale: "fa", content: <Repeater name="pricing" initial={pricingRowsFa} fields={PRICING_FIELDS} addLabel="افزودن پلن" rowLabel={(r, i) => r.name || `پلن ${i + 1}`} /> },
+                { locale: "en", content: <Repeater name="pricingEn" initial={pricingRowsEn} fields={PRICING_FIELDS} addLabel="Add plan" rowLabel={(r, i) => r.name || `Plan ${i + 1}`} /> },
+                { locale: "ar", content: <Repeater name="pricingAr" initial={pricingRowsAr} fields={PRICING_FIELDS} addLabel="إضافة باقة" rowLabel={(r, i) => r.name || `باقة ${i + 1}`} /> },
               ]}
             />
           </Field>
