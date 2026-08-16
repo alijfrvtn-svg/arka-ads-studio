@@ -9,6 +9,8 @@ import { Reveal } from "@/components/fx/Reveal";
 import { Accordion } from "@/components/ui/Accordion";
 import { VideoPlayer } from "@/components/work/VideoPlayer";
 import { ProjectCard } from "@/components/work/ProjectCard";
+import { HeroShowcase } from "@/components/home/HeroShowcase";
+import { getServiceDeck } from "@/lib/queries";
 import { buildMetadata, breadcrumbJsonLd, serviceJsonLd, faqPageJsonLd } from "@/lib/seo";
 import { localeNumber } from "@/lib/utils";
 import { tr, trArr, ui } from "@/lib/i18n";
@@ -51,6 +53,11 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
   });
   if (!s) notFound();
 
+  // The department's seven cards, with this service's own card pulled to the
+  // front. Null when the department has no published deck, in which case the
+  // page falls back to the plain PageHero below.
+  const deck = await getServiceDeck(slug, locale);
+
   const features = trArr<string>(locale, s.features, s.featuresEn, s.featuresAr);
   const workflow = trArr<WorkflowStep>(locale, s.workflow, s.workflowEn, s.workflowAr);
   const faqs = trArr<Faq>(locale, s.faqs, s.faqsEn, s.faqsAr);
@@ -72,26 +79,79 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
           ]),
         }}
       />
-      <PageHero
-        eyebrow={tr(locale, s.tagline || "", s.taglineEn, s.taglineAr) || c.defaultEyebrow}
-        breadcrumb={[{ label: ui(locale).navHome, href: "/" }, { label: ui(locale).navServices, href: "/services" }, { label: title }]}
-        title={title}
-        description={description}
-        image={s.cover}
-      >
-        <div className="mt-8 flex flex-wrap gap-4">
-          <Link href="/contact" className="liquid liquid-raised inline-flex items-center gap-2 rounded-full px-8 py-4 font-semibold">
-            <span className="inline-flex items-center gap-2">
-              {ui(locale).ctaRequestConsult} <ArrowUpLeft className="h-5 w-5" />
-            </span>
-          </Link>
+      {deck ? (
+        <>
+          {/* Breadcrumb lives outside the deck: the showcase owns the h1 and the
+              CTA, but it has no room for a trail, and dropping the trail would
+              leave a sub-page with no visible way back up its own branch. */}
+          <div className="container-x pt-32 md:pt-36">
+            <nav className="-mx-2 flex flex-wrap items-center text-xs text-foreground-faint">
+              {[
+                { label: ui(locale).navHome, href: "/" },
+                { label: ui(locale).navServices, href: "/services" },
+                { label: title },
+              ].map((b, i, arr) => (
+                <span key={i} className="flex items-center gap-1.5">
+                  {b.href ? (
+                    <Link href={b.href} className="inline-flex min-h-11 items-center px-2 hover:text-foreground">
+                      {b.label}
+                    </Link>
+                  ) : (
+                    <span className="inline-flex min-h-11 items-center px-2 text-foreground-muted">{b.label}</span>
+                  )}
+                  {i < arr.length - 1 && <span aria-hidden>·</span>}
+                </span>
+              ))}
+            </nav>
+          </div>
+          {/* Same deck as the homepage, narrowed to this department and turned
+              so this service's card faces front. Its six siblings stay one
+              click away, which is the whole reason it is here rather than a
+              static cover image. */}
+          <HeroShowcase
+            slides={[
+              {
+                ...deck,
+                title,
+                tagline: tr(locale, s.tagline || "", s.taglineEn, s.taglineAr) || description,
+                ctaLabel: ui(locale).ctaRequestConsult,
+                ctaHref: "/contact",
+              },
+            ]}
+            focusSlug={s.slug}
+            locale={locale}
+            compact
+          />
           {s.priceFrom && (
-            <span className="liquid-clear inline-flex items-center rounded-full px-7 py-4 text-sm text-foreground-muted ltr-nums">
-              {ui(locale).priceFromPrefix} {localeNumber(locale, s.priceFrom)} {priceUnit}
-            </span>
+            <div className="container-x -mt-4 flex justify-center pb-8">
+              <span className="liquid-clear inline-flex items-center rounded-full px-7 py-4 text-sm text-foreground-muted ltr-nums">
+                {ui(locale).priceFromPrefix} {localeNumber(locale, s.priceFrom)} {priceUnit}
+              </span>
+            </div>
           )}
-        </div>
-      </PageHero>
+        </>
+      ) : (
+        <PageHero
+          eyebrow={tr(locale, s.tagline || "", s.taglineEn, s.taglineAr) || c.defaultEyebrow}
+          breadcrumb={[{ label: ui(locale).navHome, href: "/" }, { label: ui(locale).navServices, href: "/services" }, { label: title }]}
+          title={title}
+          description={description}
+          image={s.cover}
+        >
+          <div className="mt-8 flex flex-wrap gap-4">
+            <Link href="/contact" className="liquid liquid-raised inline-flex items-center gap-2 rounded-full px-8 py-4 font-semibold">
+              <span className="inline-flex items-center gap-2">
+                {ui(locale).ctaRequestConsult} <ArrowUpLeft className="h-5 w-5" />
+              </span>
+            </Link>
+            {s.priceFrom && (
+              <span className="liquid-clear inline-flex items-center rounded-full px-7 py-4 text-sm text-foreground-muted ltr-nums">
+                {ui(locale).priceFromPrefix} {localeNumber(locale, s.priceFrom)} {priceUnit}
+              </span>
+            )}
+          </div>
+        </PageHero>
+      )}
 
       {/* intro video — a direct file or an Aparat/YouTube link; VideoPlayer
           picks the right renderer for each. */}

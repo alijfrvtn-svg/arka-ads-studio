@@ -45,16 +45,37 @@ const LABELS: Record<Locale, { prev: string; next: string; go: string; region: s
  * document but the fan is a picture, not text, so it is positioned with explicit
  * left/right transforms and stays identical in both directions.
  */
-function fan(i: number, total: number) {
+function fan(i: number, total: number, compact = false) {
   const mid = (total - 1) / 2;
   const offset = i - mid; // -3 … +3 for seven cards
+  // Spacing is a fraction of the card width, so the fan keeps its shape at both
+  // sizes instead of the compact deck spilling out of its box.
+  const step = compact ? 88 : 118;
   return {
-    x: offset * 118,
-    y: Math.abs(offset) * 26,
+    x: offset * step,
+    y: Math.abs(offset) * (compact ? 19 : 26),
     rotate: offset * 7.5,
     // Middle card sits on top, outer cards recede behind their neighbours.
     z: total - Math.abs(offset),
   };
+}
+
+/**
+ * Move `slug`'s card to the middle of the deck, keeping everything else in its
+ * existing relative order.
+ *
+ * The middle slot is the one the fan draws upright, highest and on top, so a
+ * service page can reuse the homepage deck and still make clear which card you
+ * are standing on — without a second layout or a highlight colour there is no
+ * palette for.
+ */
+function centre<T extends { slug: string }>(cards: T[], slug?: string) {
+  if (!slug) return cards;
+  const found = cards.findIndex((c) => c.slug === slug);
+  if (found === -1) return cards;
+  const rest = [...cards.slice(0, found), ...cards.slice(found + 1)];
+  const mid = Math.floor(cards.length / 2);
+  return [...rest.slice(0, mid), cards[found], ...rest.slice(mid)];
 }
 
 /** How long the outgoing deck takes to clear the frame, in ms. */
@@ -82,9 +103,23 @@ const EXIT_MS = 520;
 export function HeroShowcase({
   slides,
   locale = "fa",
+  focusSlug,
+  compact = false,
 }: {
   slides: ShowcaseSlide[];
   locale?: Locale;
+  /**
+   * Service pages pass their own slug: that card moves to the front of the fan
+   * and everything else fans out behind it. With a single slide the arrows and
+   * the position dots disappear on their own — there is nowhere to go.
+   */
+  focusSlug?: string;
+  /**
+   * Sub-page footprint. The homepage hero owns the whole first screen; on a
+   * service page the deck is an introduction to the page under it, and a
+   * full-height one would push the actual content below the fold.
+   */
+  compact?: boolean;
 }) {
   const t = LABELS[locale] ?? LABELS.fa;
   const [index, setIndex] = useState(0);
@@ -145,10 +180,15 @@ export function HeroShowcase({
   if (!count) return null;
   const slide = slides[index];
   const leaving = phase === "out";
+  const cards = centre(slide.cards, focusSlug);
+  const single = count < 2;
 
   return (
     <section
-      className="relative flex min-h-[100svh] flex-col items-center justify-center overflow-hidden pb-24 pt-32"
+      className={cn(
+        "relative flex flex-col items-center justify-center overflow-hidden",
+        compact ? "pb-16 pt-28" : "min-h-[100svh] pb-24 pt-32",
+      )}
       aria-roledescription="carousel"
       aria-label={t.region}
       onKeyDown={(e) => {
@@ -177,59 +217,67 @@ export function HeroShowcase({
 
         {/* ————— the deck —————
 
-            One keyed wrapper per slide, not one animated child per card. Keying
-            the cards individually (under AnimatePresence popLayout) left every
-            outgoing deck mounted: each card exited on its own schedule and
-            nothing guaranteed the group finished, so the screen ended up
-            holding all four decks at once. The wrapper remounts on `index`, and
-            `leaving` drives the exit, so exactly one deck exists at a time. */}
+            Every card carries its own initial/animate/transition, with the
+            stagger written as `delay: i * step` — no variants, and no
+            orchestration inherited from the wrapper.
+
+            The first version keyed each card under AnimatePresence popLayout
+            and the outgoing decks never unmounted: each card exited on its own
+            schedule, nothing tracked the group, and all four decks ended up
+            stacked on screen (7 -> 14 -> 21 -> 28 cards). Rather than tune that
+            orchestration, this drops it — a card that is told exactly where to
+            be has no group state to get stuck in.
+
+            The wrapper is keyed on `index` purely so a slide change remounts
+            the cards and replays their entrance. */}
         <div
           className="relative flex w-full items-center justify-center"
-          style={{ height: "clamp(17rem, 34vw, 25rem)", perspective: 1400 }}
+          style={{
+            height: compact ? "clamp(14rem, 26vw, 19rem)" : "clamp(17rem, 34vw, 25rem)",
+            perspective: 1400,
+          }}
         >
-          <motion.div
-              key={index}
-              className="absolute inset-0 flex items-center justify-center"
-              initial="enter"
-              animate={leaving ? "leave" : "show"}
-              variants={{
-                show: { transition: { staggerChildren: reduced ? 0 : 0.075 } },
-                leave: { transition: { staggerChildren: reduced ? 0 : 0.03 } },
-              }}
-            >
-              {slide.cards.map((card, i) => {
-                const g = fan(i, slide.cards.length);
-                return (
-                  <motion.div
-                    key={card.slug}
-                    className="absolute"
-                    style={{ zIndex: g.z }}
-                    variants={{
-                      // Up from below, through a full turn, into the fan.
-                      enter: { opacity: 0, x: g.x, y: 260, rotate: g.rotate - 360, scale: 0.82 },
-                      show: {
-                        opacity: 1,
-                        x: g.x,
-                        y: g.y,
-                        rotate: g.rotate,
-                        scale: 1,
-                        transition: reduced ? { duration: 0 } : { duration: 1, ease: [0.16, 1, 0.3, 1] },
-                      },
-                      // …and out through the top.
-                      leave: {
-                        opacity: 0,
-                        y: -300,
-                        rotate: g.rotate + 40,
-                        scale: 0.9,
-                        transition: reduced ? { duration: 0 } : { duration: 0.42, ease: [0.4, 0, 1, 1] },
-                      },
-                    }}
-                  >
-                    <ShowcaseCardFace card={card} />
-                  </motion.div>
-                );
-              })}
-          </motion.div>
+          <div key={index} className="absolute inset-0 flex items-center justify-center">
+            {cards.map((card, i) => {
+              const g = fan(i, cards.length, compact);
+              const focused = !!focusSlug && card.slug === focusSlug;
+              return (
+                <motion.div
+                  key={card.slug}
+                  className="absolute"
+                  // The focused card is lifted clear of the whole deck, not
+                  // just its neighbours, so nothing overlaps it.
+                  style={{ zIndex: focused ? cards.length + 1 : g.z }}
+                  // Up from below, through a full turn, into the fan.
+                  initial={{ opacity: 0, x: g.x, y: 260, rotate: g.rotate - 360, scale: 0.82 }}
+                  animate={
+                    leaving
+                      ? // …and out through the top.
+                        { opacity: 0, x: g.x, y: -300, rotate: g.rotate + 40, scale: 0.9 }
+                      : {
+                          opacity: 1,
+                          x: g.x,
+                          // Focused: upright, forward and a touch higher. It
+                          // reads as the front of the deck without needing a
+                          // colour to say so.
+                          y: focused ? -18 : g.y,
+                          rotate: focused ? 0 : g.rotate,
+                          scale: focused ? 1.1 : 1,
+                        }
+                  }
+                  transition={
+                    reduced
+                      ? { duration: 0 }
+                      : leaving
+                        ? { duration: 0.42, delay: i * 0.03, ease: [0.4, 0, 1, 1] }
+                        : { duration: 1, delay: i * 0.075, ease: [0.16, 1, 0.3, 1] }
+                  }
+                >
+                  <ShowcaseCardFace card={card} focused={focused} compact={compact} />
+                </motion.div>
+              );
+            })}
+          </div>
         </div>
 
         {/* ————— tagline ————— */}
@@ -255,13 +303,15 @@ export function HeroShowcase({
               Only the arrowhead flips, because in RTL the previous slide lies
               to the right. Tying the delta to the locale as well had the two
               cancelling out: this button was labelled prev and stepped forward. */}
-          <button
-            onClick={() => go(-1)}
-            aria-label={t.prev}
-            className="liquid liquid-clear grid h-12 w-12 shrink-0 place-items-center rounded-full text-foreground"
-          >
-            {locale === "en" ? <ChevronLeft className="h-5 w-5" /> : <ChevronRight className="h-5 w-5" />}
-          </button>
+          {!single && (
+            <button
+              onClick={() => go(-1)}
+              aria-label={t.prev}
+              className="liquid liquid-clear grid h-12 w-12 shrink-0 place-items-center rounded-full text-foreground"
+            >
+              {locale === "en" ? <ChevronLeft className="h-5 w-5" /> : <ChevronRight className="h-5 w-5" />}
+            </button>
+          )}
 
           <motion.div
             key={index}
@@ -289,17 +339,19 @@ export function HeroShowcase({
             </Magnetic>
           </motion.div>
 
-          <button
-            onClick={() => go(1)}
-            aria-label={t.next}
-            className="liquid liquid-clear grid h-12 w-12 shrink-0 place-items-center rounded-full text-foreground"
-          >
-            {locale === "en" ? <ChevronRight className="h-5 w-5" /> : <ChevronLeft className="h-5 w-5" />}
-          </button>
+          {!single && (
+            <button
+              onClick={() => go(1)}
+              aria-label={t.next}
+              className="liquid liquid-clear grid h-12 w-12 shrink-0 place-items-center rounded-full text-foreground"
+            >
+              {locale === "en" ? <ChevronRight className="h-5 w-5" /> : <ChevronLeft className="h-5 w-5" />}
+            </button>
+          )}
         </div>
 
         {/* ————— which of the four ————— */}
-        <div className="relative z-10 mt-8 flex items-center gap-1">
+        <div className={cn("relative z-10 mt-8 flex items-center gap-1", single && "hidden")}>
           {slides.map((s, i) => (
             <button
               key={s.department}
@@ -329,12 +381,29 @@ export function HeroShowcase({
 }
 
 /** One card in the deck. Links to its own service page. */
-function ShowcaseCardFace({ card }: { card: ShowcaseCard }) {
+function ShowcaseCardFace({
+  card,
+  focused = false,
+  compact = false,
+}: {
+  card: ShowcaseCard;
+  focused?: boolean;
+  compact?: boolean;
+}) {
   return (
     <Link
       href={`/services/${card.slug}`}
       data-cursor
-      className="group block h-[clamp(11rem,22vw,16rem)] w-[clamp(8rem,16vw,11.5rem)] overflow-hidden rounded-[1.25rem] border border-card-border bg-surface shadow-[0_1px_2px_rgba(0,0,0,0.05),0_22px_48px_-24px_rgba(0,0,0,0.4)] transition-shadow duration-700 [transition-timing-function:var(--ease-apple)] hover:shadow-[0_2px_4px_rgba(0,0,0,0.07),0_36px_70px_-28px_rgba(0,0,0,0.5)]"
+      aria-current={focused ? "page" : undefined}
+      /* 4:5 — the artwork's own ratio, so a card is never cropped. The width
+         follows from the height rather than being set independently. */
+      className={cn(
+        "group block aspect-[4/5] overflow-hidden rounded-[1.25rem] border bg-surface transition-shadow duration-700 [transition-timing-function:var(--ease-apple)]",
+        compact ? "h-[clamp(9rem,17vw,12.5rem)]" : "h-[clamp(11rem,22vw,16rem)]",
+        focused
+          ? "border-foreground/25 shadow-[0_3px_6px_rgba(0,0,0,0.08),0_48px_90px_-30px_rgba(0,0,0,0.55)]"
+          : "border-card-border shadow-[0_1px_2px_rgba(0,0,0,0.05),0_22px_48px_-24px_rgba(0,0,0,0.4)] hover:shadow-[0_2px_4px_rgba(0,0,0,0.07),0_36px_70px_-28px_rgba(0,0,0,0.5)]",
+      )}
     >
       {card.image ? (
         // eslint-disable-next-line @next/next/no-img-element

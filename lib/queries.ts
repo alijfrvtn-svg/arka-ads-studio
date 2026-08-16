@@ -821,3 +821,19 @@ export async function getHeroShowcase(locale: Locale = "fa") {
     })
     .filter((s): s is NonNullable<typeof s> => s !== null);
 }
+
+/**
+ * The department deck for one service page: the same seven cards the homepage
+ * hero shows for that department, so a visitor can move sideways through the
+ * siblings without going back to the top.
+ *
+ * Returns the slide already narrowed to the service's own department, or null
+ * if that department has no deck (nothing published, or the slug is unknown) —
+ * the page then just renders without it rather than showing an empty frame.
+ */
+export async function getServiceDeck(slug: string, locale: Locale = "fa") {
+  const service = await db.service.findUnique({ where: { slug }, select: { department: true } });
+  if (!service) return null;
+  const all = await getHeroShowcase(locale);
+  return all.find((s) => s.department === service.department) ?? null;
+}
