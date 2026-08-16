@@ -45,6 +45,28 @@ const SLIDES = (fd: FormData, k: string) =>
     (s) => s.media || s.title,
   );
 
+/** Department ids the showcase hero can address. Anything else is a typo. */
+const SHOWCASE_DEPARTMENTS = ["DESIGN", "FILM", "DIGITAL", "STRATEGY"];
+
+/**
+ * Copy for the four showcase-hero slides.
+ *
+ * The department id is the row's key, so a row without a recognised one is
+ * dropped rather than saved: it could never match a slide, and leaving it in
+ * would look like a saved setting that silently does nothing. Duplicates are
+ * dropped too — first row wins — because the reader does a `find` on the id.
+ */
+const SHOWCASE = (fd: FormData, k: string) => {
+  const seen = new Set<string>();
+  return PL(fd, k, ["department", "title", "tagline", "ctaLabel", "ctaHref"])
+    .map((r) => ({ ...r, department: String(r.department ?? "").trim().toUpperCase() }))
+    .filter((r) => {
+      if (!SHOWCASE_DEPARTMENTS.includes(r.department) || seen.has(r.department)) return false;
+      seen.add(r.department);
+      return true;
+    });
+};
+
 /**
  * Every admin save calls this, but individual paths alone aren't enough now
  * that (site)/layout.tsx no longer forces dynamic rendering: the header/footer
@@ -941,40 +963,13 @@ export async function addTaskComment(taskId: string, body: string) {
 export async function saveHomePage(fd: FormData) {
   await requirePermission("home.manage");
   const data = {
-    heroMode: S(fd, "heroMode", "cinematic"),
-    heroMedia: S(fd, "heroMedia") || null,
-    heroPoster: S(fd, "heroPoster") || null,
+    // The five hero modes are gone; the showcase hero is the only one, and its
+    // cards come from the services themselves rather than from this form.
+    heroShowcase: J(SHOWCASE(fd, "heroShowcase")),
+    heroShowcaseEn: J(SHOWCASE(fd, "heroShowcaseEn")),
+    heroShowcaseAr: J(SHOWCASE(fd, "heroShowcaseAr")),
     // Clamped, not trusted: the scrim is what guarantees legible copy over an
     // arbitrary uploaded image, so 0/100 must stay out of reach.
-    heroOverlay: Math.max(0, Math.min(90, N(fd, "heroOverlay", 55))),
-    heroHeight: S(fd, "heroHeight", "full"),
-    heroAlign: S(fd, "heroAlign", "start"),
-    heroShowStats: B(fd, "heroShowStats"),
-    heroCtaHref: S(fd, "heroCtaHref") || "/contact",
-    heroReelUrl: S(fd, "heroReelUrl") || null,
-    heroTags: J(L(fd, "heroTags")),
-    heroTagsEn: J(L(fd, "heroTagsEn")),
-    heroTagsAr: J(L(fd, "heroTagsAr")),
-    heroSlides: J(SLIDES(fd, "heroSlides")),
-    heroSlidesEn: J(SLIDES(fd, "heroSlidesEn")),
-    heroSlidesAr: J(SLIDES(fd, "heroSlidesAr")),
-    heroSlideDuration: Math.max(2, Math.min(30, N(fd, "heroSlideDuration", 6))),
-    heroScrollLength: Math.max(160, Math.min(1200, N(fd, "heroScrollLength", 640))),
-    heroBadge: S(fd, "heroBadge"),
-    heroBadgeEn: S(fd, "heroBadgeEn") || null,
-    heroBadgeAr: S(fd, "heroBadgeAr") || null,
-    heroHeadline: J(L(fd, "heroHeadline")),
-    heroHeadlineEn: J(L(fd, "heroHeadlineEn")),
-    heroHeadlineAr: J(L(fd, "heroHeadlineAr")),
-    heroDescription: S(fd, "heroDescription"),
-    heroDescriptionEn: S(fd, "heroDescriptionEn") || null,
-    heroDescriptionAr: S(fd, "heroDescriptionAr") || null,
-    heroCtaLabel: S(fd, "heroCtaLabel"),
-    heroCtaLabelEn: S(fd, "heroCtaLabelEn") || null,
-    heroCtaLabelAr: S(fd, "heroCtaLabelAr") || null,
-    heroReelLabel: S(fd, "heroReelLabel"),
-    heroReelLabelEn: S(fd, "heroReelLabelEn") || null,
-    heroReelLabelAr: S(fd, "heroReelLabelAr") || null,
     trustCaption: S(fd, "trustCaption"),
     trustCaptionEn: S(fd, "trustCaptionEn") || null,
     trustCaptionAr: S(fd, "trustCaptionAr") || null,

@@ -1,4 +1,4 @@
-import { Hero } from "@/components/home/Hero";
+import { HeroShowcase } from "@/components/home/HeroShowcase";
 import { TrustMarquee } from "@/components/home/TrustMarquee";
 import { Departments } from "@/components/home/Departments";
 import { FeaturedWork } from "@/components/home/FeaturedWork";
@@ -14,6 +14,7 @@ import {
   getHomePage,
   getContactPage,
   getCategories,
+  getHeroShowcase,
 } from "@/lib/queries";
 import { getLocale } from "@/lib/get-locale";
 import { tr } from "@/lib/i18n";
@@ -27,7 +28,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function HomePage() {
   const locale = await getLocale();
-  const [projects, stats, testimonials, clients, content, contact, departments] = await Promise.all([
+  const [projects, stats, testimonials, clients, content, contact, departments, showcase] = await Promise.all([
     getFeaturedProjects(7),
     getStats(),
     getFeaturedTestimonials(),
@@ -35,6 +36,7 @@ export default async function HomePage() {
     getHomePage(locale),
     getContactPage(locale),
     getCategories("DEPARTMENT"),
+    getHeroShowcase(locale),
   ]);
 
   const statData = stats.map((s) => ({ label: tr(locale, s.label, s.labelEn, s.labelAr), value: s.value, suffix: s.suffix }));
@@ -50,7 +52,7 @@ export default async function HomePage() {
 
   return (
     <>
-      <Hero stats={statData} content={content} locale={locale} />
+      <HeroShowcase slides={showcase} locale={locale} />
       <TrustMarquee clients={clients.map((c) => ({ name: tr(locale, c.name, c.nameEn, c.nameEn) }))} caption={content.trustCaption} />
       <Departments content={content} departments={departments} locale={locale} />
       <FeaturedWork projects={projects} content={content} locale={locale} />

@@ -58,6 +58,9 @@ export const UI = {
     navJournal: "ژورنال",
     navContact: "تماس",
     ctaStartProject: "شروع پروژه",
+    // Prefixes the department name on the homepage hero button, e.g.
+    // "خدمات عکاسی و تصویربرداری". Overridden per slide from the CMS.
+    heroShowcaseCta: "خدمات",
     ctaRequestConsult: "درخواست مشاوره",
     ctaWatchReel: "تماشای شوریل ۲۰۲۵",
     footerFollowUs: "ما را دنبال کنید",
@@ -135,6 +138,7 @@ export const UI = {
     navJournal: "Journal",
     navContact: "Contact",
     ctaStartProject: "Start a Project",
+    heroShowcaseCta: "Explore",
     ctaRequestConsult: "Request a Consultation",
     ctaWatchReel: "Watch 2025 Reel",
     footerFollowUs: "Follow us",
@@ -212,6 +216,7 @@ export const UI = {
     navJournal: "المدونة",
     navContact: "تواصل معنا",
     ctaStartProject: "ابدأ مشروعك",
+    heroShowcaseCta: "خدمات",
     ctaRequestConsult: "اطلب استشارة",
     ctaWatchReel: "شاهد عرض ٢٠٢٥",
     footerFollowUs: "تابعنا",

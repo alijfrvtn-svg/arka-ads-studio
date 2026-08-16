@@ -25,6 +25,25 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizePackageImports: ["lucide-react", "framer-motion"],
   },
+  /**
+   * The four original service pages were broad SEO landing pages; the service
+   * list is now 28 focused pages under four departments. These are permanent
+   * moves, not deletions — each old URL is indexed and has whatever authority it
+   * earned, so it is 301'd to the new page closest to its topic rather than
+   * left to 404. Keep in sync with RETIRED in prisma/seed-services.ts.
+   *
+   * `statusCode: 301` rather than `permanent: true`, which emits 308. The two
+   * are equivalent to Google, but 301 is the code every other crawler, log
+   * pipeline and CDN in the stack already understands.
+   */
+  async redirects() {
+    return [
+      { source: "/services/branding-and-digital-marketing-services", destination: "/services/digital-strategy", statusCode: 301 },
+      { source: "/services/web-design-and-seo-services", destination: "/services/web-development", statusCode: 301 },
+      { source: "/services/graphic-design-logo-visual-identity", destination: "/services/logo-design", statusCode: 301 },
+      { source: "/services/content-creation-and-social-media-management", destination: "/services/social-media-management", statusCode: 301 },
+    ];
+  },
 };
 
 export default nextConfig;

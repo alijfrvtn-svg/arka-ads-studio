@@ -139,12 +139,9 @@ export function SiteFooter({
                 {navLabel(n.href)}
               </Link>
             ))}
-            <Link
-              href="/admin"
-              className="inline-flex min-h-11 items-center px-1 hover:text-foreground"
-            >
-              {t.footerAdminLogin}
-            </Link>
+            {/* The CMS link is deliberately gone. /admin is reached through the
+                secret entry route in middleware.ts (ADMIN_ACCESS_PATH), so the
+                public site advertises no way in at all. */}
           </div>
         </div>
       </div>

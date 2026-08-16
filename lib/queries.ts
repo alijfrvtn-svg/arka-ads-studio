@@ -1,7 +1,7 @@
 import { db } from "./db";
 import { parseArr } from "./utils";
 import { SAMPLE } from "./media";
-import { tr, trArr } from "./i18n";
+import { tr, trArr, ui } from "./i18n";
 import { DEPARTMENTS, WORK_CATEGORIES, WORK_CATEGORY_LABELS } from "./constants";
 import type { Locale } from "@/types";
 
@@ -751,4 +751,73 @@ export async function getContactPage(locale: Locale = "fa"): Promise<ContactCont
       ? tr(locale, row.metaDescription, row.metaDescriptionEn, row.metaDescriptionAr)
       : CONTACT_DEFAULTS_BY_LOCALE[locale].metaDescription,
   };
+}
+
+/* ============================================================
+   Homepage showcase hero
+   ============================================================ */
+
+export interface ShowcaseSlideCopy {
+  department: string;
+  title: string;
+  tagline: string;
+  ctaLabel: string;
+  ctaHref: string;
+}
+
+/**
+ * The four department slides for the homepage hero, each carrying its seven
+ * published services as cards.
+ *
+ * Copy comes from HomePage.heroShowcase when an admin has written it, and falls
+ * back per-field to the department's own title/desc — so a half-filled row still
+ * renders a complete slide rather than a blank one.
+ *
+ * Card artwork is each service's `cover`, deliberately not a separate hero
+ * image field: one upload point means the hero cannot drift out of sync with
+ * the catalogue, and a service without a cover yet renders a labelled
+ * placeholder instead of a hole.
+ *
+ * A department with no published services is dropped — an empty deck under a
+ * heading looks broken, and this is the homepage.
+ */
+export async function getHeroShowcase(locale: Locale = "fa") {
+  const [row, services, departments] = await Promise.all([
+    db.homePage.findUnique({ where: { id: "home" }, select: { heroShowcase: true, heroShowcaseEn: true, heroShowcaseAr: true } }),
+    db.service.findMany({
+      where: { published: true },
+      orderBy: { order: "asc" },
+      select: { slug: true, title: true, titleEn: true, titleAr: true, cover: true, department: true },
+    }),
+    getCategories("DEPARTMENT"),
+  ]);
+
+  const copy = trArr<ShowcaseSlideCopy>(locale, row?.heroShowcase ?? "[]", row?.heroShowcaseEn, row?.heroShowcaseAr);
+  const byDept = new Map<string, typeof services>();
+  for (const s of services) {
+    const list = byDept.get(s.department) ?? [];
+    list.push(s);
+    byDept.set(s.department, list);
+  }
+
+  return departments
+    .map((d) => {
+      const cards = (byDept.get(d.slug) ?? []).slice(0, 7);
+      if (!cards.length) return null;
+      const written = copy.find((c) => c.department === d.slug);
+      const name = tr(locale, d.title, d.titleEn, d.titleAr);
+      return {
+        department: d.slug,
+        title: written?.title?.trim() || name,
+        tagline: written?.tagline?.trim() || tr(locale, d.desc ?? "", d.descEn, d.descAr),
+        ctaLabel: written?.ctaLabel?.trim() || `${ui(locale).heroShowcaseCta} ${name}`,
+        ctaHref: written?.ctaHref?.trim() || "/services",
+        cards: cards.map((s) => ({
+          slug: s.slug,
+          title: tr(locale, s.title, s.titleEn, s.titleAr),
+          image: s.cover || null,
+        })),
+      };
+    })
+    .filter((s): s is NonNullable<typeof s> => s !== null);
 }

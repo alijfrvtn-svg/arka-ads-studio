@@ -57,50 +57,60 @@ export interface DepartmentDef {
   accent: string;
 }
 
+/**
+ * The four service departments.
+ *
+ * Order is meaningful: it is the order the homepage hero steps through, and it
+ * matches the four blocks of seven services below. The `key` values are the
+ * original enum strings (FILM/DIGITAL/DESIGN/STRATEGY) and are deliberately
+ * left alone — every Service row stores one, so renaming a key would orphan
+ * the lot. Only the labels moved, to describe what each department actually
+ * contains: FILM is photography, DIGITAL is web and SEO.
+ */
 export const DEPARTMENTS: DepartmentDef[] = [
   {
+    key: "DESIGN",
+    title: "برندینگ و طراحی گرافیک",
+    titleEn: "Branding & Graphic Design",
+    titleAr: "العلامة التجارية والتصميم الجرافيكي",
+    desc: "لوگو، تایپوگرافی، هویت بصری، کتاب برند و طراحی بسته‌بندی و تبلیغات.",
+    descEn: "Logo, typography, visual identity, brand book, packaging and advertising design.",
+    descAr: "الشعار، الطباعة، الهوية البصرية، دليل العلامة، التغليف وتصميم الإعلانات.",
+    icon: "Palette",
+    accent: "#111111",
+  },
+  {
     key: "FILM",
-    title: "فیلم و پروداکشن",
-    titleEn: "Film & Production",
-    titleAr: "الأفلام والإنتاج",
-    desc: "تیزر تبلیغاتی، فیلم صنعتی، موشن‌گرافیک و CGI سینمایی.",
-    descEn: "Ad films, industrial documentaries, motion graphics and cinematic CGI.",
-    descAr: "أفلام إعلانية، أفلام صناعية، موشن غرافيك ومؤثرات CGI سينمائية.",
-    icon: "Clapperboard",
-    accent: "#6699ff",
+    title: "عکاسی و تصویربرداری",
+    titleEn: "Photography & Imaging",
+    titleAr: "التصوير الفوتوغرافي",
+    desc: "عکاسی محصول، صنعتی، تبلیغاتی، لایف‌استایل، غذا، معماری و پرتره سازمانی.",
+    descEn: "Product, industrial, advertising, lifestyle, food, architecture and corporate portrait photography.",
+    descAr: "تصوير المنتجات والصناعي والإعلاني ونمط الحياة والطعام والعمارة والبورتريه المؤسسي.",
+    icon: "Camera",
+    accent: "#111111",
   },
   {
     key: "DIGITAL",
-    title: "دیجیتال مارکتینگ",
-    titleEn: "Digital Marketing",
-    titleAr: "التسويق الرقمي",
-    desc: "پرفورمنس، سئو، کمپین داده‌محور و رشد پایدار برند.",
-    descEn: "Performance marketing, SEO, data-driven campaigns and sustainable brand growth.",
-    descAr: "تسويق الأداء، تحسين محركات البحث، حملات قائمة على البيانات ونمو مستدام للعلامة.",
-    icon: "TrendingUp",
-    accent: "#a6c9ff",
-  },
-  {
-    key: "DESIGN",
-    title: "برندینگ و طراحی",
-    titleEn: "Branding & Design",
-    titleAr: "العلامة التجارية والتصميم",
-    desc: "هویت بصری، طراحی وب‌سایت و تجربه کاربری لوکس.",
-    descEn: "Visual identity, website design and a luxury user experience.",
-    descAr: "هوية بصرية، تصميم مواقع وتجربة مستخدم فاخرة.",
-    icon: "Palette",
-    accent: "#7aa6ff",
+    title: "طراحی وب و سئو",
+    titleEn: "Web Design & SEO",
+    titleAr: "تصميم الويب وتحسين محركات البحث",
+    desc: "رابط و تجربه کاربری، توسعه وب‌سایت و سئوی تکنیکال، محتوایی و محلی.",
+    descEn: "UI and UX design, web development, and technical, content and local SEO.",
+    descAr: "تصميم واجهة وتجربة المستخدم، تطوير المواقع، والسيو التقني والمحتوائي والمحلي.",
+    icon: "Monitor",
+    accent: "#111111",
   },
   {
     key: "STRATEGY",
-    title: "استراتژی و محتوا",
-    titleEn: "Strategy & Content",
-    titleAr: "الاستراتيجية والمحتوى",
-    desc: "پوزیشنینگ، استوری‌تلینگ برند و تولید محتوای هدفمند.",
-    descEn: "Positioning, brand storytelling and purposeful content production.",
-    descAr: "تحديد الموقع التنافسي، سرد قصة العلامة وإنتاج محتوى هادف.",
-    icon: "Target",
-    accent: "#d3ebfe",
+    title: "مارکتینگ و استراتژی محتوا",
+    titleEn: "Marketing & Content Strategy",
+    titleAr: "التسويق واستراتيجية المحتوى",
+    desc: "استراتژی دیجیتال، مدیریت شبکه‌های اجتماعی، کپی‌رایتینگ، کمپین و پرفورمنس.",
+    descEn: "Digital strategy, social media management, copywriting, campaigns and performance marketing.",
+    descAr: "الاستراتيجية الرقمية، إدارة وسائل التواصل، كتابة المحتوى، الحملات وتسويق الأداء.",
+    icon: "TrendingUp",
+    accent: "#111111",
   },
 ];
 

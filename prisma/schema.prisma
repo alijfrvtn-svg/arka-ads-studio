@@ -463,6 +463,15 @@ model HomePage {
   heroSlidesAr                   String? // JSON, same shape
   heroSlideDuration              Int      @default(6) // seconds per slide before auto-advance
   heroScrollLength               Int      @default(640) // vh of scroll runway for the scroll-driven modes
+  /// Copy for the four department slides in the showcase hero:
+  /// JSON [{department,title,tagline,ctaLabel,ctaHref}]. The seven cards on each
+  /// slide are NOT stored here — they are the department's published services,
+  /// and each card's artwork is that service's own `cover`. One image, edited in
+  /// one place, so the hero can never drift out of sync with the catalogue.
+  /// Empty falls back to the department's own title/desc (lib/constants.ts).
+  heroShowcase                   String   @default("[]")
+  heroShowcaseEn                 String? // JSON, same shape
+  heroShowcaseAr                 String? // JSON, same shape
   heroBadge                      String   @default("استودیوی خلاقیت، پروداکشن و دیجیتال مارکتینگ")
   heroBadgeEn                    String?
   heroBadgeAr                    String?
