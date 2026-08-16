@@ -105,7 +105,7 @@ export function HeroScrollVideo({
         )}
       >
         {!content.heroMedia ? (
-          <div className="absolute inset-0 reel-bg opacity-60" />
+          <div className="absolute inset-0 reel-bg opacity-70" />
         ) : embedded ? (
           // An Aparat/YouTube clip plays inside a third-party iframe we cannot
           // seek, so scroll-scrubbing is impossible for it. Rather than show a
@@ -162,7 +162,7 @@ export function HeroScrollVideo({
               {ui(locale).scrollHint}
             </div>
             <div
-              className="absolute bottom-0 left-0 z-20 h-0.5 bg-primary"
+              className="absolute bottom-0 left-0 z-20 h-0.5 bg-foreground"
               style={{ width: `${(progress * 100).toFixed(2)}%` }}
               aria-hidden
             />

@@ -63,7 +63,7 @@ export function SearchResults({
                 i === activeIndex ? "bg-card-hover" : "hover:bg-card-hover",
               )}
             >
-              <span className="grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-lg border border-card-border bg-background/50 text-primary">
+              <span className="grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-lg border border-card-border bg-surface-2 text-foreground">
                 {h.image ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={h.image} alt="" className="h-full w-full object-cover" />

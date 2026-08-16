@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Vazirmatn, Syne } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
-import { AccentProvider } from "@/components/theme/AccentProvider";
+import { GlassFilters } from "@/components/fx/GlassFilters";
 import { SITE } from "@/lib/constants";
 import { organizationJsonLd } from "@/lib/seo";
 import { getContactPage } from "@/lib/queries";
@@ -51,24 +51,25 @@ export const metadata: Metadata = {
   verification: { google: "ayWrAgIiSbeyN0W6I9VUoW-pcLxNN-sUSPoxDS_azeg" },
 };
 
+// The public site is paper white and has no second theme to announce.
 export const viewport: Viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: dark)", color: "#04060d" },
-    { media: "(prefers-color-scheme: light)", color: "#f5f8fe" },
-  ],
+  themeColor: "#ffffff",
 };
 
-// Prevent theme flash: set the class before first paint.
+// The public site has exactly one appearance — white — so there is no theme to
+// restore and no flash to prevent: no class on <html> means the whitespace
+// tokens in :root apply, and that is the only look the site has.
 //
-// The identity colour deliberately is NOT restored here: every visit opens on
-// the brand blue and the 30-second cycle takes over from there (see
-// AccentProvider). Painting a mid-cycle colour before the page has rendered
-// would make the site look like it has a different brand each time you arrive.
+// The CMS (/admin, /portal) is the one place that still owns a dark/light
+// switch, so the pre-paint restore is scoped to those routes. It runs before
+// first paint to stop the panel flashing the wrong theme on load.
 const themeScript = `
-(function(){try{var t=localStorage.getItem('arka-theme');
+(function(){try{var e=document.documentElement;
+if(!/^\\/(admin|portal)(\\/|$)/.test(location.pathname)){e.classList.remove('light','dark');e.style.colorScheme='light';return;}
+var t=localStorage.getItem('arka-theme');
 if(t!=='light'&&t!=='dark'){t=window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark';}
-var e=document.documentElement;e.classList.remove('light','dark');e.classList.add(t);e.style.colorScheme=t;
-}catch(e){document.documentElement.classList.add('dark');}})();
+e.classList.remove('light','dark');e.classList.add(t);e.style.colorScheme=t;
+}catch(e){}})();
 `;
 
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
@@ -80,9 +81,8 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body className="font-sans antialiased">
-        <ThemeProvider>
-          <AccentProvider>{children}</AccentProvider>
-        </ThemeProvider>
+        <ThemeProvider>{children}</ThemeProvider>
+        <GlassFilters />
         <div className="global-grain" aria-hidden />
         <script
           type="application/ld+json"

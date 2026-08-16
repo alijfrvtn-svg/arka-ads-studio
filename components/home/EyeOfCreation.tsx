@@ -5,7 +5,6 @@ import { Cormorant_Garamond, Space_Grotesk, IBM_Plex_Mono } from "next/font/goog
 import { ArrowUpLeft, Play } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Magnetic } from "@/components/fx/Magnetic";
-import { useTheme } from "@/components/theme/ThemeProvider";
 import { ui } from "@/lib/i18n";
 import type { HomeContent } from "@/lib/queries";
 import type { Locale } from "@/types";
@@ -32,46 +31,32 @@ const LENGTH_VH: Record<Length, number> = { compact: 440, standard: 640, epic: 9
  * unlike the original (which read document.documentElement.scrollHeight),
  * so it behaves as one hero section among others, not a whole-page takeover.
  */
-function computeVals(p: number, showScrollHint: boolean, isLight: boolean) {
+function computeVals(p: number, showScrollHint: boolean) {
   const clamp = (v: number, a: number, b: number) => Math.max(a, Math.min(b, v));
   const rng = (x: number, a: number, b: number) => clamp((x - a) / (b - a), 0, 1);
   const sm = (t: number) => t * t * (3 - 2 * t);
   const seg = (x: number, a: number, b: number) => sm(rng(x, a, b));
   const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
-  // The lens/tunnel/panels are treated as "hardware" (a camera lens is dark
-  // glass regardless of room light) and stay constant; only the surrounding
-  // stage + finale text — which read as page chrome, not a physical object —
-  // swap with the site's light/dark theme.
-  const stage = isLight
-    ? {
-        bg: "var(--eoc-light-1)",
-        radial: "radial-gradient(120% 120% at 50% 46%, #ffffff 0%, var(--eoc-light-2) 45%, var(--eoc-light-3) 100%)",
-        vignette: "radial-gradient(70% 70% at 50% 48%, transparent 40%, rgba(var(--eoc-light-ink), 0.12) 100%)",
-        floodBg:
-          "radial-gradient(60% 100% at 50% 50%, rgba(255,255,255,0.92) 0%, rgba(var(--eoc-accent), 0.65) 30%, rgba(var(--eoc-accent), 0.3) 55%, transparent 78%), linear-gradient(120deg, transparent 20%, rgba(var(--eoc-deep), 0.18) 48%, transparent 62%)",
-        logoColor: "rgb(var(--eoc-light-ink))",
-        logoShadow: "0 2px 30px rgba(var(--eoc-deep), 0.18)",
-        taglineColor: "rgba(var(--eoc-deep), 0.85)",
-        servicesColor: "rgba(var(--eoc-light-ink), 0.55)",
-        hintColor: "rgba(var(--eoc-light-ink), 0.55)",
-        progressGrad: "linear-gradient(90deg, rgba(var(--eoc-deep), 0.35), rgb(var(--eoc-deep)))",
-        progressGlow: "0 0 10px rgba(var(--eoc-deep), 0.4)",
-      }
-    : {
-        bg: "#050506",
-        radial: "radial-gradient(120% 120% at 50% 46%, #0b0b0f 0%, #060608 45%, #030304 100%)",
-        vignette: "radial-gradient(70% 70% at 50% 48%, transparent 40%, rgba(0,0,0,0.55) 100%)",
-        floodBg:
-          "radial-gradient(60% 100% at 50% 50%, rgba(255,250,240,0.98) 0%, rgba(var(--eoc-accent), 0.85) 30%, rgba(var(--eoc-accent), 0.4) 55%, transparent 78%), linear-gradient(120deg, transparent 20%, rgba(255,240,214,0.5) 48%, transparent 62%)",
-        logoColor: "#f6efe2",
-        logoShadow: "0 2px 40px rgba(var(--eoc-accent), 0.25)",
-        taglineColor: "rgba(var(--eoc-accent), 0.9)",
-        servicesColor: "rgba(240,232,218,0.55)",
-        hintColor: "rgba(230,225,215,0.6)",
-        progressGrad: "linear-gradient(90deg, rgba(var(--eoc-accent), 0.5), rgb(var(--eoc-accent)))",
-        progressGlow: "0 0 10px rgba(var(--eoc-accent), 0.6)",
-      };
+  // The lens/tunnel/panels are treated as "hardware" — a camera lens is dark
+  // glass regardless of room light — so they stay dark on the white stage; the
+  // contrast between the two is what makes the object read as a physical thing
+  // sitting on paper. There is only one stage now: the site has a single
+  // appearance, so the old dark variant is gone rather than unreachable.
+  const stage = {
+    bg: "var(--eoc-light-1)",
+    radial: "radial-gradient(120% 120% at 50% 46%, #ffffff 0%, var(--eoc-light-2) 45%, var(--eoc-light-3) 100%)",
+    vignette: "radial-gradient(70% 70% at 50% 48%, transparent 40%, rgba(var(--eoc-light-ink), 0.12) 100%)",
+    floodBg:
+      "radial-gradient(60% 100% at 50% 50%, rgba(255,255,255,0.94) 0%, rgba(var(--eoc-accent), 0.5) 30%, rgba(var(--eoc-accent), 0.22) 55%, transparent 78%), linear-gradient(120deg, transparent 20%, rgba(var(--eoc-deep), 0.14) 48%, transparent 62%)",
+    logoColor: "rgb(var(--eoc-light-ink))",
+    logoShadow: "0 2px 30px rgba(var(--eoc-deep), 0.16)",
+    taglineColor: "rgba(var(--eoc-deep), 0.85)",
+    servicesColor: "rgba(var(--eoc-light-ink), 0.55)",
+    hintColor: "rgba(var(--eoc-light-ink), 0.55)",
+    progressGrad: "linear-gradient(90deg, rgba(var(--eoc-deep), 0.3), rgb(var(--eoc-deep)))",
+    progressGlow: "0 0 10px rgba(var(--eoc-deep), 0.35)",
+  };
 
   let phaseLabel = "Silhouette";
   if (p >= 0.9) phaseLabel = "Finale";
@@ -98,7 +83,7 @@ function computeVals(p: number, showScrollHint: boolean, isLight: boolean) {
     position: "absolute", left: "50%", top: "50%", width: "58vh", height: "58vh",
     marginLeft: "-29vh", marginTop: "-29vh", borderRadius: "50%",
     transform: `rotate(${rotA.toFixed(1)}deg)`,
-    background: "repeating-conic-gradient(from 0deg, rgba(210,220,235,0.0) 0deg 4deg, rgba(210,220,235,0.5) 4deg 4.5deg)",
+    background: "repeating-conic-gradient(from 0deg, rgba(190,190,190,0.0) 0deg 4deg, rgba(190,190,190,0.5) 4deg 4.5deg)",
     WebkitMask: "radial-gradient(circle, transparent 26vh, #000 26vh, #000 29vh, transparent 29vh)",
     mask: "radial-gradient(circle, transparent 26vh, #000 26vh, #000 29vh, transparent 29vh)",
     opacity: 0.4 + ringGlow * 0.6,
@@ -289,7 +274,7 @@ function computeVals(p: number, showScrollHint: boolean, isLight: boolean) {
   const flashStyle: CSSProperties = {
     position: "absolute", left: "50%", top: "32%", width: "80%", height: "80%",
     marginLeft: "-40%", borderRadius: "50%",
-    background: "radial-gradient(circle, rgba(255,252,245,0.95) 0%, rgba(255,238,214,0.45) 26%, transparent 60%)",
+    background: "radial-gradient(circle, rgba(255,255,255,0.95) 0%, rgba(225,225,225,0.45) 26%, transparent 60%)",
     transform: `scale(${(0.5 + flash * 1.1).toFixed(2)})`,
     opacity: flash * 0.95, pointerEvents: "none",
   };
@@ -366,7 +351,6 @@ export function EyeOfCreation({
   const scaffoldRef = useRef<HTMLDivElement>(null);
   const [progress, setProgress] = useState(0);
   const ticking = useRef(false);
-  const { theme } = useTheme();
 
   // Desktop-only: below the `lg` breakpoint this component is hidden by its
   // wrapper (see Hero.tsx), so skip the scroll math entirely rather than
@@ -415,7 +399,7 @@ export function EyeOfCreation({
     };
   }, []);
 
-  const v = computeVals(progress, showScrollHint, theme === "light");
+  const v = computeVals(progress, showScrollHint);
   const labelStyle: CSSProperties = { fontFamily: FONT_DISPLAY, letterSpacing: "0.28em", color: "rgb(var(--eoc-soft))" };
   const logoImg = (
     <div style={{ position: "absolute", inset: 0, borderRadius: "50%", background: "radial-gradient(circle, rgba(var(--eoc-soft), 0.20) 0%, transparent 66%)", filter: "blur(4px)" }} />
@@ -437,7 +421,7 @@ export function EyeOfCreation({
           <div style={{ position: "absolute", left: "22%", top: "34%", width: 3, height: 3, borderRadius: "50%", background: "rgba(var(--eoc-accent), 0.5)", filter: "blur(0.4px)", animation: "eoc-drift1 13s ease-in-out infinite" }} />
           <div style={{ position: "absolute", left: "70%", top: "28%", width: 2, height: 2, borderRadius: "50%", background: "rgba(var(--eoc-sky-2), 0.5)", animation: "eoc-drift2 17s ease-in-out infinite" }} />
           <div style={{ position: "absolute", left: "58%", top: "62%", width: 2.5, height: 2.5, borderRadius: "50%", background: "rgba(var(--eoc-accent), 0.4)", animation: "eoc-drift1 19s ease-in-out infinite" }} />
-          <div style={{ position: "absolute", left: "33%", top: "70%", width: 2, height: 2, borderRadius: "50%", background: "rgba(255,240,220,0.5)", animation: "eoc-drift2 15s ease-in-out infinite" }} />
+          <div style={{ position: "absolute", left: "33%", top: "70%", width: 2, height: 2, borderRadius: "50%", background: "rgba(235,235,235,0.5)", animation: "eoc-drift2 15s ease-in-out infinite" }} />
           <div style={{ position: "absolute", left: "80%", top: "58%", width: 2, height: 2, borderRadius: "50%", background: "rgba(var(--eoc-sky-2), 0.4)", animation: "eoc-drift1 21s ease-in-out infinite" }} />
         </div>
 
@@ -463,12 +447,12 @@ export function EyeOfCreation({
 
         {/* ===== THE LENS ===== */}
         <div style={v.lensGroupStyle}>
-          <div style={{ position: "absolute", left: "50%", top: "50%", width: "74vh", height: "74vh", marginLeft: "-37vh", marginTop: "-37vh", borderRadius: "50%", background: "radial-gradient(circle at 42% 36%, #1c1c22 0%, #0d0d11 55%, #050506 100%)", boxShadow: "inset 0 0 0 2px rgba(30,30,36,0.9), inset -14px -18px 60px rgba(0,0,0,0.9), inset 12px 10px 44px rgba(70,70,84,0.12)" }} />
+          <div style={{ position: "absolute", left: "50%", top: "50%", width: "74vh", height: "74vh", marginLeft: "-37vh", marginTop: "-37vh", borderRadius: "50%", background: "radial-gradient(circle at 42% 36%, #1e1e1e 0%, #0e0e0e 55%, #050505 100%)", boxShadow: "inset 0 0 0 2px rgba(32,32,32,0.9), inset -14px -18px 60px rgba(0,0,0,0.9), inset 12px 10px 44px rgba(78,78,78,0.12)" }} />
           <div style={v.rimStyle} />
-          <div style={{ position: "absolute", left: "50%", top: "50%", width: "64vh", height: "64vh", marginLeft: "-32vh", marginTop: "-32vh", borderRadius: "50%", background: "conic-gradient(from 0deg, #131317, #23232b, #131317, #26262f, #131317, #23232b, #131317, #26262f, #131317)", boxShadow: "inset 0 0 24px rgba(0,0,0,0.85)" }} />
+          <div style={{ position: "absolute", left: "50%", top: "50%", width: "64vh", height: "64vh", marginLeft: "-32vh", marginTop: "-32vh", borderRadius: "50%", background: "conic-gradient(from 0deg, #151515, #262626, #151515, #2b2b2b, #151515, #262626, #151515, #2b2b2b, #151515)", boxShadow: "inset 0 0 24px rgba(0,0,0,0.85)" }} />
           <div style={v.focalRingAStyle} />
           <div style={v.focalRingBStyle} />
-          <div style={{ position: "absolute", left: "50%", top: "50%", width: "44vh", height: "44vh", marginLeft: "-22vh", marginTop: "-22vh", borderRadius: "50%", background: "radial-gradient(circle at 44% 40%, #16161c, #08080b 70%)", boxShadow: "inset 0 0 0 6px #0a0a0d, inset 0 0 30px rgba(0,0,0,0.9)" }} />
+          <div style={{ position: "absolute", left: "50%", top: "50%", width: "44vh", height: "44vh", marginLeft: "-22vh", marginTop: "-22vh", borderRadius: "50%", background: "radial-gradient(circle at 44% 40%, #181818, #090909 70%)", boxShadow: "inset 0 0 0 6px #0b0b0b, inset 0 0 30px rgba(0,0,0,0.9)" }} />
           <div style={v.glassStyle}>
             <div style={v.glassShimmerStyle} />
             <div dir="ltr" style={v.sloganStyle}>
@@ -517,12 +501,12 @@ export function EyeOfCreation({
             <div style={{ marginTop: 26 }}>
               {v.codeLines.map((ln) => (
                 <div key={ln.n} style={{ display: "flex", alignItems: "center", gap: 14, height: 24, overflow: "hidden" }}>
-                  <span style={{ color: "#33463f", fontSize: 13, width: 18, textAlign: "right", flex: "none" }}>{ln.n}</span>
+                  <span style={{ color: "#8a8a8a", fontSize: 13, width: 18, textAlign: "right", flex: "none" }}>{ln.n}</span>
                   <span style={ln.barStyle} />
                 </div>
               ))}
               <div style={{ display: "flex", alignItems: "center", gap: 14, height: 24 }}>
-                <span style={{ color: "#33463f", fontSize: 13, width: 18, textAlign: "right", flex: "none" }}>{v.cursorLineNum}</span>
+                <span style={{ color: "#8a8a8a", fontSize: 13, width: 18, textAlign: "right", flex: "none" }}>{v.cursorLineNum}</span>
                 <span style={{ display: "inline-block", width: 9, height: 16, background: "rgb(var(--eoc-primary))", animation: "eoc-cursor 1s step-end infinite" }} />
               </div>
             </div>
@@ -587,9 +571,9 @@ export function EyeOfCreation({
             </Magnetic>
             {onWatchReel && (
               <button onClick={onWatchReel} className="group inline-flex items-center gap-3 text-foreground">
-                <span className="relative grid h-14 w-14 place-items-center rounded-full border border-card-border bg-surface/60 backdrop-blur transition-colors group-hover:border-primary">
-                  <span className="absolute inset-0 animate-ping-slow rounded-full border border-primary/40" />
-                  <Play className="h-5 w-5 translate-x-0.5 fill-current text-primary" />
+                <span className="liquid liquid-clear relative grid h-14 w-14 place-items-center rounded-full">
+                  <span className="absolute inset-0 animate-ping-slow rounded-full border border-foreground/25" />
+                  <Play className="h-5 w-5 translate-x-0.5 fill-current text-foreground" />
                 </span>
                 <span className="text-sm font-medium">{content.heroReelLabel}</span>
               </button>

@@ -67,18 +67,18 @@ export function HeroCopy({
         <motion.div
           {...rise(0)}
           className={cn(
-            "mb-6 inline-flex items-center gap-2 rounded-full border border-card-border bg-surface/50 px-4 py-1.5 text-xs font-medium text-foreground-muted backdrop-blur",
+            "liquid-clear mb-7 inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-medium text-foreground-muted",
           )}
         >
-          <span className="relative flex h-2 w-2">
-            <span className="absolute inline-flex h-full w-full animate-ping-slow rounded-full bg-primary" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
+          <span className="relative flex h-1.5 w-1.5">
+            <span className="absolute inline-flex h-full w-full animate-ping-slow rounded-full bg-foreground" />
+            <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-foreground" />
           </span>
           {badge}
         </motion.div>
       )}
 
-      <h1 className="font-display break-words text-[11vw] font-extrabold leading-[1.15] tracking-tight sm:text-7xl sm:leading-[1.02] md:text-8xl lg:text-[7.5rem] lg:leading-[0.95]">
+      <h1 className="font-display break-words text-[11vw] font-extrabold leading-[1.12] tracking-[-0.03em] sm:text-7xl sm:leading-[1.02] md:text-8xl lg:text-[7.5rem] lg:leading-[0.95]">
         {headline.map((line, i) => (
           <motion.span
             key={`${line}-${i}`}
@@ -116,7 +116,7 @@ export function HeroCopy({
           {tags.map((t) => (
             <li
               key={t}
-              className="rounded-full border border-card-border bg-surface/40 px-3 py-1 text-xs text-foreground-muted backdrop-blur"
+              className="liquid-clear rounded-full px-3.5 py-1.5 text-xs text-foreground-muted"
             >
               {t}
             </li>
@@ -136,9 +136,9 @@ export function HeroCopy({
         </Magnetic>
         {onWatchReel && reelLabel && (
           <button onClick={onWatchReel} className="group inline-flex items-center gap-3 text-foreground">
-            <span className="relative grid h-14 w-14 place-items-center rounded-full border border-card-border bg-surface/50 backdrop-blur transition-colors group-hover:border-primary">
-              <span className="absolute inset-0 animate-ping-slow rounded-full border border-primary/40" />
-              <Play className="h-5 w-5 translate-x-0.5 fill-current text-primary" />
+            <span className="liquid liquid-clear relative grid h-14 w-14 place-items-center rounded-full">
+              <span className="absolute inset-0 animate-ping-slow rounded-full border border-foreground/25" />
+              <Play className="h-5 w-5 translate-x-0.5 fill-current text-foreground" />
             </span>
             <span className="text-sm font-medium">{reelLabel}</span>
           </button>
@@ -174,7 +174,7 @@ export function ScrollCue({ locale = "fa" }: { locale?: Locale }) {
     <div className="absolute bottom-8 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-2 md:flex">
       <span className="text-[10px] uppercase tracking-[0.3em] text-foreground-faint">{ui(locale).scrollHint}</span>
       <span className="h-10 w-px overflow-hidden bg-card-border">
-        <span className="block h-full w-full animate-scroll-line bg-primary" />
+        <span className="block h-full w-full animate-scroll-line bg-foreground" />
       </span>
     </div>
   );

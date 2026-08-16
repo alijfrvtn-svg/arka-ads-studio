@@ -12,7 +12,7 @@ export default function NotFound() {
         <p className="mt-2 text-foreground-muted">شاید صفحه جابه‌جا شده یا هرگز وجود نداشته است.</p>
         <Link
           href="/"
-          className="mt-8 inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3.5 font-semibold text-primary-foreground transition-transform hover:scale-[1.03]"
+          className="liquid liquid-ink mt-10 inline-flex items-center gap-2 rounded-full px-8 py-4 font-semibold"
         >
           بازگشت به خانه
         </Link>

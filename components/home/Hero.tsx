@@ -95,11 +95,11 @@ export function Hero({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] grid place-items-center bg-background/90 p-4 backdrop-blur-xl"
+            className="fixed inset-0 z-[100] grid place-items-center bg-background/85 p-4 backdrop-blur-2xl"
             onClick={() => setReel(false)}
           >
             <button
-              className="absolute right-6 top-6 grid h-12 w-12 place-items-center rounded-full border border-card-border text-foreground hover:border-primary"
+              className="liquid liquid-clear absolute right-6 top-6 grid h-12 w-12 place-items-center rounded-full text-foreground"
               onClick={() => setReel(false)}
               aria-label={locale === "en" ? "Close" : locale === "ar" ? "إغلاق" : "بستن"}
             >
@@ -110,7 +110,7 @@ export function Hero({
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.94, opacity: 0 }}
               transition={{ ease: EASE, duration: 0.35 }}
-              className="aspect-video w-full max-w-5xl overflow-hidden rounded-2xl border border-card-border shadow-2xl"
+              className="aspect-video w-full max-w-5xl overflow-hidden rounded-[1.75rem] border border-card-border shadow-[0_2px_8px_rgba(0,0,0,0.08),0_40px_90px_-30px_rgba(0,0,0,0.45)]"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Aparat/YouTube page links are embedded; a direct file plays inline. */}

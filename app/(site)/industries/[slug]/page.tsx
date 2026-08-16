@@ -85,11 +85,11 @@ export default async function IndustryPage({ params }: { params: Promise<{ slug:
         <Section>
           <Container>
             <SectionHeading eyebrow={ui(locale).industryApproachEyebrow} title={c.approachTitle(title)} className="mb-12 max-w-3xl" />
-            <div className="grid gap-4 md:grid-cols-2">
+            <div className="grid gap-5 md:grid-cols-2">
               {approach.map((a, i) => (
                 <Reveal key={i} delay={i * 0.06}>
-                  <div className="flex items-start gap-4 rounded-2xl border border-card-border bg-surface p-6">
-                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-primary/15 font-bold text-primary">{i + 1}</span>
+                  <div className="flex h-full items-start gap-4 rounded-[1.5rem] border border-card-border bg-surface p-7">
+                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-foreground font-bold text-background">{i + 1}</span>
                     <p className="text-foreground">{a}</p>
                   </div>
                 </Reveal>
@@ -104,7 +104,7 @@ export default async function IndustryPage({ params }: { params: Promise<{ slug:
         <Section className="bg-background-2">
           <Container>
             <SectionHeading eyebrow={ui(locale).portfolioEyebrow} title={c.portfolioTitle(title)} className="mb-10" />
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {ind.projects.map((p) => <ProjectCard key={p.id} project={p} locale={locale} />)}
             </div>
           </Container>
@@ -114,13 +114,15 @@ export default async function IndustryPage({ params }: { params: Promise<{ slug:
       {/* cta */}
       <Section>
         <Container>
-          <div className="relative overflow-hidden rounded-3xl border border-card-border p-12 text-center">
-            <div className="reel-bg absolute inset-0 opacity-15" />
+          <div className="relative overflow-hidden rounded-[2.5rem] border border-card-border bg-surface-2 p-16 text-center">
+            <div className="absolute inset-0 dotgrid opacity-50" />
             <div className="relative">
-              <h2 className="font-display text-3xl font-extrabold text-foreground md:text-4xl">{c.ctaHeading(title)}</h2>
-              <p className="mx-auto mt-3 max-w-xl text-foreground-muted">{c.ctaBody}</p>
-              <Link href="/contact" className="mt-8 inline-flex items-center gap-2 rounded-full bg-primary px-8 py-4 font-semibold text-primary-foreground transition-transform hover:scale-[1.03]">
-                {c.ctaButton} <ArrowUpLeft className="h-5 w-5" />
+              <h2 className="font-display text-3xl font-extrabold tracking-[-0.03em] text-foreground md:text-4xl">{c.ctaHeading(title)}</h2>
+              <p className="mx-auto mt-4 max-w-xl text-foreground-muted">{c.ctaBody}</p>
+              <Link href="/contact" className="liquid liquid-ink mt-10 inline-flex items-center gap-2 rounded-full px-9 py-4 font-semibold">
+                <span className="inline-flex items-center gap-2">
+                  {c.ctaButton} <ArrowUpLeft className="h-5 w-5" />
+                </span>
               </Link>
             </div>
           </div>

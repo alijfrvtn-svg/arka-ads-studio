@@ -52,7 +52,7 @@ export function SiteSearch() {
       <button
         onClick={() => setOpen(true)}
         aria-label="جستجو در سایت"
-        className="grid h-11 w-11 place-items-center rounded-full border border-card-border bg-surface/60 text-foreground transition-colors hover:border-primary/50 hover:text-primary"
+        className="liquid liquid-clear grid h-11 w-11 place-items-center rounded-full text-foreground"
       >
         <Search className="h-[18px] w-[18px]" />
       </button>

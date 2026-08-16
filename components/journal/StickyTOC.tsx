@@ -34,7 +34,7 @@ export function StickyTOC({ items, locale = "fa" }: { items: { level: number; te
               href={`#${it.id}`}
               className={cn(
                 "block text-sm transition-colors",
-                active === it.id ? "font-semibold text-primary" : "text-foreground-muted hover:text-foreground",
+                active === it.id ? "font-semibold text-foreground" : "text-foreground-muted hover:text-foreground",
               )}
             >
               {it.text}

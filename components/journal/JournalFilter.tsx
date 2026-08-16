@@ -49,15 +49,17 @@ export function JournalFilter({
 
   return (
     <div>
-      <div className="sticky top-[72px] z-20 mb-10 border-y border-card-border bg-background/80 py-3 backdrop-blur-xl">
+      <div className="glass glass-strong sticky top-[72px] z-20 mb-14 rounded-none border-x-0 py-3.5">
         <div className="container-x flex gap-2 overflow-x-auto">
           {cats.map((c) => (
             <button
               key={c}
               onClick={() => setCat(c)}
               className={cn(
-                "inline-flex min-h-11 shrink-0 items-center rounded-full px-4 text-sm font-medium transition-colors",
-                cat === c ? "bg-primary text-primary-foreground" : "border border-card-border text-foreground-muted hover:text-foreground",
+                "inline-flex min-h-11 shrink-0 items-center rounded-full px-5 text-sm font-medium transition-all duration-500 [transition-timing-function:var(--ease-apple)]",
+                cat === c
+                  ? "bg-foreground text-background shadow-[0_1px_2px_rgba(0,0,0,0.18),0_10px_24px_-12px_rgba(0,0,0,0.4)]"
+                  : "border border-card-border text-foreground-muted hover:border-foreground/25 hover:text-foreground",
               )}
             >
               {c === ALL ? ui(locale).filterAll : tr(locale, labels.get(c)?.title ?? c, labels.get(c)?.titleEn, labels.get(c)?.titleAr)}
@@ -67,7 +69,7 @@ export function JournalFilter({
       </div>
 
       <div className="container-x">
-        <motion.div layout className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <motion.div layout className="grid gap-7 sm:grid-cols-2 lg:grid-cols-3">
           <AnimatePresence mode="popLayout">
             {list.map((p) => (
               <motion.article
@@ -78,14 +80,14 @@ export function JournalFilter({
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.35 }}
               >
-                <Link href={`/journal/${p.slug}`} className="group flex h-full flex-col overflow-hidden rounded-2xl border border-card-border bg-surface">
+                <Link href={`/journal/${p.slug}`} className="group flex h-full flex-col overflow-hidden rounded-[1.5rem] border border-card-border bg-surface transition-all duration-700 [transition-timing-function:var(--ease-apple)] hover:-translate-y-1.5 hover:border-foreground/25 hover:shadow-[0_1px_2px_rgba(0,0,0,0.04),0_28px_60px_-32px_rgba(0,0,0,0.35)]">
                   <div className="relative aspect-[16/10] overflow-hidden">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={p.cover} alt="" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
-                    <span className="absolute right-3 top-3 rounded-full bg-black/40 px-3 py-1 text-xs text-white backdrop-blur">{tr(locale, labels.get(p.category)?.title ?? p.category, labels.get(p.category)?.titleEn, labels.get(p.category)?.titleAr)}</span>
+                    <img src={p.cover} alt="" className="h-full w-full object-cover transition-all duration-[900ms] [transition-timing-function:var(--ease-apple)] group-hover:scale-[1.04]" />
+                    <span className="glass-onmedia absolute right-3 top-3 rounded-full px-3 py-1 text-xs">{tr(locale, labels.get(p.category)?.title ?? p.category, labels.get(p.category)?.titleEn, labels.get(p.category)?.titleAr)}</span>
                   </div>
-                  <div className="flex flex-1 flex-col p-5">
-                    <h3 className="font-display text-lg font-bold leading-snug text-foreground transition-colors group-hover:text-primary">{tr(locale, p.title, p.titleEn, p.titleAr)}</h3>
+                  <div className="flex flex-1 flex-col p-6">
+                    <h3 className="font-display text-lg font-bold leading-snug tracking-tight text-foreground">{tr(locale, p.title, p.titleEn, p.titleAr)}</h3>
                     <p className="mt-2 line-clamp-2 flex-1 text-sm text-foreground-muted">{tr(locale, p.excerpt, p.excerptEn, p.excerptAr)}</p>
                     <div className="mt-4 flex items-center gap-3 border-t border-card-border pt-3 text-xs text-foreground-faint">
                       <span className="flex items-center gap-1"><Clock className="h-3 w-3" /> {localeNumber(locale, p.readingMinutes)} {ui(locale).readingMinutesSuffix}</span>

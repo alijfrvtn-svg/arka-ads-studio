@@ -6,8 +6,9 @@ import { CheckCircle2, Loader2, Send } from "lucide-react";
 import { ui } from "@/lib/i18n";
 import type { Locale } from "@/types";
 
-const field = "peer h-14 w-full rounded-xl border border-card-border bg-surface px-4 pt-4 text-foreground outline-none transition-colors focus:border-primary placeholder-transparent";
-const lbl = "pointer-events-none absolute right-4 top-4 text-foreground-faint transition-all peer-focus:top-1.5 peer-focus:text-xs peer-focus:text-primary peer-[:not(:placeholder-shown)]:top-1.5 peer-[:not(:placeholder-shown)]:text-xs";
+const field =
+  "peer h-14 w-full rounded-[14px] border border-card-border bg-surface-2 px-4 pt-4 text-foreground outline-none transition-all duration-300 [transition-timing-function:var(--ease-apple)] focus:border-foreground focus:bg-background focus:shadow-[0_0_0_4px_rgba(0,0,0,0.05)] placeholder-transparent";
+const lbl = "pointer-events-none absolute right-4 top-4 text-foreground-faint transition-all peer-focus:top-1.5 peer-focus:text-xs peer-focus:text-foreground peer-[:not(:placeholder-shown)]:top-1.5 peer-[:not(:placeholder-shown)]:text-xs";
 
 export function ContactForm({
   serviceOptions,
@@ -52,8 +53,8 @@ export function ContactForm({
 
   if (done) {
     return (
-      <div className="flex flex-col items-center justify-center rounded-2xl border border-card-border bg-surface p-12 text-center">
-        <CheckCircle2 className="h-16 w-16 text-emerald-400" />
+      <div className="flex flex-col items-center justify-center rounded-[1.5rem] border border-card-border bg-surface-2 p-14 text-center">
+        <CheckCircle2 className="h-16 w-16 text-foreground" strokeWidth={1.25} />
         <h3 className="mt-5 font-display text-2xl font-bold text-foreground">{t.contactSuccessTitle}</h3>
         <p className="mt-2 text-foreground-muted">{t.contactSuccessBody}</p>
       </div>
@@ -83,11 +84,11 @@ export function ContactForm({
         </div>
       </div>
       <div className="grid gap-4 sm:grid-cols-2">
-        <select name="service" className="h-14 w-full rounded-xl border border-card-border bg-surface px-4 text-foreground outline-none focus:border-primary" defaultValue="">
+        <select name="service" className="h-14 w-full rounded-[14px] border border-card-border bg-surface-2 px-4 text-foreground outline-none transition-all duration-300 focus:border-foreground focus:bg-background focus:shadow-[0_0_0_4px_rgba(0,0,0,0.05)]" defaultValue="">
           <option value="" disabled>{t.contactServicePlaceholder}</option>
           {serviceOptions.map((s) => <option key={s} value={s}>{s}</option>)}
         </select>
-        <select name="budget" className="h-14 w-full rounded-xl border border-card-border bg-surface px-4 text-foreground outline-none focus:border-primary" defaultValue="">
+        <select name="budget" className="h-14 w-full rounded-[14px] border border-card-border bg-surface-2 px-4 text-foreground outline-none transition-all duration-300 focus:border-foreground focus:bg-background focus:shadow-[0_0_0_4px_rgba(0,0,0,0.05)]" defaultValue="">
           <option value="" disabled>{t.contactBudgetPlaceholder}</option>
           {budgetOptions.map((b) => <option key={b} value={b}>{b}</option>)}
         </select>
@@ -101,9 +102,15 @@ export function ContactForm({
         <label className={lbl}>{t.contactMessageLabel}</label>
       </div>
 
-      {error && <div className="rounded-xl border border-rose-500/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-400">{error}</div>}
+      {/* An error has no colour to shout with, so it shouts with ink: solid
+          black block, reversed-out text. */}
+      {error && (
+        <div role="alert" className="rounded-[14px] bg-foreground px-4 py-3 text-sm font-medium text-background">
+          {error}
+        </div>
+      )}
 
-      <button type="submit" disabled={loading} className="inline-flex h-14 w-full items-center justify-center gap-2 rounded-xl bg-primary font-semibold text-primary-foreground transition-all hover:brightness-110 disabled:opacity-60">
+      <button type="submit" disabled={loading} className="liquid liquid-ink inline-flex h-14 w-full items-center justify-center gap-2 rounded-[14px] font-semibold disabled:opacity-60">
         {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <><Send className="h-5 w-5" /> {t.contactSubmit}</>}
       </button>
     </form>

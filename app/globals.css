@@ -1,28 +1,53 @@
 @import "tailwindcss";
 
 /* ============================================================
-   ARKA — Design System
-   Swiss Modernist / Bauhaus · 8px grid · RTL-first · Dark/Light
-   Brand palette (from official brand sheet):
-     #162d73 navy · #6699ff azure · #a6c9ff sky · #d3ebfe mist
+   ARKA — Whitespace Design System
+   ------------------------------------------------------------
+   One theme. No dark/light switch, no identity colour cycle, no hue at all:
+   every value below is achromatic (R = G = B), so the site is built entirely
+   out of paper white, ink black and the grey ramp between them. Hierarchy that
+   used to be carried by colour is now carried by weight, size, opacity and —
+   above all — empty space.
+
+   Depth comes from glass instead of colour: translucent panels that blur and
+   refract whatever sits behind them, lit by a specular hairline along the top
+   edge (see the "Liquid glass" section).
+
+   The legacy .dark / .light token blocks are still here, but they are now only
+   ever applied to /admin and /portal (see the pre-paint script in
+   app/layout.tsx) so the CMS keeps rendering exactly as it did.
    ============================================================ */
 
+/* Still registered because the admin panel uses `dark:` utilities. */
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* ————— static brand tokens (identical in both themes) ————— */
+/* ————— static tokens ————— */
 @theme {
-  --color-navy: #162d73;
-  --color-navy-deep: #0b1a45;
-  --color-navy-ink: #04060d;
-  --color-azure: #6699ff;
-  --color-azure-bright: #7aa6ff;
-  --color-sky: #a6c9ff;
-  --color-mist: #d3ebfe;
+  /* Achromatic ramp — the entire palette of the public site. */
+  --color-paper: #ffffff;
+  --color-paper-2: #fbfbfb;
+  --color-paper-3: #f5f5f5;
+  --color-ash-100: #ededed;
+  --color-ash-200: #e2e2e2;
+  --color-ash-300: #cfcfcf;
+  --color-ash-400: #a8a8a8;
+  --color-ash-500: #8a8a8a;
+  --color-ash-600: #6b6b6b;
+  --color-ash-700: #4a4a4a;
+  --color-ash-800: #2c2c2c;
+  --color-ink: #111111;
+  --color-ink-black: #000000;
 
   --font-sans: var(--font-vazir), "Vazirmatn", ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-syne), "Syne", var(--font-vazir), sans-serif;
   --font-mono: ui-monospace, "SFMono-Regular", "Menlo", monospace;
 
+  /* Left at the project's original values on purpose. These feed every
+     `rounded-*` utility in the codebase — including ~160 of them inside
+     /admin — so widening the scale here to get softer public-site corners
+     would silently reshape the CMS too. The whitespace corner language is
+     expressed with explicit values at the call site instead
+     (rounded-[1.5rem], rounded-[2.5rem]). */
   --radius-xs: 6px;
   --radius-sm: 10px;
   --radius-md: 14px;
@@ -30,19 +55,127 @@
   --radius-xl: 28px;
   --radius-2xl: 36px;
 
-  /* Driven by --eoc-primary so a glowing button matches the active identity
-     colour instead of staying brand blue. */
-  --shadow-glow: 0 0 0 1px rgba(var(--eoc-primary), 0.14), 0 18px 60px -18px rgba(var(--eoc-primary), 0.5);
-  --shadow-card: 0 24px 60px -28px rgba(4, 8, 22, 0.65);
+  /* Elevation is grey, never tinted — a tinted shadow is a colour. */
+  --shadow-glow: 0 1px 2px rgba(0, 0, 0, 0.16), 0 18px 44px -20px rgba(0, 0, 0, 0.42);
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.04), 0 18px 50px -30px rgba(0, 0, 0, 0.28);
 
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+  /* Apple's house curve — used for anything that should feel like hardware. */
+  --ease-apple: cubic-bezier(0.28, 0.11, 0.32, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 
   --breakpoint-3xl: 1720px;
 }
 
-/* ————— semantic tokens · DARK (default, cinematic) ————— */
-:root,
+/* ————— semantic tokens · the public site ————— */
+:root {
+  --background: #ffffff;
+  --background-2: #fbfbfb;
+  --surface: #ffffff;
+  --surface-2: #f7f7f7;
+  --surface-3: #f0f0f0;
+  --card: #ffffff;
+  --card-border: rgba(0, 0, 0, 0.09);
+  --card-hover: rgba(0, 0, 0, 0.035);
+  /* The grey ramp IS the hierarchy here — with no hue to rank things by, these
+     three steps carry every level of emphasis on the site, so each one has to
+     stay readable rather than merely decorative. Contrast against the lightest
+     surface text ever sits on (--surface-2, #f7f7f7):
+       foreground        18.1:1   headings, emphasis
+       foreground-muted   7.1:1   body copy, eyebrows
+       foreground-faint   4.8:1   captions, meta, legal
+     All three clear WCAG AA (4.5:1) — the old #9a9a9a faint sat at 2.8:1, which
+     is where most of the small uppercase micro-type on the page lived. */
+  --foreground: #111111;
+  --foreground-muted: #545454;
+  --foreground-faint: #6e6e6e;
+
+  /* "primary" is now ink. Emphasis is the darkest thing on the page rather
+     than the most saturated one. */
+  --primary: #000000;
+  --primary-foreground: #ffffff;
+  --accent: #111111;
+  --accent-bright: #2c2c2c;
+  --accent-soft: #6b6b6b;
+  --ring: #000000;
+
+  --grid-line: rgba(0, 0, 0, 0.05);
+  --hairline: rgba(0, 0, 0, 0.09);
+
+  /* Liquid glass — light (clear) variant. */
+  --glass-bg: rgba(255, 255, 255, 0.62);
+  --glass-bg-strong: rgba(255, 255, 255, 0.82);
+  --glass-border: rgba(0, 0, 0, 0.08);
+  --glass-blur: 24px;
+  --glass-highlight: rgba(255, 255, 255, 0.95);
+  --glass-shade: rgba(0, 0, 0, 0.05);
+  --glass-shadow: 0 1px 1px rgba(0, 0, 0, 0.04), 0 10px 30px -12px rgba(0, 0, 0, 0.22);
+
+  /* Liquid glass — dark (ink) variant, used for primary actions. */
+  --glass-ink-bg: rgba(17, 17, 17, 0.86);
+  --glass-ink-border: rgba(255, 255, 255, 0.14);
+  --glass-ink-highlight: rgba(255, 255, 255, 0.4);
+  --glass-ink-shadow: 0 1px 2px rgba(0, 0, 0, 0.2), 0 14px 34px -14px rgba(0, 0, 0, 0.5);
+
+  --scrollbar-track: #ffffff;
+  --scrollbar-thumb: #d4d4d4;
+  --selection-bg: #111111;
+  --selection-fg: #ffffff;
+  color-scheme: light;
+}
+
+/* ============================================================
+   Eye of Creation stage palette (components/home/EyeOfCreation.tsx)
+   ------------------------------------------------------------
+   That hero paints ~90 colour literals through inline styles. Every stop is
+   now a grey, so the lens, beams and flood read as light and shadow instead of
+   brand blue. Kept as variables rather than inlined so the component keeps its
+   original shape.
+   ============================================================ */
+:root {
+  --eoc-primary: 17, 17, 17;
+  --eoc-accent: 90, 90, 90;
+  --eoc-soft: 200, 200, 200;
+  --eoc-glow: 150, 150, 150;
+  --eoc-glow-2: 120, 120, 120;
+  --eoc-beam: 190, 190, 190;
+  --eoc-sky-2: 180, 180, 180;
+  --eoc-sky-3: 198, 198, 198;
+  --eoc-sky-4: 210, 210, 210;
+  --eoc-glass: 150, 150, 150;
+  --eoc-glass-2: 140, 140, 140;
+  --eoc-glass-3: 180, 180, 180;
+  --eoc-deep: 34, 34, 34;
+  --eoc-navy: #2b2b2b;
+  --eoc-navy-deep: #1a1a1a;
+  --eoc-navy-mid: #3d3d3d;
+  --eoc-navy-ink: #141414;
+  --eoc-navy-panel: #1f1f1f;
+  --eoc-navy-sh: #171717;
+  --eoc-navy-sh-2: #1d1d1d;
+  --eoc-indigo: #4a4a4a;
+  --eoc-glass-bg: #242424;
+  --eoc-glass-ink: #0a0a0a;
+  --eoc-light-1: #ffffff;
+  --eoc-light-2: #f7f7f7;
+  --eoc-light-3: #ebebeb;
+  --eoc-bright: #3d3d3d;
+  --eoc-box-end: #5a5a5a;
+  --eoc-navy-darkest: #121212;
+  --eoc-royal: #383838;
+  --eoc-primary-c: #111111;
+  --eoc-accent-c: #6b6b6b;
+  --eoc-light-ink: 17, 17, 17;
+}
+
+/* ============================================================
+   Legacy CMS theme — /admin and /portal only
+   ------------------------------------------------------------
+   These are the pre-whitespace tokens, untouched. The pre-paint script only
+   puts .dark/.light on <html> for CMS routes, so the public site never sees
+   them; they sit after :root so they win wherever they are applied.
+   ============================================================ */
 .dark {
   --background: #04060d;
   --background-2: #070c1a;
@@ -58,15 +191,17 @@
   --primary: #6699ff;
   --primary-foreground: #04060d;
   --accent: #a6c9ff;
-  /* Gradient/glow stops. Default to the static brand tokens so the blue
-     identity is byte-identical to before; the accent switcher below swaps
-     only these, never the brand tokens themselves. */
-  --accent-bright: var(--color-azure-bright);
-  --accent-soft: var(--color-sky);
+  --accent-bright: #7aa6ff;
+  --accent-soft: #a6c9ff;
   --ring: #6699ff;
   --grid-line: rgba(255, 255, 255, 0.045);
+  --hairline: rgba(255, 255, 255, 0.08);
   --glass-bg: rgba(255, 255, 255, 0.04);
+  --glass-bg-strong: rgba(255, 255, 255, 0.08);
   --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-highlight: rgba(255, 255, 255, 0.18);
+  --glass-shade: rgba(0, 0, 0, 0.3);
+  --glass-shadow: 0 24px 60px -28px rgba(4, 8, 22, 0.65);
   --scrollbar-track: #04060d;
   --scrollbar-thumb: #1b2c58;
   --selection-bg: #6699ff;
@@ -74,7 +209,6 @@
   color-scheme: dark;
 }
 
-/* ————— semantic tokens · LIGHT ————— */
 .light {
   --background: #f5f8fe;
   --background-2: #eef3fc;
@@ -94,418 +228,18 @@
   --accent-soft: #162d73;
   --ring: #2b56d6;
   --grid-line: rgba(22, 45, 115, 0.07);
+  --hairline: rgba(22, 45, 115, 0.1);
   --glass-bg: rgba(255, 255, 255, 0.65);
+  --glass-bg-strong: rgba(255, 255, 255, 0.85);
   --glass-border: rgba(22, 45, 115, 0.12);
+  --glass-highlight: rgba(255, 255, 255, 0.9);
+  --glass-shade: rgba(22, 45, 115, 0.06);
+  --glass-shadow: 0 24px 60px -30px rgba(22, 45, 115, 0.35);
   --scrollbar-track: #e8eefb;
   --scrollbar-thumb: #b8c8ec;
   --selection-bg: #2b56d6;
   --selection-fg: #ffffff;
   color-scheme: light;
-}
-
-/* ============================================================
-   Identity cross-fade
-   ------------------------------------------------------------
-   The 30-second colour cycle swaps data-accent on <html>. Custom properties
-   cannot be transitioned directly (and registering them with @property made
-   Chrome refuse the cascade change outright), so instead the provider adds
-   `.accent-shifting` for the length of the fade and we transition the
-   *consuming* properties. The class is only present during the swap, so normal
-   hover timings are untouched the rest of the time.
-
-   stop-color is in the list on purpose: it is what fades the logo mark.
-   ============================================================ */
-html.accent-shifting,
-html.accent-shifting *,
-html.accent-shifting *::before,
-html.accent-shifting *::after {
-  transition-property: color, background-color, border-color, outline-color, fill, stroke,
-    stop-color, box-shadow, text-decoration-color !important;
-  transition-duration: 1800ms !important;
-  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1) !important;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  html.accent-shifting,
-  html.accent-shifting *,
-  html.accent-shifting *::before,
-  html.accent-shifting *::after {
-    transition-duration: 0.01ms !important;
-  }
-}
-
-/* ============================================================
-   Identity accent — visitor-selectable (components/theme/AccentProvider.tsx)
-   ------------------------------------------------------------
-   Set as data-accent on <html>. No attribute = the default ARKA blue, whose
-   values live untouched in the :root/.light blocks above — these rules only
-   ever add a *different* identity on top, so the brand default cannot drift.
-
-   Every hue is the brand blue rotated in OKLCH at identical lightness and
-   chroma, so all of them land at the same perceived punch and clear WCAG AA
-   on both backgrounds (verified 5.16:1 – 16.55:1; the weakest is green on
-   light, the rest sit well above). The `.light` pair carries higher
-   specificity, so it wins whenever the day theme is on.
-   ============================================================ */
-html[data-accent="red"] {
-  --primary: #ef6f68;
-  --accent: #fab2ab;
-  --accent-bright: #f3837b;
-  --accent-soft: #ffdfdb;
-  --ring: #ef6f68;
-  --selection-bg: #ef6f68;
-}
-html[data-accent="red"].light {
-  --primary: #bd061f;
-  --accent: #66090f;
-  --accent-bright: #bd061f;
-  --accent-soft: #66090f;
-  --ring: #bd061f;
-  --selection-bg: #bd061f;
-}
-
-html[data-accent="orange"] {
-  --primary: #e67d22;
-  --accent: #f3b992;
-  --accent-bright: #ea8e4a;
-  --accent-soft: #fbe2d1;
-  --ring: #e67d22;
-  --selection-bg: #e67d22;
-}
-html[data-accent="orange"].light {
-  --primary: #994d00;
-  --accent: #532700;
-  --accent-bright: #994d00;
-  --accent-soft: #532700;
-  --ring: #994d00;
-  --selection-bg: #994d00;
-}
-
-html[data-accent="yellow"] {
-  --primary: #b89a00;
-  --accent: #d8c787;
-  --accent-bright: #c3a629;
-  --accent-soft: #efe8cd;
-  --ring: #b89a00;
-  --selection-bg: #b89a00;
-}
-html[data-accent="yellow"].light {
-  --primary: #786300;
-  --accent: #403400;
-  --accent-bright: #786300;
-  --accent-soft: #403400;
-  --ring: #786300;
-  --selection-bg: #786300;
-}
-
-html[data-accent="green"] {
-  --primary: #48b760;
-  --accent: #a2d7a8;
-  --accent-bright: #65c075;
-  --accent-soft: #d8eeda;
-  --ring: #48b760;
-  --selection-bg: #48b760;
-}
-html[data-accent="green"].light {
-  --primary: #007a2e;
-  --accent: #004115;
-  --accent-bright: #007a2e;
-  --accent-soft: #004115;
-  --ring: #007a2e;
-  --selection-bg: #007a2e;
-}
-
-html[data-accent="purple"] {
-  --primary: #b480eb;
-  --accent: #d4baf4;
-  --accent-bright: #bc90ee;
-  --accent-soft: #ede2fb;
-  --ring: #b480eb;
-  --selection-bg: #b480eb;
-}
-html[data-accent="purple"].light {
-  --primary: #8137bf;
-  --accent: #441d66;
-  --accent-bright: #8137bf;
-  --accent-soft: #441d66;
-  --ring: #8137bf;
-  --selection-bg: #8137bf;
-}
-
-html[data-accent="pink"] {
-  --primary: #e46eaa;
-  --accent: #f3b1cf;
-  --accent-bright: #e882b4;
-  --accent-soft: #fbdeeb;
-  --ring: #e46eaa;
-  --selection-bg: #e46eaa;
-}
-html[data-accent="pink"].light {
-  --primary: #b01175;
-  --accent: #5f0b3d;
-  --accent-bright: #b01175;
-  --accent-soft: #5f0b3d;
-  --ring: #b01175;
-  --selection-bg: #b01175;
-}
-
-/* ------------------------------------------------------------
-   Eye of Creation stage palette (components/home/EyeOfCreation.tsx).
-   That hero paints ~90 colour literals through inline styles; exposing them
-   as variables lets the accent follow the visitor's choice without the
-   component re-rendering. The :root block below reproduces the original blue
-   values exactly, so the default identity is unchanged.
-   ------------------------------------------------------------ */
-:root {
-  --eoc-primary: 102, 153, 255;
-  --eoc-accent: 166, 201, 255;
-  --eoc-soft: 211, 235, 254;
-  --eoc-glow: 150, 200, 255;
-  --eoc-glow-2: 120, 180, 255;
-  --eoc-beam: 190, 216, 255;
-  --eoc-sky-2: 180, 215, 255;
-  --eoc-sky-3: 198, 222, 255;
-  --eoc-sky-4: 200, 225, 255;
-  --eoc-glass: 90, 150, 210;
-  --eoc-glass-2: 90, 140, 220;
-  --eoc-glass-3: 120, 180, 240;
-  --eoc-deep: 43, 86, 214;
-  --eoc-navy: #162d73;
-  --eoc-navy-deep: #0d1b4a;
-  --eoc-navy-mid: #1f3a86;
-  --eoc-navy-ink: #0c1226;
-  --eoc-navy-panel: #0d1a44;
-  --eoc-navy-sh: #0a1230;
-  --eoc-navy-sh-2: #0c1740;
-  --eoc-indigo: #2f4a9c;
-  --eoc-glass-bg: #182234;
-  --eoc-glass-ink: #05070c;
-  --eoc-light-1: #f5f8fe;
-  --eoc-light-2: #eef3fc;
-  --eoc-light-3: #dde6f5;
-  --eoc-bright: #7aa6ff;
-  --eoc-box-end: #3f6fe0;
-  --eoc-navy-darkest: #0b1a45;
-  --eoc-royal: #2b4bb8;
-  --eoc-primary-c: #6699ff;
-  --eoc-accent-c: #a6c9ff;
-  --eoc-light-ink: 10, 19, 46;
-}
-
-html[data-accent="red"] {
-  --eoc-primary: 239, 111, 104;
-  --eoc-accent: 250, 178, 171;
-  --eoc-soft: 255, 223, 219;
-  --eoc-glow: 251, 172, 165;
-  --eoc-glow-2: 246, 144, 136;
-  --eoc-beam: 252, 199, 194;
-  --eoc-sky-2: 253, 195, 189;
-  --eoc-sky-3: 253, 207, 203;
-  --eoc-sky-4: 254, 210, 206;
-  --eoc-glass: 204, 118, 111;
-  --eoc-glass-2: 209, 105, 99;
-  --eoc-glass-3: 235, 147, 140;
-  --eoc-deep: 189, 6, 31;
-  --eoc-navy: #66090f;
-  --eoc-navy-deep: #410508;
-  --eoc-navy-mid: #78171a;
-  --eoc-navy-ink: #230b0a;
-  --eoc-navy-panel: #3c0709;
-  --eoc-navy-sh: #2b0606;
-  --eoc-navy-sh-2: #390507;
-  --eoc-indigo: #8e2827;
-  --eoc-glass-bg: #321b19;
-  --eoc-glass-ink: #0b0505;
-  --eoc-light-1: #fef6f5;
-  --eoc-light-2: #fcf0ee;
-  --eoc-light-3: #f4e0de;
-  --eoc-bright: #f3837b;
-  --eoc-box-end: #cc3d3d;
-  --eoc-navy-darkest: #3d0608;
-  --eoc-royal: #a3121e;
-  --eoc-primary-c: #ef6f68;
-  --eoc-accent-c: #fab2ab;
-  --eoc-light-ink: 42, 8, 8;
-}
-
-html[data-accent="orange"] {
-  --eoc-primary: 230, 125, 34;
-  --eoc-accent: 243, 185, 146;
-  --eoc-soft: 251, 226, 209;
-  --eoc-glow: 243, 179, 136;
-  --eoc-glow-2: 238, 154, 95;
-  --eoc-beam: 247, 204, 176;
-  --eoc-sky-2: 247, 200, 170;
-  --eoc-sky-3: 248, 212, 188;
-  --eoc-sky-4: 249, 215, 192;
-  --eoc-glass: 197, 126, 76;
-  --eoc-glass-2: 201, 116, 50;
-  --eoc-glass-3: 227, 156, 107;
-  --eoc-deep: 153, 77, 0;
-  --eoc-navy: #532700;
-  --eoc-navy-deep: #351700;
-  --eoc-navy-mid: #663100;
-  --eoc-navy-ink: #210e02;
-  --eoc-navy-panel: #331500;
-  --eoc-navy-sh: #250e00;
-  --eoc-navy-sh-2: #2f1300;
-  --eoc-indigo: #7d3e00;
-  --eoc-glass-bg: #301d10;
-  --eoc-glass-ink: #0b0604;
-  --eoc-light-1: #fdf7f3;
-  --eoc-light-2: #faf1eb;
-  --eoc-light-3: #f2e2d8;
-  --eoc-bright: #ea8e4a;
-  --eoc-box-end: #b55c00;
-  --eoc-navy-darkest: #331500;
-  --eoc-royal: #864300;
-  --eoc-primary-c: #e67d22;
-  --eoc-accent-c: #f3b992;
-  --eoc-light-ink: 37, 14, 0;
-}
-
-html[data-accent="yellow"] {
-  --eoc-primary: 184, 154, 0;
-  --eoc-accent: 216, 199, 135;
-  --eoc-soft: 239, 232, 205;
-  --eoc-glow: 214, 195, 123;
-  --eoc-glow-2: 202, 176, 72;
-  --eoc-beam: 226, 214, 169;
-  --eoc-sky-2: 225, 212, 162;
-  --eoc-sky-3: 230, 220, 181;
-  --eoc-sky-4: 232, 223, 186;
-  --eoc-glass: 167, 144, 57;
-  --eoc-glass-2: 166, 138, 0;
-  --eoc-glass-3: 196, 174, 91;
-  --eoc-deep: 120, 99, 0;
-  --eoc-navy: #403400;
-  --eoc-navy-deep: #282000;
-  --eoc-navy-mid: #4e4000;
-  --eoc-navy-ink: #191300;
-  --eoc-navy-panel: #261e00;
-  --eoc-navy-sh: #1b1500;
-  --eoc-navy-sh-2: #221b00;
-  --eoc-indigo: #615000;
-  --eoc-glass-bg: #28220b;
-  --eoc-glass-ink: #080703;
-  --eoc-light-1: #faf8f2;
-  --eoc-light-2: #f5f3e9;
-  --eoc-light-3: #eae6d5;
-  --eoc-bright: #c3a629;
-  --eoc-box-end: #8d7600;
-  --eoc-navy-darkest: #261e00;
-  --eoc-royal: #685600;
-  --eoc-primary-c: #b89a00;
-  --eoc-accent-c: #d8c787;
-  --eoc-light-ink: 27, 21, 0;
-}
-
-html[data-accent="green"] {
-  --eoc-primary: 72, 183, 96;
-  --eoc-accent: 162, 215, 168;
-  --eoc-soft: 216, 238, 218;
-  --eoc-glow: 154, 213, 161;
-  --eoc-glow-2: 118, 199, 131;
-  --eoc-beam: 188, 226, 192;
-  --eoc-sky-2: 182, 224, 187;
-  --eoc-sky-3: 197, 230, 201;
-  --eoc-sky-4: 201, 232, 204;
-  --eoc-glass: 96, 164, 106;
-  --eoc-glass-2: 76, 162, 92;
-  --eoc-glass-3: 126, 194, 136;
-  --eoc-deep: 0, 122, 46;
-  --eoc-navy: #004115;
-  --eoc-navy-deep: #00290a;
-  --eoc-navy-mid: #00501c;
-  --eoc-navy-ink: #051808;
-  --eoc-navy-panel: #002609;
-  --eoc-navy-sh: #001c05;
-  --eoc-navy-sh-2: #002308;
-  --eoc-indigo: #006324;
-  --eoc-glass-bg: #152718;
-  --eoc-glass-ink: #040805;
-  --eoc-light-1: #f4faf5;
-  --eoc-light-2: #edf5ee;
-  --eoc-light-3: #dceadd;
-  --eoc-bright: #65c075;
-  --eoc-box-end: #009038;
-  --eoc-navy-darkest: #002609;
-  --eoc-royal: #006a27;
-  --eoc-primary-c: #48b760;
-  --eoc-accent-c: #a2d7a8;
-  --eoc-light-ink: 0, 28, 6;
-}
-
-html[data-accent="purple"] {
-  --eoc-primary: 180, 128, 235;
-  --eoc-accent: 212, 186, 244;
-  --eoc-soft: 237, 226, 251;
-  --eoc-glow: 209, 180, 245;
-  --eoc-glow-2: 195, 156, 241;
-  --eoc-beam: 223, 205, 247;
-  --eoc-sky-2: 221, 201, 248;
-  --eoc-sky-3: 228, 212, 248;
-  --eoc-sky-4: 230, 215, 249;
-  --eoc-glass: 161, 128, 199;
-  --eoc-glass-2: 159, 118, 204;
-  --eoc-glass-3: 190, 157, 229;
-  --eoc-deep: 129, 55, 191;
-  --eoc-navy: #441d66;
-  --eoc-navy-deep: #2a1041;
-  --eoc-navy-mid: #522878;
-  --eoc-navy-ink: #180e22;
-  --eoc-navy-panel: #27113c;
-  --eoc-navy-sh: #1c0c2a;
-  --eoc-navy-sh-2: #240e39;
-  --eoc-indigo: #63388d;
-  --eoc-glass-bg: #261d30;
-  --eoc-glass-ink: #08060b;
-  --eoc-light-1: #f9f7fd;
-  --eoc-light-2: #f5f1fa;
-  --eoc-light-3: #e9e2f2;
-  --eoc-bright: #bc90ee;
-  --eoc-box-end: #9154cb;
-  --eoc-navy-darkest: #28103d;
-  --eoc-royal: #6f32a4;
-  --eoc-primary-c: #b480eb;
-  --eoc-accent-c: #d4baf4;
-  --eoc-light-ink: 27, 13, 41;
-}
-
-html[data-accent="pink"] {
-  --eoc-primary: 228, 110, 170;
-  --eoc-accent: 243, 177, 207;
-  --eoc-soft: 251, 222, 235;
-  --eoc-glow: 243, 171, 204;
-  --eoc-glow-2: 236, 143, 188;
-  --eoc-beam: 247, 198, 220;
-  --eoc-sky-2: 247, 194, 218;
-  --eoc-sky-3: 248, 206, 225;
-  --eoc-sky-4: 249, 210, 227;
-  --eoc-glass: 196, 116, 155;
-  --eoc-glass-2: 199, 104, 152;
-  --eoc-glass-3: 226, 146, 184;
-  --eoc-deep: 176, 17, 117;
-  --eoc-navy: #5f0b3d;
-  --eoc-navy-deep: #3c0626;
-  --eoc-navy-mid: #70184b;
-  --eoc-navy-ink: #210b16;
-  --eoc-navy-panel: #380824;
-  --eoc-navy-sh: #280719;
-  --eoc-navy-sh-2: #340621;
-  --eoc-indigo: #85285c;
-  --eoc-glass-bg: #301a25;
-  --eoc-glass-ink: #0b0508;
-  --eoc-light-1: #fdf6f9;
-  --eoc-light-2: #faeff4;
-  --eoc-light-3: #f2e0e7;
-  --eoc-bright: #e882b4;
-  --eoc-box-end: #c03e86;
-  --eoc-navy-darkest: #390724;
-  --eoc-royal: #981665;
-  --eoc-primary-c: #e46eaa;
-  --eoc-accent-c: #f3b1cf;
-  --eoc-light-ink: 39, 8, 25;
 }
 
 /* map semantic vars → tailwind color utilities */
@@ -543,9 +277,9 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
   overflow-x: hidden;
-  transition: background-color 0.5s var(--ease-out-quint), color 0.5s var(--ease-out-quint);
 }
 
 /* RTL numerics stay LTR where needed */
@@ -562,7 +296,7 @@ body {
 :focus-visible {
   outline: 2px solid var(--ring);
   outline-offset: 3px;
-  border-radius: 3px;
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar {
@@ -578,7 +312,7 @@ body {
   border: 3px solid var(--scrollbar-track);
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--primary);
+  background: var(--foreground-faint);
 }
 
 /* hide native cursor only on fine-pointer devices where custom cursor runs */
@@ -593,67 +327,295 @@ body {
 }
 
 /* ============================================================
-   Layout primitives (8px grid)
+   Layout primitives
+   ------------------------------------------------------------
+   Whitespace is the design, so the two dials that matter most live here: the
+   measure (how wide a line of text is allowed to get) and the section rhythm
+   (how much air sits between ideas). Both are deliberately larger than before.
    ============================================================ */
 .container-x {
   margin-inline: auto;
   width: 100%;
-  max-width: 1360px;
-  padding-inline: 1.25rem;
+  max-width: 1240px;
+  padding-inline: 1.5rem;
 }
 @media (min-width: 768px) {
-  .container-x {
-    padding-inline: 2rem;
-  }
-}
-@media (min-width: 1280px) {
   .container-x {
     padding-inline: 2.5rem;
   }
 }
-
-.section {
-  padding-block: clamp(4rem, 9vw, 9rem);
+@media (min-width: 1280px) {
+  .container-x {
+    padding-inline: 3rem;
+  }
 }
 
-/* Swiss editorial eyebrow */
+/* Editorial measure — long-form copy should never run the full 1240px. */
+.container-narrow {
+  margin-inline: auto;
+  width: 100%;
+  max-width: 860px;
+  padding-inline: 1.5rem;
+}
+
+.section {
+  padding-block: clamp(5.5rem, 11vw, 11rem);
+}
+
+/* Swiss editorial eyebrow — now grey uppercase micro-type instead of a
+   coloured label. */
 .eyebrow {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.625rem;
   font-family: var(--font-mono);
-  font-size: 0.72rem;
-  letter-spacing: 0.28em;
+  font-size: 0.7rem;
+  letter-spacing: 0.3em;
   text-transform: uppercase;
-  color: var(--primary);
+  color: var(--foreground-muted);
 }
 .eyebrow::before {
   content: "";
   width: 1.75rem;
   height: 1px;
   background: currentColor;
-  opacity: 0.6;
+  opacity: 0.45;
 }
 
 /* ============================================================
-   Surfaces & glass
+   Liquid glass
+   ------------------------------------------------------------
+   Four ingredients, in this order, are what separate "glass" from "a
+   translucent box":
+
+     1. backdrop-filter blur + saturate — refracts the page behind it. The
+        saturate is what keeps blurred content from going flat; on a monochrome
+        page it mostly boosts local contrast.
+     2. a specular hairline — a bright inset line along the TOP edge and a
+        darker one along the bottom, which is how a real bevel catches light.
+     3. an outer hairline border at low alpha, so the panel has an edge without
+        a drawn-on outline.
+     4. a soft ambient shadow that lifts the panel off the page.
+
+   True refraction (feDisplacementMap driving backdrop-filter, the technique
+   Apple uses) only composites correctly in Chromium, so it is layered on as a
+   progressive enhancement at the bottom of this section — everything above
+   stands on its own everywhere else.
+
+   Note: never hand-write `-webkit-backdrop-filter` beside `backdrop-filter`
+   here. Lightning CSS (which ships inside @tailwindcss/postcss) sees the pair,
+   tries to reconcile them against the build targets, and drops BOTH — the rule
+   comes out with no backdrop at all and the glass silently turns into a flat
+   translucent box. Write the standard property only; the prefix, where a target
+   still needs one, is added during the build.
    ============================================================ */
 .glass {
+  position: relative;
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
-  backdrop-filter: blur(22px) saturate(140%);
-  -webkit-backdrop-filter: blur(22px) saturate(140%);
+  backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+  box-shadow:
+    inset 0 1px 0 var(--glass-highlight),
+    inset 0 -1px 0 var(--glass-shade),
+    var(--glass-shadow);
 }
 
+/* Denser variant for surfaces that sit over busy media. */
+.glass-strong {
+  background: var(--glass-bg-strong);
+  backdrop-filter: blur(32px) saturate(190%);
+}
+
+/* Ink glass — the same physics, dark. Used for primary actions so they hold
+   contrast on a white page. */
+.glass-ink {
+  position: relative;
+  background: var(--glass-ink-bg);
+  border: 1px solid var(--glass-ink-border);
+  backdrop-filter: blur(18px) saturate(160%);
+  box-shadow:
+    inset 0 1px 0 var(--glass-ink-highlight),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.4),
+    var(--glass-ink-shadow);
+  color: #ffffff;
+}
+
+/* ------------------------------------------------------------
+   .liquid — a glass surface that behaves like a physical control.
+
+   `isolation: isolate` plus `contain: paint` keeps the specular sweep and the
+   backdrop rasterisation inside the element's own layer; without the
+   containment a page full of these tanks INP, because every hover invalidates
+   a full-page backdrop pass.
+   ------------------------------------------------------------ */
+.liquid {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  contain: paint;
+  transition:
+    transform 0.45s var(--ease-apple),
+    box-shadow 0.45s var(--ease-apple),
+    background-color 0.45s var(--ease-apple),
+    border-color 0.45s var(--ease-apple);
+  will-change: transform;
+}
+
+/* The sweep: a soft band of light that travels across the surface on hover,
+   the way a highlight slides over a curved piece of glass as it tilts.
+   It passes *over* the label — that is the point — so the alpha is capped low
+   enough that text never drops below readable contrast mid-pass. */
+.liquid::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    105deg,
+    transparent 34%,
+    rgba(255, 255, 255, 0.38) 48%,
+    rgba(255, 255, 255, 0.12) 56%,
+    transparent 68%
+  );
+  transform: translateX(-120%);
+  opacity: 0;
+  transition:
+    transform 0.9s var(--ease-apple),
+    opacity 0.4s var(--ease-apple);
+}
+.liquid:hover::after,
+.liquid:focus-visible::after {
+  transform: translateX(120%);
+  opacity: 1;
+}
+
+.liquid:hover {
+  transform: translateY(-1px);
+}
+.liquid:active {
+  transform: translateY(0) scale(0.985);
+  transition-duration: 0.12s;
+}
+
+/* Keep real content above the sweep. */
+.liquid > * {
+  position: relative;
+  z-index: 2;
+}
+
+/* Clear liquid glass — secondary actions, chips, filters. */
+.liquid-clear {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  color: var(--foreground);
+  backdrop-filter: blur(20px) saturate(180%);
+  box-shadow:
+    inset 0 1px 0 var(--glass-highlight),
+    inset 0 -1px 0 var(--glass-shade),
+    var(--glass-shadow);
+}
+.liquid-clear:hover {
+  background: rgba(255, 255, 255, 0.85);
+  border-color: rgba(0, 0, 0, 0.16);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    inset 0 -1px 0 var(--glass-shade),
+    0 1px 2px rgba(0, 0, 0, 0.05),
+    0 16px 40px -14px rgba(0, 0, 0, 0.26);
+}
+
+/* Ink liquid glass — the primary action. */
+.liquid-ink {
+  background: var(--glass-ink-bg);
+  border: 1px solid var(--glass-ink-border);
+  color: #ffffff;
+  backdrop-filter: blur(18px) saturate(160%);
+  box-shadow:
+    inset 0 1px 0 var(--glass-ink-highlight),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.5),
+    var(--glass-ink-shadow);
+}
+.liquid-ink:hover {
+  background: rgba(0, 0, 0, 0.94);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.5),
+    0 1px 2px rgba(0, 0, 0, 0.24),
+    0 20px 44px -16px rgba(0, 0, 0, 0.55);
+}
+/* On ink the sweep has to be gentler or it reads as a flash. */
+.liquid-ink::after {
+  background: linear-gradient(
+    105deg,
+    transparent 32%,
+    rgba(255, 255, 255, 0.3) 48%,
+    rgba(255, 255, 255, 0.08) 57%,
+    transparent 72%
+  );
+}
+
+/* ------------------------------------------------------------
+   .glass-onmedia — the one material allowed on top of a photograph.
+
+   Chips, play buttons and status pills sit on covers an admin uploads, so
+   nothing about the backdrop is known: the next upload could be a night shot
+   or a white product on seamless. Translucent-white-with-white-type (the
+   obvious "glass over a hero" look) fails the moment the photo is bright, and
+   translucent-black-with-white-type fails at the other end unless it is opaque
+   enough to stop being glass at all.
+
+   Frosted white with INK content is the only combination that survives both
+   extremes, because white is an endpoint: at 84% white the backdrop can only
+   land between L=0.84 (over pure black) and L=1.0 (over pure white), so ink
+   type never drops below ~15:1. It is also the same material as the rest of
+   the site's glass, just opaque enough to stand on its own.
+   ------------------------------------------------------------ */
+.glass-onmedia {
+  background: rgba(255, 255, 255, 0.84);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  color: var(--foreground);
+  backdrop-filter: blur(20px) saturate(170%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.06),
+    0 8px 26px -10px rgba(0, 0, 0, 0.45);
+}
+.glass-onmedia:hover {
+  background: rgba(255, 255, 255, 0.95);
+}
+
+/* ------------------------------------------------------------
+   Real refraction (Chromium only).
+   feDisplacementMap warps the *backdrop*, so the page bends at the panel's
+   edges the way it does through a thick lens. Applied only where the browser
+   can composite `backdrop-filter: url(#…)`; everywhere else the blur above is
+   already the finished look, not a degraded one.
+   ------------------------------------------------------------ */
+/* `not (-webkit-hyphens: none)` is a Safari exclusion: Safari claims support
+   for `backdrop-filter: url()` and then composites nothing, which would strip
+   the blur along with the refraction. Chromium fails that inner test, so only
+   Chromium opts in. */
+@supports (backdrop-filter: url(#arka-refract)) and (not (-webkit-hyphens: none)) {
+  .liquid-refract {
+    backdrop-filter: url(#arka-refract) blur(14px) saturate(180%);
+  }
+}
+
+/* ============================================================
+   Surfaces
+   ============================================================ */
 .card-surface {
   background: var(--card);
   border: 1px solid var(--card-border);
-  transition: border-color 0.35s var(--ease-out-quint), background 0.35s var(--ease-out-quint),
-    transform 0.35s var(--ease-out-quint);
+  transition:
+    border-color 0.5s var(--ease-apple),
+    box-shadow 0.5s var(--ease-apple),
+    transform 0.5s var(--ease-apple);
 }
 .card-surface:hover {
-  background: var(--card-hover);
-  border-color: color-mix(in srgb, var(--primary) 45%, transparent);
+  border-color: rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-card);
 }
 
 .hairline {
@@ -662,15 +624,30 @@ body {
 }
 
 /* ============================================================
-   Typography FX
+   Typography
+   ------------------------------------------------------------
+   Tight optical tracking on large type is what makes headings read as
+   "designed" rather than "default" — Apple negative-tracks everything above
+   ~28px, and at Persian display sizes it matters just as much.
    ============================================================ */
 .font-display {
   font-family: var(--font-display);
   font-feature-settings: "ss01";
 }
 
+h1,
+h2,
+h3 {
+  letter-spacing: -0.022em;
+}
+
+/* The emphasis span in headings (HighlightedTitle) and the last hero line.
+   Kept dark on purpose: a gradient that fades toward light grey would make the
+   *emphasised* words the faintest ones on the page. This stays between black
+   and graphite, so it reads as a sheen across the letterforms rather than a
+   loss of weight. */
 .text-gradient {
-  background: linear-gradient(100deg, var(--primary) 0%, var(--accent-soft) 45%, var(--foreground) 100%);
+  background: linear-gradient(100deg, #000000 0%, #1f1f1f 45%, #565656 100%);
   background-clip: text;
   -webkit-background-clip: text;
   color: transparent;
@@ -678,7 +655,7 @@ body {
 
 .text-outline {
   color: transparent;
-  -webkit-text-stroke: 1.2px color-mix(in srgb, var(--primary) 40%, transparent);
+  -webkit-text-stroke: 1.2px rgba(0, 0, 0, 0.22);
 }
 
 .balance {
@@ -687,77 +664,80 @@ body {
 
 .link-underline {
   background-image: linear-gradient(currentColor, currentColor);
-  background-size: 0% 1.5px;
+  background-size: 0% 1px;
   background-repeat: no-repeat;
   background-position: right bottom;
-  transition: background-size 0.4s var(--ease-out-quint);
+  transition: background-size 0.45s var(--ease-apple);
   padding-bottom: 2px;
 }
 .link-underline:hover,
 .link-underline[data-active="true"] {
-  background-size: 100% 1.5px;
+  background-size: 100% 1px;
 }
 
 /* ============================================================
-   Cinematic backdrops
+   Backdrops
+   ------------------------------------------------------------
+   All of these used to be brand-blue washes. They survive as grey structure
+   because they carry layout information (grids, rhythm) rather than mood.
    ============================================================ */
 .global-grain {
   position: fixed;
   inset: 0;
   z-index: 90;
   pointer-events: none;
-  opacity: 0.04;
+  /* Just enough tooth that large white areas do not band on cheap panels. */
+  opacity: 0.016;
+  mix-blend-mode: multiply;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   background-size: 150px 150px;
-}
-.light .global-grain {
-  opacity: 0.025;
-  mix-blend-mode: multiply;
 }
 
 .hero-grid {
   background-image: linear-gradient(var(--grid-line) 1px, transparent 1px),
     linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
-  background-size: 68px 68px;
+  background-size: 80px 80px;
   mask-image: radial-gradient(ellipse 92% 72% at 50% 34%, black 22%, transparent 78%);
   -webkit-mask-image: radial-gradient(ellipse 92% 72% at 50% 34%, black 22%, transparent 78%);
 }
 
 .dotgrid {
   background-image: radial-gradient(var(--grid-line) 1.2px, transparent 1.2px);
-  background-size: 22px 22px;
+  background-size: 24px 24px;
 }
 
+/* Was an animated brand-gradient "film reel". Now a slow graphite sweep — the
+   movement is kept, the hue is gone. */
 .reel-bg {
   background: linear-gradient(
     115deg,
-    var(--background) 0%,
-    var(--eoc-navy-darkest) 18%,
-    var(--eoc-navy) 36%,
-    var(--eoc-royal) 50%,
-    var(--eoc-primary-c) 60%,
-    var(--eoc-navy) 74%,
-    var(--eoc-navy-darkest) 86%,
-    var(--background) 100%
+    #ffffff 0%,
+    #f2f2f2 18%,
+    #e0e0e0 36%,
+    #bdbdbd 50%,
+    #d6d6d6 62%,
+    #efefef 78%,
+    #ffffff 100%
   );
   background-size: 280% 280%;
-  animation: reel-pan 18s ease-in-out infinite;
+  animation: reel-pan 22s ease-in-out infinite;
 }
 
 .spotlight {
   background: radial-gradient(
     600px circle at var(--mx, 50%) var(--my, 50%),
-    color-mix(in srgb, var(--primary) 16%, transparent),
+    rgba(0, 0, 0, 0.05),
     transparent 65%
   );
 }
 
-/* aurora blobs */
+/* Soft grey haze. Kept for composition (it anchors the eye) but pulled far
+   back — on white, anything stronger reads as a smudge. */
 .aurora {
   position: absolute;
   border-radius: 50%;
-  filter: blur(90px);
-  opacity: 0.55;
+  filter: blur(110px);
+  opacity: 0.5;
   pointer-events: none;
 }
 
@@ -980,17 +960,16 @@ body {
   position: absolute;
   inset: 0;
   transform: translateX(-100%);
-  background: linear-gradient(
-    90deg,
-    transparent,
-    color-mix(in srgb, var(--primary) 18%, transparent),
-    transparent
-  );
+  background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.06), transparent);
   animation: shimmer 2.2s infinite;
 }
 
 /* ============================================================
    Custom cursor
+   ------------------------------------------------------------
+   mix-blend-mode: difference means the white cursor inverts to black over the
+   white page and back to white over ink — one element, always visible, no
+   colour involved.
    ============================================================ */
 .cursor-dot,
 .cursor-ring {
@@ -1004,44 +983,88 @@ body {
   will-change: transform;
 }
 .cursor-dot {
-  width: 7px;
-  height: 7px;
+  width: 6px;
+  height: 6px;
   background: #fff;
   transform: translate(-50%, -50%);
 }
 .cursor-ring {
-  width: 40px;
-  height: 40px;
-  border: 1.5px solid #fff;
+  width: 38px;
+  height: 38px;
+  border: 1px solid #fff;
   transform: translate(-50%, -50%);
-  transition: width 0.28s var(--ease-out-quint), height 0.28s var(--ease-out-quint),
-    background 0.28s, opacity 0.28s;
+  transition:
+    width 0.35s var(--ease-apple),
+    height 0.35s var(--ease-apple),
+    background 0.35s var(--ease-apple),
+    opacity 0.35s var(--ease-apple);
 }
 .cursor-ring[data-hover="true"] {
-  width: 64px;
-  height: 64px;
-  background: rgba(255, 255, 255, 0.12);
+  width: 62px;
+  height: 62px;
+  background: rgba(255, 255, 255, 0.14);
 }
 
 /* ============================================================
-   Buttons / chips
+   Buttons
+   ------------------------------------------------------------
+   .btn-glow kept its name (it is the `glow` Button variant) but is now the
+   ink liquid-glass pill: the strongest thing on a white page.
    ============================================================ */
 .btn-glow {
   position: relative;
   isolation: isolate;
   overflow: hidden;
+  contain: paint;
+  background: var(--glass-ink-bg);
+  border: 1px solid var(--glass-ink-border);
+  color: #ffffff;
+  backdrop-filter: blur(18px) saturate(160%);
+  box-shadow:
+    inset 0 1px 0 var(--glass-ink-highlight),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.5),
+    var(--glass-ink-shadow);
+  transition:
+    transform 0.45s var(--ease-apple),
+    box-shadow 0.45s var(--ease-apple),
+    background-color 0.45s var(--ease-apple);
 }
-.btn-glow::before {
+.btn-glow::after {
   content: "";
   position: absolute;
   inset: 0;
-  z-index: -1;
-  background: linear-gradient(120deg, var(--primary), var(--accent-bright), var(--primary));
-  background-size: 200% 100%;
-  transition: background-position 0.6s var(--ease-out-quint);
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    105deg,
+    transparent 32%,
+    rgba(255, 255, 255, 0.32) 48%,
+    rgba(255, 255, 255, 0.08) 57%,
+    transparent 72%
+  );
+  transform: translateX(-120%);
+  opacity: 0;
+  transition:
+    transform 0.9s var(--ease-apple),
+    opacity 0.4s var(--ease-apple);
 }
-.btn-glow:hover::before {
-  background-position: 100% 0;
+.btn-glow:hover::after,
+.btn-glow:focus-visible::after {
+  transform: translateX(120%);
+  opacity: 1;
+}
+.btn-glow:hover {
+  transform: translateY(-1px);
+  background: rgba(0, 0, 0, 0.94);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.5),
+    0 1px 2px rgba(0, 0, 0, 0.24),
+    0 20px 44px -16px rgba(0, 0, 0, 0.55);
+}
+.btn-glow > * {
+  position: relative;
+  z-index: 2;
 }
 
 /* ============================================================
@@ -1077,33 +1100,40 @@ body {
 /* prose (journal / case study body) */
 .prose-arka {
   color: var(--foreground-muted);
-  line-height: 2.1;
-  font-size: 1.05rem;
+  line-height: 2.15;
+  font-size: 1.0625rem;
 }
 .prose-arka h2 {
   color: var(--foreground);
   font-family: var(--font-display);
-  font-size: 1.7rem;
-  margin-block: 2.4rem 1rem;
+  font-size: 1.75rem;
+  margin-block: 2.75rem 1rem;
   font-weight: 700;
+  letter-spacing: -0.02em;
 }
 .prose-arka h3 {
   color: var(--foreground);
   font-size: 1.3rem;
-  margin-block: 1.8rem 0.8rem;
+  margin-block: 2rem 0.8rem;
   font-weight: 700;
+  letter-spacing: -0.015em;
 }
 .prose-arka p {
-  margin-block: 1.1rem;
+  margin-block: 1.25rem;
 }
 .prose-arka a {
-  color: var(--primary);
+  color: var(--foreground);
   text-decoration: underline;
-  text-underline-offset: 3px;
+  text-decoration-color: rgba(0, 0, 0, 0.3);
+  text-underline-offset: 4px;
+  transition: text-decoration-color 0.3s var(--ease-apple);
+}
+.prose-arka a:hover {
+  text-decoration-color: var(--foreground);
 }
 .prose-arka ul,
 .prose-arka ol {
-  margin-block: 1.1rem;
+  margin-block: 1.25rem;
   padding-inline-start: 1.4rem;
 }
 .prose-arka li {
@@ -1111,22 +1141,24 @@ body {
   list-style: disc;
 }
 .prose-arka blockquote {
-  border-inline-start: 3px solid var(--primary);
-  padding-inline-start: 1.25rem;
-  margin-block: 1.6rem;
+  border-inline-start: 2px solid var(--foreground);
+  padding-inline-start: 1.5rem;
+  margin-block: 2rem;
   color: var(--foreground);
-  font-size: 1.2rem;
-  font-style: italic;
+  font-size: 1.25rem;
+  font-style: normal;
+  line-height: 1.75;
 }
 .prose-arka img {
   border-radius: var(--radius-lg);
-  margin-block: 2rem;
+  margin-block: 2.5rem;
   width: 100%;
 }
 .prose-arka code {
   font-family: var(--font-mono);
-  background: var(--surface-2);
+  background: var(--surface-3);
   padding: 0.15em 0.4em;
   border-radius: 5px;
   font-size: 0.9em;
 }
+

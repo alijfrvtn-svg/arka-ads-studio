@@ -57,15 +57,17 @@ export function WorkFilter({
 
   return (
     <div>
-      <div className="sticky top-[72px] z-20 -mx-4 mb-8 border-y border-card-border bg-background/80 px-4 py-3 backdrop-blur-xl">
+      <div className="glass glass-strong sticky top-[72px] z-20 -mx-4 mb-12 rounded-none border-x-0 px-4 py-3.5">
         <div className="container-x flex gap-2 overflow-x-auto">
           {cats.map((c) => (
             <button
               key={c}
               onClick={() => setCat(c)}
               className={cn(
-                "inline-flex min-h-11 shrink-0 items-center rounded-full px-4 text-sm font-medium transition-colors",
-                cat === c ? "bg-primary text-primary-foreground" : "border border-card-border text-foreground-muted hover:text-foreground",
+                "inline-flex min-h-11 shrink-0 items-center rounded-full px-5 text-sm font-medium transition-all duration-500 [transition-timing-function:var(--ease-apple)]",
+                cat === c
+                  ? "bg-foreground text-background shadow-[0_1px_2px_rgba(0,0,0,0.18),0_10px_24px_-12px_rgba(0,0,0,0.4)]"
+                  : "border border-card-border text-foreground-muted hover:border-foreground/25 hover:text-foreground",
               )}
             >
               {c === ALL ? ui(locale).filterAll : tr(locale, labels.get(c)?.title ?? c, labels.get(c)?.titleEn, labels.get(c)?.titleAr)}
@@ -82,14 +84,25 @@ export function WorkFilter({
                   onClick={() => setStatus(v)}
                   aria-pressed={status === v}
                   className={cn(
-                    "inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-full border px-3.5 text-xs font-medium transition-colors",
+                    "inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-full border px-4 text-xs font-medium transition-all duration-500",
                     status === v
-                      ? "border-primary text-foreground"
+                      ? "border-foreground font-semibold text-foreground"
                       : "border-card-border text-foreground-muted hover:text-foreground",
                   )}
                 >
+                  {/* Filled dot = delivered, hollow ring = still in production. The
+                      label next to it carries the same information, so the shape
+                      is reinforcement, not the only cue. */}
                   {meta && (
-                    <span className="h-2 w-2 rounded-full" style={{ background: meta.color }} aria-hidden />
+                    <span
+                      className="h-2 w-2 rounded-full"
+                      style={
+                        meta.value === "IN_PROGRESS"
+                          ? { border: "1.5px solid currentColor" }
+                          : { background: "currentColor" }
+                      }
+                      aria-hidden
+                    />
                   )}
                   {v === "ALL" ? ui(locale).filterAll : tr(locale, meta!.label, meta!.labelEn, meta!.labelAr)}
                 </button>

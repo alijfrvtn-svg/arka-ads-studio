@@ -11,15 +11,15 @@ export function TrustMarquee({
 }) {
   const row = clients.length ? clients : [{ name: "برند" }];
   return (
-    <div className="border-y border-card-border bg-surface/30 py-8">
-      <p className="container-x mb-6 text-center text-xs uppercase tracking-[0.3em] text-foreground-faint">
+    <div className="border-y border-card-border bg-surface-2 py-10">
+      <p className="container-x mb-8 text-center text-[0.7rem] uppercase tracking-[0.3em] text-foreground-faint">
         {caption}
       </p>
       <Marquee speed={38}>
         {row.map((c, i) => (
           <div
             key={i}
-            className="mx-3 flex items-center gap-2.5 rounded-xl border border-card-border bg-surface/40 px-6 py-3.5 text-foreground-muted transition-colors hover:text-foreground"
+            className="liquid-clear mx-3 flex items-center gap-2.5 rounded-2xl px-6 py-3.5 text-foreground-muted transition-colors duration-500 hover:text-foreground"
           >
             <LogoMark mono className="h-5 w-5 opacity-70" />
             <span className="whitespace-nowrap font-display text-lg font-bold">{c.name}</span>

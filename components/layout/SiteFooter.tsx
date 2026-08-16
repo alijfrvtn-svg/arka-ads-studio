@@ -6,7 +6,6 @@ import { SITE, NAV } from "@/lib/constants";
 import { ui } from "@/lib/i18n";
 import type { Locale } from "@/types";
 import type { ContactContent } from "@/lib/queries";
-import { AccentSwitcher } from "@/components/theme/AccentSwitcher";
 
 const NAV_KEY: Record<string, string> = {
   "/": "navHome",
@@ -55,34 +54,35 @@ export function SiteFooter({
       ? new Intl.DateTimeFormat("fa-IR-u-ca-persian", { year: "numeric" }).format(new Date())
       : new Date().getFullYear();
   return (
-    <footer className="relative overflow-hidden border-t border-card-border bg-background-2">
-      <div className="pointer-events-none absolute -top-32 right-1/4 h-72 w-72 rounded-full bg-primary/10 blur-[120px]" />
-      <div className="container-x relative py-16">
+    <footer className="relative overflow-hidden border-t border-card-border bg-background">
+      <div className="container-x relative py-20 md:py-24">
         {/* CTA strip */}
-        <div className="mb-16 flex flex-col items-start justify-between gap-6 rounded-3xl border border-card-border bg-surface/50 p-8 md:flex-row md:items-center md:p-12">
+        <div className="mb-20 flex flex-col items-start justify-between gap-8 rounded-[2rem] border border-card-border bg-surface-2 p-10 md:flex-row md:items-center md:p-14">
           <div>
-            <h3 className="font-display text-2xl font-bold text-foreground md:text-3xl">
+            <h3 className="font-display text-2xl font-bold tracking-tight text-foreground md:text-3xl">
               {ctaHeading}
             </h3>
-            <p className="mt-2 text-foreground-muted">{ctaBody}</p>
+            <p className="mt-3 text-foreground-muted">{ctaBody}</p>
           </div>
           <Link
             href="/contact"
-            className="group inline-flex items-center gap-2 rounded-full bg-primary px-7 py-4 font-semibold text-primary-foreground transition-transform hover:scale-[1.03]"
+            className="liquid liquid-ink group inline-flex shrink-0 items-center gap-2 rounded-full px-8 py-4 font-semibold"
           >
-            {ctaButton}
-            <ArrowUpLeft className="h-5 w-5 transition-transform group-hover:-translate-x-1 group-hover:-translate-y-1" />
+            <span className="inline-flex items-center gap-2">
+              {ctaButton}
+              <ArrowUpLeft className="h-5 w-5 transition-transform duration-500 group-hover:-translate-x-1 group-hover:-translate-y-1" />
+            </span>
           </Link>
         </div>
 
         {/* columns */}
-        <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-5">
+        <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-5">
           <div className="lg:col-span-2">
             <Logo tagline />
             <p className="mt-5 max-w-xs text-sm leading-relaxed text-foreground-muted">
               {description}
             </p>
-            <div className="mt-6 flex gap-2">
+            <div className="mt-7 flex gap-2.5">
               {contact.socials.map((s) => (
                 <a
                   key={s.platform}
@@ -90,7 +90,7 @@ export function SiteFooter({
                   target="_blank"
                   rel="noreferrer"
                   aria-label={s.label}
-                  className="grid h-11 w-11 place-items-center rounded-full border border-card-border text-foreground-muted transition-all hover:border-primary hover:text-primary"
+                  className="liquid liquid-clear grid h-11 w-11 place-items-center rounded-full text-foreground-muted hover:text-foreground"
                 >
                   <SocialIcon platform={s.platform} className="h-[18px] w-[18px]" />
                 </a>
@@ -104,19 +104,19 @@ export function SiteFooter({
             <h4 className="mb-4 text-sm font-bold text-foreground">{t.footerContact}</h4>
             <ul className="flex flex-col gap-3 text-sm text-foreground-muted">
               <li className="flex items-start gap-2.5">
-                <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-foreground-faint" />
                 {contact.address}
               </li>
               <li className="flex items-center gap-2.5">
-                <Phone className="h-4 w-4 shrink-0 text-primary" />
+                <Phone className="h-4 w-4 shrink-0 text-foreground-faint" />
                 {/* A phone number on a phone should be tappable. */}
-                <a href={`tel:${contact.phone}`} className="ltr-nums inline-flex min-h-11 items-center hover:text-primary">
+                <a href={`tel:${contact.phone}`} className="ltr-nums inline-flex min-h-11 items-center hover:text-foreground">
                   {contact.phoneDisplay}
                 </a>
               </li>
               <li className="flex items-center gap-2.5">
-                <Mail className="h-4 w-4 shrink-0 text-primary" />
-                <a href={`mailto:${contact.email}`} className="ltr-nums inline-flex min-h-11 items-center hover:text-primary">
+                <Mail className="h-4 w-4 shrink-0 text-foreground-faint" />
+                <a href={`mailto:${contact.email}`} className="ltr-nums inline-flex min-h-11 items-center hover:text-foreground">
                   {contact.email}
                 </a>
               </li>
@@ -124,21 +124,8 @@ export function SiteFooter({
           </div>
         </div>
 
-        {/* Living-colour switch. The header carries an icon-only copy; this is
-            the one that explains itself, because the footer has room for a
-            sentence and the header does not. */}
-        <div className="mt-12 flex items-center justify-center gap-3 rounded-2xl border border-card-border bg-surface/40 p-4 sm:justify-start">
-          <AccentSwitcher />
-          <div className="text-sm leading-snug">
-            <p className="font-medium text-foreground">تغییر خودکار رنگ سایت</p>
-            <p className="mt-0.5 text-xs text-foreground-muted">
-              با روشن بودن، هویت رنگی سایت هر ۳۰ ثانیه به‌آرامی عوض می‌شود. با خاموش کردن، روی آبی آرکا ثابت می‌ماند.
-            </p>
-          </div>
-        </div>
-
         {/* bottom */}
-        <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-card-border pt-7 text-sm text-foreground-faint md:flex-row">
+        <div className="mt-16 flex flex-col items-center justify-between gap-4 border-t border-card-border pt-8 text-sm text-foreground-faint md:flex-row">
           <p className="text-center md:text-right">
             © {year} {SITE.legalName}. {copyright}
           </p>
@@ -154,7 +141,7 @@ export function SiteFooter({
             ))}
             <Link
               href="/admin"
-              className="inline-flex min-h-11 items-center px-1 text-primary/80 hover:text-primary"
+              className="inline-flex min-h-11 items-center px-1 hover:text-foreground"
             >
               {t.footerAdminLogin}
             </Link>
@@ -174,7 +161,7 @@ function FooterCol({ title, links }: { title: string; links: { label: string; hr
       <ul className="flex flex-col text-sm text-foreground-muted">
         {links.map((l) => (
           <li key={l.href}>
-            <Link href={l.href} className="link-underline inline-flex min-h-11 items-center hover:text-primary">
+            <Link href={l.href} className="link-underline inline-flex min-h-11 items-center hover:text-foreground">
               {l.label}
             </Link>
           </li>

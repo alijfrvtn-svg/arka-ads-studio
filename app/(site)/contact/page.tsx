@@ -52,26 +52,28 @@ export default async function ContactPage() {
 
             <Reveal delay={0.1}>
               <div className="space-y-6">
-                <div className="space-y-3">
+                <div className="space-y-4">
                   <ContactRow icon={MapPin} label={ui(locale).contactRowOffice} value={c.address} />
                   <ContactRow icon={Phone} label={ui(locale).contactRowPhone} value={c.phoneDisplay} href={`tel:${c.phone}`} ltr />
                   <ContactRow icon={Mail} label={ui(locale).contactRowEmail} value={c.email} href={`mailto:${c.email}`} ltr />
                   <ContactRow icon={Clock} label={ui(locale).contactRowHours} value={c.officeHours} />
                 </div>
 
-                {/* dark-themed map */}
-                <div className="relative overflow-hidden rounded-2xl border border-card-border">
+                {/* The map is interface, not imagery, so it stays achromatic.
+                    Greyscale rather than the old invert(), which existed only
+                    to fake dark tiles for the dark theme. */}
+                <div className="relative overflow-hidden rounded-[1.5rem] border border-card-border">
                   <iframe
                     title={ui(locale).mapTitle}
                     src={`https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${c.mapLat}%2C${c.mapLng}`}
                     className="h-64 w-full"
-                    style={{ filter: "invert(0.92) hue-rotate(180deg) saturate(0.8) contrast(0.9)" }}
+                    style={{ filter: "grayscale(1) contrast(1.04)" }}
                     loading="lazy"
                   />
-                  <div className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-primary/10" />
+                  <div className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-black/5" />
                 </div>
 
-                <div className="rounded-2xl border border-card-border bg-surface/50 p-6">
+                <div className="rounded-[1.5rem] border border-card-border bg-surface-2 p-7">
                   <p className="mb-4 text-sm font-semibold text-foreground">{ui(locale).footerFollowUs}</p>
                   <div className="flex gap-2">
                     {c.socials.map((s) => (
@@ -81,7 +83,7 @@ export default async function ContactPage() {
                         target="_blank"
                         rel="noreferrer"
                         aria-label={s.label}
-                        className="grid h-11 w-11 place-items-center rounded-full border border-card-border text-foreground-muted transition-all hover:-translate-y-0.5 hover:border-primary hover:text-primary"
+                        className="liquid liquid-clear grid h-11 w-11 place-items-center rounded-full text-foreground-muted hover:text-foreground"
                       >
                         <SocialIcon platform={s.platform} className="h-[18px] w-[18px]" />
                       </a>
@@ -99,8 +101,8 @@ export default async function ContactPage() {
 
 function ContactRow({ icon: Icon, label, value, href, ltr }: { icon: any; label: string; value: string; href?: string; ltr?: boolean }) {
   const inner = (
-    <div className="flex items-start gap-4 rounded-2xl border border-card-border bg-surface/50 p-5 transition-colors hover:border-primary/40">
-      <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl border border-card-border bg-background/50 text-primary">
+    <div className="flex items-start gap-4 rounded-[1.25rem] border border-card-border bg-surface-2 p-6 transition-all duration-500 [transition-timing-function:var(--ease-apple)] hover:border-foreground/25 hover:bg-background hover:shadow-[0_1px_2px_rgba(0,0,0,0.04),0_18px_40px_-24px_rgba(0,0,0,0.3)]">
+      <span className="liquid-clear grid h-11 w-11 shrink-0 place-items-center rounded-[12px] text-foreground">
         <Icon className="h-5 w-5" />
       </span>
       <div>

@@ -21,7 +21,7 @@ export function Departments({
   return (
     <Section id="departments">
       <Container>
-        <div className="mb-14 flex flex-col justify-between gap-6 md:flex-row md:items-end">
+        <div className="mb-16 flex flex-col justify-between gap-6 md:flex-row md:items-end">
           <SectionHeading
             eyebrow={content.departmentsEyebrow}
             title={<HighlightedTitle title={content.departmentsHeading} highlight={content.departmentsHeadingHighlight} />}
@@ -29,28 +29,27 @@ export function Departments({
           />
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
           {departments.map((d, i) => (
             <Reveal key={d.slug} delay={i * 0.08}>
+              {/* A card used to announce itself with a coloured glow on hover.
+                  Now it lifts and casts a real shadow instead — the same
+                  "this is interactive" signal, told with light. */}
               <Link
                 href="/services"
-                className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-card-border bg-surface/40 p-7 transition-all duration-500 hover:-translate-y-1 hover:border-primary/50"
+                className="group relative flex h-full flex-col overflow-hidden rounded-[1.5rem] border border-card-border bg-surface p-8 transition-all duration-700 [transition-timing-function:var(--ease-apple)] hover:-translate-y-1.5 hover:border-foreground/25 hover:shadow-[0_1px_2px_rgba(0,0,0,0.04),0_28px_60px_-32px_rgba(0,0,0,0.35)]"
               >
-                <div
-                  className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full opacity-0 blur-3xl transition-opacity duration-500 group-hover:opacity-100"
-                  style={{ background: "var(--primary)" }}
-                />
-                <div className="mb-6 grid h-14 w-14 place-items-center rounded-xl border border-card-border bg-background/50 text-primary transition-colors group-hover:border-primary/40">
+                <div className="liquid-clear mb-7 grid h-14 w-14 place-items-center rounded-[15px] text-foreground">
                   <Icon name={d.icon} className="h-6 w-6" />
                 </div>
-                <h3 className="font-display text-xl font-bold text-foreground">{tr(locale, d.title, d.titleEn, d.titleAr)}</h3>
+                <h3 className="font-display text-xl font-bold tracking-tight text-foreground">{tr(locale, d.title, d.titleEn, d.titleAr)}</h3>
                 {locale === "fa" && d.titleEn && (
-                  <p className="mt-1 text-xs uppercase tracking-widest text-foreground-faint">{d.titleEn}</p>
+                  <p className="mt-1.5 text-[0.65rem] uppercase tracking-[0.25em] text-foreground-faint">{d.titleEn}</p>
                 )}
-                <p className="mt-4 flex-1 text-sm leading-relaxed text-foreground-muted">{tr(locale, d.desc ?? "", d.descEn, d.descAr)}</p>
-                <span className="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold text-primary">
+                <p className="mt-5 flex-1 text-sm leading-relaxed text-foreground-muted">{tr(locale, d.desc ?? "", d.descEn, d.descAr)}</p>
+                <span className="mt-7 inline-flex items-center gap-1.5 text-sm font-semibold text-foreground">
                   {content.departmentsCtaLabel}
-                  <ArrowUpLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1 group-hover:-translate-y-1" />
+                  <ArrowUpLeft className="h-4 w-4 transition-transform duration-500 group-hover:-translate-x-1 group-hover:-translate-y-1" />
                 </span>
               </Link>
             </Reveal>

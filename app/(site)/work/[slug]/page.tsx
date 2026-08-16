@@ -80,24 +80,24 @@ export default async function CaseStudy({ params }: { params: Promise<{ slug: st
       <section className="relative flex min-h-[86vh] items-end overflow-hidden pb-16 pt-32">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={p.cover} alt={title} className="absolute inset-0 h-full w-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/70 to-background/40" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-black/25" />
         <Container className="relative">
           <Reveal>
             <nav className="mb-5 flex items-center gap-1.5 text-xs text-white/70">
-              <Link href="/" className="hover:text-primary">{ui(locale).navHome}</Link> ‹
-              <Link href="/work" className="hover:text-primary">{ui(locale).navWork}</Link>
+              <Link href="/" className="transition-colors hover:text-white">{ui(locale).navHome}</Link> ‹
+              <Link href="/work" className="transition-colors hover:text-white">{ui(locale).navWork}</Link>
             </nav>
           </Reveal>
           <Reveal delay={0.05}>
             <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/30 px-3 py-1 text-xs text-white backdrop-blur">
+              <span className="glass-onmedia inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-medium">
                 {category}
               </span>
-              <ProjectStatusDot status={p.status} locale={locale} onMedia />
+              <ProjectStatusDot status={p.status} locale={locale} onMedia mono />
             </div>
           </Reveal>
           <Reveal delay={0.1}>
-            <h1 className="mt-4 max-w-4xl font-display text-3xl font-extrabold leading-[1.2] text-white balance sm:text-4xl md:text-6xl md:leading-[1.05] lg:text-7xl">
+            <h1 className="mt-5 max-w-4xl font-display text-3xl font-extrabold leading-[1.15] tracking-[-0.03em] text-white balance sm:text-4xl md:text-6xl md:leading-[1.02] lg:text-7xl">
               {title}
             </h1>
           </Reveal>
@@ -260,13 +260,15 @@ export default async function CaseStudy({ params }: { params: Promise<{ slug: st
       {next && (
         <Link href={`/work/${next.slug}`} className="group relative block overflow-hidden">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={next.cover} alt="" className="absolute inset-0 h-full w-full object-cover opacity-30 transition-transform duration-700 group-hover:scale-105" />
-          <div className="absolute inset-0 bg-background/70" />
-          <Container className="relative py-24 text-center">
-            <p className="text-sm text-foreground-muted">{ui(locale).nextProject}</p>
-            <h2 className="mx-auto mt-3 max-w-3xl font-display text-3xl font-extrabold text-foreground md:text-5xl">{tr(locale, next.title, next.titleEn, next.titleAr)}</h2>
-            <span className="mt-6 inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 font-semibold text-primary-foreground">
-              {ui(locale).viewProject} <ArrowUpLeft className="h-5 w-5 transition-transform group-hover:-translate-x-1 group-hover:-translate-y-1" />
+          <img src={next.cover} alt="" className="absolute inset-0 h-full w-full object-cover opacity-30 transition-transform duration-[900ms] [transition-timing-function:var(--ease-apple)] group-hover:scale-[1.04]" />
+          <div className="absolute inset-0 bg-background/75" />
+          <Container className="relative py-32 text-center">
+            <p className="text-[0.7rem] uppercase tracking-[0.3em] text-foreground-faint">{ui(locale).nextProject}</p>
+            <h2 className="mx-auto mt-4 max-w-3xl font-display text-3xl font-extrabold tracking-[-0.03em] text-foreground md:text-5xl">{tr(locale, next.title, next.titleEn, next.titleAr)}</h2>
+            <span className="liquid liquid-ink mt-10 inline-flex items-center gap-2 rounded-full px-8 py-4 font-semibold">
+              <span className="inline-flex items-center gap-2">
+                {ui(locale).viewProject} <ArrowUpLeft className="h-5 w-5 transition-transform duration-500 group-hover:-translate-x-1 group-hover:-translate-y-1" />
+              </span>
             </span>
           </Container>
         </Link>

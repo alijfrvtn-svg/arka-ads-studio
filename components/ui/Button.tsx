@@ -4,11 +4,15 @@ import { cn } from "@/lib/utils";
 type Variant = "primary" | "outline" | "ghost" | "glow" | "dark";
 type Size = "sm" | "md" | "lg";
 
+// On a white page contrast, not hue, is what ranks an action — so `primary`
+// and `glow` are both ink, separated by material: `primary` is solid, `glow`
+// is the liquid-glass pill with a specular sweep. `outline` is the clear glass
+// counterpart for secondary actions.
 const variants: Record<Variant, string> = {
   primary:
-    "bg-primary text-primary-foreground hover:brightness-110 shadow-[0_10px_40px_-12px_var(--primary)]",
-  glow: "btn-glow text-white",
-  outline: "border border-card-border text-foreground hover:border-primary hover:text-primary",
+    "bg-primary text-primary-foreground shadow-[0_1px_2px_rgba(0,0,0,0.18),0_14px_34px_-14px_rgba(0,0,0,0.45)] hover:-translate-y-px hover:shadow-[0_1px_2px_rgba(0,0,0,0.22),0_20px_44px_-16px_rgba(0,0,0,0.55)]",
+  glow: "btn-glow",
+  outline: "liquid liquid-clear",
   ghost: "text-foreground hover:bg-card-hover",
   dark: "bg-foreground text-background hover:opacity-90",
 };
@@ -40,7 +44,7 @@ export function Button({
     | ({ href?: undefined } & React.ButtonHTMLAttributes<HTMLButtonElement>)
   )) {
   const cls = cn(
-    "group inline-flex select-none items-center justify-center rounded-full font-semibold tracking-tight transition-all duration-300 active:scale-[0.98] focus-visible:outline-none",
+    "group inline-flex select-none items-center justify-center rounded-full font-semibold tracking-tight transition-all duration-500 [transition-timing-function:var(--ease-apple)] active:scale-[0.98] focus-visible:outline-none",
     variants[variant],
     sizes[size],
     className,

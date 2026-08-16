@@ -6,8 +6,6 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowUpLeft, ChevronDown, Menu, X } from "lucide-react";
 import { Logo } from "@/components/brand/Logo";
-import { ThemeToggle } from "@/components/theme/ThemeToggle";
-import { AccentSwitcher } from "@/components/theme/AccentSwitcher";
 import { SiteSearch } from "@/components/search/SiteSearch";
 import { Button } from "@/components/ui/Button";
 import { Magnetic } from "@/components/fx/Magnetic";
@@ -65,16 +63,19 @@ export function SiteHeader({
   return (
     <header
       className={cn(
-        "fixed inset-x-0 top-0 z-50 transition-all duration-500",
-        scrolled ? "py-2" : "py-4",
+        "fixed inset-x-0 top-0 z-50 transition-all duration-700 [transition-timing-function:var(--ease-apple)]",
+        scrolled ? "py-2.5" : "py-5",
       )}
       onMouseLeave={() => setMega(null)}
     >
       <div className="container-x">
+        {/* Unscrolled the bar is invisible and the page reads as one sheet of
+            paper; on scroll it condenses into a floating pane of glass that
+            refracts the content sliding under it. */}
         <div
           className={cn(
-            "flex items-center justify-between rounded-2xl px-4 transition-all duration-500 md:px-5",
-            scrolled ? "glass h-14 shadow-[0_10px_40px_-24px_rgba(0,0,0,0.6)]" : "h-16",
+            "flex items-center justify-between rounded-full px-4 transition-all duration-700 [transition-timing-function:var(--ease-apple)] md:px-6",
+            scrolled ? "glass glass-strong liquid-refract h-14" : "h-16 border border-transparent",
           )}
         >
           <Link href="/" aria-label="آرکا" className="shrink-0">
@@ -96,10 +97,13 @@ export function SiteHeader({
                     href={item.href}
                     data-active={isActive(item.href)}
                     className={cn(
-                      "flex items-center gap-1 rounded-full px-3.5 py-2 text-sm font-medium transition-colors",
+                      // Hue used to carry "you are here"; now weight and ink
+                      // density do, which is the only honest way to signal
+                      // state in a monochrome system.
+                      "flex items-center gap-1 rounded-full px-3.5 py-2 text-sm transition-colors duration-300",
                       isActive(item.href)
-                        ? "text-primary"
-                        : "text-foreground-muted hover:text-foreground",
+                        ? "font-semibold text-foreground"
+                        : "font-medium text-foreground-muted hover:text-foreground",
                     )}
                   >
                     {navLabel(item.href)}
@@ -113,8 +117,6 @@ export function SiteHeader({
           {/* actions */}
           <div className="flex items-center gap-1.5 sm:gap-2">
             <SiteSearch />
-            <AccentSwitcher className="hidden sm:flex" />
-            <ThemeToggle />
             <div className="hidden md:block">
               <Magnetic strength={0.4}>
                 <Button href="/contact" size="sm" variant="glow" className="gap-1.5" data-track="header-cta">
@@ -126,7 +128,7 @@ export function SiteHeader({
             <button
               onClick={() => setOpen((o) => !o)}
               aria-label="منو"
-              className="grid h-11 w-11 place-items-center rounded-full border border-card-border bg-surface/60 text-foreground lg:hidden"
+              className="liquid liquid-clear grid h-11 w-11 place-items-center rounded-full text-foreground lg:hidden"
             >
               {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
@@ -144,13 +146,13 @@ export function SiteHeader({
               className="absolute inset-x-0 top-full hidden px-[max(1.25rem,calc((100vw-1360px)/2+1.25rem))] pt-3 lg:block"
               onMouseEnter={() => setMega(mega)}
             >
-              <div className="glass overflow-hidden rounded-2xl border border-card-border p-2 shadow-2xl">
+              <div className="glass glass-strong overflow-hidden rounded-[1.75rem] p-3">
                 {mega === "services" ? (
                   <div className="grid grid-cols-4 gap-2">
                     {departments.map((d) => (
-                      <div key={d.slug} className="rounded-xl p-3">
-                        <p className="mb-2 flex items-center gap-2 text-xs font-bold text-primary">
-                          <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+                      <div key={d.slug} className="rounded-2xl p-4">
+                        <p className="mb-3 flex items-center gap-2 text-xs font-bold tracking-wide text-foreground">
+                          <span className="h-1 w-1 rounded-full bg-foreground" />
                           {tr(locale, d.title, d.titleEn, d.titleAr)}
                         </p>
                         <div className="flex flex-col">
@@ -158,7 +160,7 @@ export function SiteHeader({
                             <Link
                               key={s.slug}
                               href={`/services/${s.slug}`}
-                              className="rounded-lg px-2 py-1.5 text-sm text-foreground-muted transition-colors hover:bg-card-hover hover:text-foreground"
+                              className="rounded-lg px-2 py-1.5 text-sm text-foreground-muted transition-colors duration-300 hover:bg-card-hover hover:text-foreground"
                             >
                               {s.title}
                             </Link>
@@ -173,7 +175,7 @@ export function SiteHeader({
                       <Link
                         key={i.slug}
                         href={`/industries/${i.slug}`}
-                        className="rounded-lg px-3 py-2 text-sm text-foreground-muted transition-colors hover:bg-card-hover hover:text-foreground"
+                        className="rounded-lg px-3 py-2 text-sm text-foreground-muted transition-colors duration-300 hover:bg-card-hover hover:text-foreground"
                       >
                         {i.title}
                       </Link>
@@ -193,21 +195,21 @@ export function SiteHeader({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 top-[72px] z-40 bg-background/95 backdrop-blur-xl lg:hidden"
+            className="fixed inset-0 top-[72px] z-40 bg-background/90 backdrop-blur-2xl lg:hidden"
           >
-            <nav className="container-x flex flex-col gap-1 py-6">
+            <nav className="container-x flex flex-col gap-1 py-8">
               {NAV.map((item, i) => (
                 <motion.div
                   key={item.href}
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.05 }}
+                  transition={{ delay: i * 0.045, ease: [0.28, 0.11, 0.32, 1] }}
                 >
                   <Link
                     href={item.href}
                     className={cn(
-                      "flex items-center justify-between border-b border-card-border py-4 text-lg font-medium",
-                      isActive(item.href) ? "text-primary" : "text-foreground",
+                      "flex items-center justify-between border-b border-card-border py-5 text-lg tracking-tight",
+                      isActive(item.href) ? "font-bold text-foreground" : "font-medium text-foreground-muted",
                     )}
                   >
                     {navLabel(item.href)}
@@ -217,16 +219,7 @@ export function SiteHeader({
                   </Link>
                 </motion.div>
               ))}
-              <div className="mt-6 flex items-center justify-between gap-3 rounded-2xl border border-card-border p-3 sm:hidden">
-                <span className="text-sm leading-snug text-foreground-muted">
-                  تغییر خودکار رنگ سایت
-                  <span className="mt-0.5 block text-xs text-foreground-faint">
-                    هر ۳۰ ثانیه رنگ هویت عوض می‌شود
-                  </span>
-                </span>
-                <AccentSwitcher />
-              </div>
-              <Button href="/contact" size="lg" variant="glow" className="mt-6 w-full" data-track="mobile-nav-cta">
+              <Button href="/contact" size="lg" variant="glow" className="mt-8 w-full" data-track="mobile-nav-cta">
                 {t.ctaStartProject}
                 <ArrowUpLeft className="h-5 w-5" />
               </Button>

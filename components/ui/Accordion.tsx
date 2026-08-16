@@ -15,7 +15,7 @@ export function Accordion({ items }: { items: { q: string; a: string }[] }) {
             className="flex w-full items-center justify-between gap-4 p-5 text-right"
           >
             <span className="font-medium text-foreground">{it.q}</span>
-            <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-card-border text-primary">
+            <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-card-border text-foreground">
               {open === i ? <Minus className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
             </span>
           </button>

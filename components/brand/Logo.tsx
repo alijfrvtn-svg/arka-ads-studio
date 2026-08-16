@@ -2,11 +2,10 @@ import { cn } from "@/lib/utils";
 
 /** ARKA fast-forward / double-play mark, recreated from the brand sheet.
  *
- * Gradient stops read the --eoc-* identity variables rather than literals, so
- * the mark tracks the visitor's chosen accent — a blue logo sitting above a red
- * site was the most obvious thing left behind by the accent switch. The default
- * values of those variables are the exact brand blues, so an untouched site is
- * pixel-identical. */
+ * Gradient stops read the --eoc-* variables rather than literals, so the mark
+ * follows the site's palette. On the whitespace site those variables are all
+ * greys, which turns the two chevrons into a graphite-to-ink gradient — the
+ * brand shape is untouched, only its fill is achromatic. */
 export function LogoMark({
   className,
   mono = false,
@@ -51,8 +50,8 @@ export function LogoMark({
       />
       <path
         d={boxed ? "M34 16 L52 32 L34 48 Z" : "M29 13 L55 32 L29 51 Z"}
-        fill={boxed ? "#dbe8ff" : mono ? "currentColor" : `url(#arka-b-${id})`}
-        stroke={boxed ? "#dbe8ff" : mono ? "currentColor" : `url(#arka-b-${id})`}
+        fill={boxed ? "#c9c9c9" : mono ? "currentColor" : `url(#arka-b-${id})`}
+        stroke={boxed ? "#c9c9c9" : mono ? "currentColor" : `url(#arka-b-${id})`}
         strokeWidth="5"
         strokeLinejoin="round"
       />

@@ -44,11 +44,11 @@ export function Testimonials({ items, content, locale = "fa" }: { items: T[]; co
           align="center"
           eyebrow={content.testimonialsEyebrow}
           title={<HighlightedTitle title={content.testimonialsHeading} highlight={content.testimonialsHeadingHighlight} />}
-          className="mx-auto mb-14 max-w-2xl"
+          className="mx-auto mb-16 max-w-2xl"
         />
 
         <div className="relative mx-auto max-w-4xl">
-          <Quote className="mx-auto mb-8 h-12 w-12 text-primary/30" />
+          <Quote className="mx-auto mb-10 h-12 w-12 text-foreground/15" />
           <div className="min-h-[220px]">
             <AnimatePresence mode="wait">
               <motion.blockquote
@@ -59,10 +59,10 @@ export function Testimonials({ items, content, locale = "fa" }: { items: T[]; co
                 transition={{ duration: 0.4 }}
                 className="text-center"
               >
-                <p className="font-display text-2xl font-medium leading-relaxed text-foreground md:text-3xl">
+                <p className="font-display text-2xl font-medium leading-relaxed tracking-tight text-foreground md:text-3xl">
                   «{t.quote}»
                 </p>
-                <div className="mt-8 flex items-center justify-center gap-4">
+                <div className="mt-10 flex items-center justify-center gap-4">
                   {t.avatar && (
                     <Image
                       src={t.avatar}
@@ -78,9 +78,9 @@ export function Testimonials({ items, content, locale = "fa" }: { items: T[]; co
                       {t.role}
                       {t.company ? ` · ${t.company}` : ""}
                     </div>
-                    <div className="mt-1 flex gap-0.5">
+                    <div className="mt-1.5 flex gap-0.5">
                       {Array.from({ length: t.rating }).map((_, k) => (
-                        <Star key={k} className="h-3.5 w-3.5 fill-primary text-primary" />
+                        <Star key={k} className="h-3.5 w-3.5 fill-foreground text-foreground" />
                       ))}
                     </div>
                   </div>
@@ -93,7 +93,7 @@ export function Testimonials({ items, content, locale = "fa" }: { items: T[]; co
             <button
               onClick={() => go(-1)}
               aria-label={ui(locale).testimonialPrev}
-              className="grid h-11 w-11 shrink-0 place-items-center rounded-full border border-card-border text-foreground transition-colors hover:border-primary hover:text-primary"
+              className="liquid liquid-clear grid h-11 w-11 shrink-0 place-items-center rounded-full text-foreground"
             >
               <ChevronRight className="h-5 w-5" />
             </button>
@@ -109,7 +109,7 @@ export function Testimonials({ items, content, locale = "fa" }: { items: T[]; co
                   className="grid h-11 w-8 place-items-center"
                 >
                   <span
-                    className={`block h-2 rounded-full transition-all ${k === i ? "w-6 bg-primary" : "w-2 bg-card-border"}`}
+                    className={`block h-1.5 rounded-full transition-all duration-500 [transition-timing-function:var(--ease-apple)] ${k === i ? "w-7 bg-foreground" : "w-1.5 bg-foreground/20"}`}
                   />
                 </button>
               ))}
@@ -117,7 +117,7 @@ export function Testimonials({ items, content, locale = "fa" }: { items: T[]; co
             <button
               onClick={() => go(1)}
               aria-label={ui(locale).testimonialNext}
-              className="grid h-11 w-11 shrink-0 place-items-center rounded-full border border-card-border text-foreground transition-colors hover:border-primary hover:text-primary"
+              className="liquid liquid-clear grid h-11 w-11 shrink-0 place-items-center rounded-full text-foreground"
             >
               <ChevronLeft className="h-5 w-5" />
             </button>

@@ -9,7 +9,10 @@ import { Logo } from "@/components/brand/Logo";
  */
 export function MaintenanceBanner() {
   return (
-    <div className="relative z-[60] flex flex-wrap items-center justify-center gap-x-3 gap-y-1 bg-amber-400 px-4 py-2 text-center text-xs font-semibold text-[#04060d] sm:text-sm">
+    // Was an amber warning strip. With no palette to raise an alarm with, the
+    // banner takes the loudest thing the site has instead: full-bleed ink with
+    // the type knocked out of it.
+    <div className="relative z-[60] flex flex-wrap items-center justify-center gap-x-3 gap-y-1 bg-foreground px-4 py-2.5 text-center text-xs font-semibold text-background sm:text-sm">
       <ShieldAlert className="h-4 w-4 shrink-0" aria-hidden />
       <span>حالت تعمیر و نگهداری روشن است — بازدیدکنندگان صفحه‌ی «در حال تعمیر» را می‌بینند.</span>
       <span className="opacity-80">شما چون وارد پنل شده‌اید سایت را عادی می‌بینید.</span>
@@ -27,10 +30,10 @@ export function MaintenanceScreen() {
         <div className="mb-8 flex justify-center">
           <Logo tagline={false} />
         </div>
-        <h1 className="font-display text-3xl font-bold text-foreground md:text-4xl">
+        <h1 className="font-display text-3xl font-bold tracking-[-0.03em] text-foreground md:text-4xl">
           سایت موقتاً در حال تعمیر و نگهداری است
         </h1>
-        <p className="mx-auto mt-4 max-w-md text-foreground-muted">
+        <p className="mx-auto mt-5 max-w-md text-foreground-muted">
           به‌زودی برمی‌گردیم. از صبر شما سپاسگزاریم.
         </p>
       </div>

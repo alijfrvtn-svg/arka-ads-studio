@@ -98,7 +98,7 @@ export function IndustryHero({
       >
         <Reveal>
           <nav className="mb-4 text-xs text-foreground-muted">
-            <Link href="/" className="hover:text-primary">{ui(locale).navHome}</Link> ‹ <Link href="/industries" className="hover:text-primary">{ui(locale).navIndustries}</Link>
+            <Link href="/" className="transition-colors hover:text-foreground">{ui(locale).navHome}</Link> ‹ <Link href="/industries" className="transition-colors hover:text-foreground">{ui(locale).navIndustries}</Link>
           </nav>
         </Reveal>
         <Reveal delay={0.05}>

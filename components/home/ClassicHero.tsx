@@ -28,6 +28,9 @@ export function ClassicHero({
 
   return (
     <section className="relative flex min-h-[100svh] items-center overflow-hidden">
+      {/* Backdrop media plays in its own colour, held far back (22% over white,
+          plus the scrim below) so the ink headline on top keeps its contrast
+          whatever the admin uploads. */}
       {content.heroMedia ? (
         isVideo ? (
           <SmartVideo
@@ -36,7 +39,7 @@ export function ClassicHero({
             background
             autoPlay
             loop
-            className="absolute inset-0 h-full w-full object-cover opacity-[0.28]"
+            className="absolute inset-0 h-full w-full object-cover opacity-[0.32]"
           />
         ) : (
           // eslint-disable-next-line @next/next/no-img-element
@@ -45,16 +48,16 @@ export function ClassicHero({
             alt=""
             fetchPriority="high"
             decoding="async"
-            className="absolute inset-0 h-full w-full object-cover opacity-[0.28]"
+            className="absolute inset-0 h-full w-full object-cover opacity-[0.32]"
           />
         )
       ) : (
-        <div className="absolute inset-0 reel-bg opacity-40" />
+        <div className="absolute inset-0 reel-bg opacity-50" />
       )}
 
       <HeroScrim strength={content.heroOverlay} />
-      <div className="aurora animate-aurora-1 -left-40 top-10 h-[32rem] w-[32rem] bg-primary/25" />
-      <div className="aurora animate-aurora-2 -right-32 bottom-0 h-[28rem] w-[28rem] bg-accent/20" />
+      <div className="aurora animate-aurora-1 -left-40 top-10 h-[32rem] w-[32rem] bg-foreground/[0.07]" />
+      <div className="aurora animate-aurora-2 -right-32 bottom-0 h-[28rem] w-[28rem] bg-foreground/[0.05]" />
 
       <div className="container-x relative z-10 pt-28">
         <HeroCopy

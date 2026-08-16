@@ -61,13 +61,15 @@ export function IndustryShowcase({ industries, locale = "fa" }: { industries: In
             key={ind.id}
             href={`/industries/${ind.slug}`}
             onMouseEnter={() => setActive(i)}
-            className="group flex items-center justify-between gap-4 px-6 py-5 md:px-10"
+            className="group flex items-center justify-between gap-4 px-6 py-7 transition-colors duration-500 hover:bg-card-hover md:px-10"
           >
             <div className="flex items-center gap-4">
               <span
                 className={cn(
-                  "grid h-11 w-11 place-items-center rounded-xl border transition-colors",
-                  i === active ? "border-primary/50 bg-primary/10 text-primary" : "border-card-border text-foreground-faint",
+                  "grid h-11 w-11 place-items-center rounded-[12px] border transition-all duration-500 [transition-timing-function:var(--ease-apple)]",
+                  i === active
+                    ? "border-transparent bg-foreground text-background"
+                    : "border-card-border text-foreground-faint",
                 )}
               >
                 <Icon name={ind.icon} className="h-5 w-5" />
@@ -82,7 +84,7 @@ export function IndustryShowcase({ industries, locale = "fa" }: { industries: In
                   {tr(locale, ind.title, ind.titleEn, ind.titleAr)}
                 </span>
                 {locale === "fa" && (
-                  <p className={cn("text-xs uppercase tracking-widest transition-opacity", i === active ? "text-primary opacity-100" : "opacity-0")}>
+                  <p className={cn("text-[0.65rem] uppercase tracking-[0.25em] transition-opacity duration-500", i === active ? "text-foreground-muted opacity-100" : "opacity-0")}>
                     {ind.titleEn}
                   </p>
                 )}
@@ -90,8 +92,8 @@ export function IndustryShowcase({ industries, locale = "fa" }: { industries: In
             </div>
             <ArrowUpLeft
               className={cn(
-                "h-6 w-6 shrink-0 transition-all",
-                i === active ? "translate-x-0 text-primary opacity-100" : "translate-x-2 opacity-0",
+                "h-6 w-6 shrink-0 transition-all duration-500 [transition-timing-function:var(--ease-apple)]",
+                i === active ? "translate-x-0 text-foreground opacity-100" : "translate-x-2 opacity-0",
               )}
             />
           </Link>

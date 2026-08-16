@@ -44,13 +44,13 @@ export function VideoPlayer({
           brand gradient instead. */}
       {poster ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={poster} alt="" className="h-full w-full object-cover" />
+        <img src={poster} alt="" className="h-full w-full object-cover transition-all duration-700" />
       ) : (
         <span className="reel-bg block h-full w-full" />
       )}
-      <span className="absolute inset-0 grid place-items-center bg-black/30 transition-colors group-hover:bg-black/40">
-        <span className="relative grid h-20 w-20 place-items-center rounded-full bg-primary text-primary-foreground transition-transform group-hover:scale-110">
-          <span className="absolute inset-0 animate-ping-slow rounded-full bg-primary/50" />
+      <span className="absolute inset-0 grid place-items-center bg-black/25 transition-colors duration-500 group-hover:bg-black/35">
+        <span className="glass-onmedia relative grid h-20 w-20 place-items-center rounded-full transition-transform duration-500 [transition-timing-function:var(--ease-apple)] group-hover:scale-110">
+          <span className="absolute inset-0 animate-ping-slow rounded-full border border-white/60" />
           <Play className="h-7 w-7 translate-x-0.5 fill-current" />
         </span>
       </span>

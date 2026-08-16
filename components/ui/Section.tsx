@@ -41,7 +41,7 @@ export function SectionHeading({
   return (
     <div
       className={cn(
-        "flex flex-col gap-4",
+        "flex flex-col gap-5",
         align === "center" && "items-center text-center",
         className,
       )}
@@ -52,7 +52,7 @@ export function SectionHeading({
         </Reveal>
       )}
       <Reveal delay={0.05}>
-        <h2 className="font-display text-3xl font-bold leading-[1.15] tracking-tight text-foreground balance sm:text-4xl md:text-5xl">
+        <h2 className="font-display text-3xl font-bold leading-[1.1] tracking-[-0.028em] text-foreground balance sm:text-4xl md:text-5xl">
           {title}
         </h2>
       </Reveal>
@@ -81,12 +81,15 @@ export function Badge({
   className?: string;
   tone?: "default" | "primary" | "success" | "warn" | "danger";
 }) {
+  // Monochrome: severity is carried by ink density and weight, not hue —
+  // "danger" is the boldest, "default" the lightest. Anywhere the distinction
+  // has to survive a glance, pair the badge with a word.
   const tones = {
-    default: "border-card-border bg-surface text-foreground-muted",
-    primary: "border-primary/30 bg-primary/10 text-primary",
-    success: "border-emerald-400/30 bg-emerald-400/10 text-emerald-400",
-    warn: "border-amber-400/30 bg-amber-400/10 text-amber-400",
-    danger: "border-rose-400/30 bg-rose-400/10 text-rose-400",
+    default: "border-card-border bg-surface-2 text-foreground-muted",
+    primary: "border-foreground/20 bg-foreground/[0.06] text-foreground",
+    success: "border-foreground/25 bg-foreground/[0.05] font-semibold text-foreground",
+    warn: "border-foreground/40 bg-foreground/[0.08] font-semibold text-foreground",
+    danger: "border-transparent bg-foreground font-semibold text-background",
   };
   return (
     <span

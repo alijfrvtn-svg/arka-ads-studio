@@ -57,14 +57,14 @@ export function HeroMedia({
           />
         )
       ) : (
-        // No media chosen yet — fall back to the brand gradient rather than a
-        // blank black box, so a half-configured hero still looks intentional.
-        <div className="absolute inset-0 reel-bg opacity-60" />
+        // No media chosen yet — fall back to the graphite sweep rather than a
+        // blank box, so a half-configured hero still looks intentional.
+        <div className="absolute inset-0 reel-bg opacity-70" />
       )}
 
       <HeroScrim strength={content.heroOverlay} />
-      <div className="aurora animate-aurora-1 -left-40 top-10 h-[32rem] w-[32rem] bg-primary/25" />
-      <div className="aurora animate-aurora-2 -right-32 bottom-0 h-[28rem] w-[28rem] bg-accent/20" />
+      <div className="aurora animate-aurora-1 -left-40 top-10 h-[32rem] w-[32rem] bg-foreground/[0.07]" />
+      <div className="aurora animate-aurora-2 -right-32 bottom-0 h-[28rem] w-[28rem] bg-foreground/[0.05]" />
 
       <div className={cn("container-x relative z-10 pt-28", centered && "flex justify-center")}>
         <HeroCopy

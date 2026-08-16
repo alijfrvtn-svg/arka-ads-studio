@@ -17,16 +17,15 @@ export function FinalCTA({
   return (
     <section className="section">
       <Container>
-        <div className="relative overflow-hidden rounded-[2rem] border border-card-border px-6 py-20 text-center md:px-16 md:py-28">
-          <div className="reel-bg absolute inset-0 opacity-20" />
-          <div className="absolute inset-0 dotgrid opacity-30" />
-          <div className="pointer-events-none absolute left-1/2 top-1/2 h-96 w-96 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/20 blur-[120px]" />
+        <div className="relative overflow-hidden rounded-[2.5rem] border border-card-border bg-surface-2 px-6 py-24 text-center md:px-16 md:py-32">
+          <div className="absolute inset-0 dotgrid opacity-50" />
+          <div className="pointer-events-none absolute left-1/2 top-1/2 h-[30rem] w-[30rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-foreground/[0.04] blur-[130px]" />
           <div className="relative">
             <Reveal>
               <p className="eyebrow mx-auto w-fit">{content.finalEyebrow}</p>
             </Reveal>
             <Reveal delay={0.05}>
-              <h2 className="mx-auto mt-6 max-w-3xl font-display text-4xl font-extrabold leading-tight text-foreground balance md:text-6xl">
+              <h2 className="mx-auto mt-7 max-w-3xl font-display text-4xl font-extrabold leading-[1.08] tracking-[-0.03em] text-foreground balance md:text-6xl">
                 <HighlightedTitle title={content.finalHeading} highlight={content.finalHeadingHighlight} />
               </h2>
             </Reveal>
@@ -34,17 +33,19 @@ export function FinalCTA({
               <p className="mx-auto mt-6 max-w-xl text-lg text-foreground-muted">{content.finalDescription}</p>
             </Reveal>
             <Reveal delay={0.15}>
-              <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
+              <div className="mt-12 flex flex-wrap items-center justify-center gap-4">
                 <Link
                   href="/contact"
-                  className="group inline-flex items-center gap-2 rounded-full bg-primary px-8 py-4 text-base font-semibold text-primary-foreground transition-transform hover:scale-[1.03]"
+                  className="liquid liquid-ink group inline-flex items-center gap-2 rounded-full px-9 py-4 text-base font-semibold"
                 >
-                  {content.finalCtaLabel}
-                  <ArrowUpLeft className="h-5 w-5 transition-transform group-hover:-translate-x-1 group-hover:-translate-y-1" />
+                  <span className="inline-flex items-center gap-2">
+                    {content.finalCtaLabel}
+                    <ArrowUpLeft className="h-5 w-5 transition-transform duration-500 group-hover:-translate-x-1 group-hover:-translate-y-1" />
+                  </span>
                 </Link>
                 <a
                   href={`tel:${phone}`}
-                  className="inline-flex items-center gap-2 rounded-full border border-card-border px-8 py-4 text-base font-semibold text-foreground transition-colors hover:border-primary hover:text-primary"
+                  className="liquid liquid-clear inline-flex items-center gap-2 rounded-full px-9 py-4 text-base font-semibold text-foreground"
                 >
                   <span className="ltr-nums">{phoneDisplay}</span>
                 </a>

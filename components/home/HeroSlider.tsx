@@ -128,7 +128,7 @@ export function HeroSlider({
               className="h-full w-full object-cover"
             />
           ))}
-          {!slide.media && <div className="h-full w-full reel-bg opacity-60" />}
+          {!slide.media && <div className="h-full w-full reel-bg opacity-70" />}
         </motion.div>
       </AnimatePresence>
 
@@ -148,11 +148,11 @@ export function HeroSlider({
               {index + 1} / {count}
             </p>
             {slide.badge && (
-              <span className="mb-6 inline-flex items-center gap-2 rounded-full border border-card-border bg-surface/50 px-4 py-1.5 text-xs font-medium text-foreground-muted backdrop-blur">
+              <span className="liquid-clear mb-7 inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-medium text-foreground-muted">
                 {slide.badge}
               </span>
             )}
-            <h1 className="font-display max-w-4xl break-words text-[11vw] font-extrabold leading-[1.15] tracking-tight text-foreground sm:text-6xl sm:leading-[1.05] md:text-7xl lg:text-[5.5rem] lg:leading-[0.98]">
+            <h1 className="font-display max-w-4xl break-words text-[11vw] font-extrabold leading-[1.12] tracking-[-0.03em] text-foreground sm:text-6xl sm:leading-[1.05] md:text-7xl lg:text-[5.5rem] lg:leading-[0.98]">
               {slide.title}
             </h1>
             {slide.desc && (
@@ -175,7 +175,7 @@ export function HeroSlider({
           <button
             onClick={() => go(index - 1, true)}
             aria-label={t.prev}
-            className="grid h-11 w-11 place-items-center rounded-full border border-card-border bg-surface/60 text-foreground backdrop-blur transition-colors hover:border-primary hover:text-primary"
+            className="liquid liquid-clear grid h-11 w-11 place-items-center rounded-full text-foreground"
           >
             <ChevronRight className="h-5 w-5" />
           </button>
@@ -188,8 +188,8 @@ export function HeroSlider({
                 aria-label={`${t.go} ${i + 1}`}
                 aria-current={i === index}
                 className={cn(
-                  "h-2.5 rounded-full transition-all",
-                  i === index ? "w-8 bg-primary" : "w-2.5 bg-card-border hover:bg-foreground-faint",
+                  "h-1.5 rounded-full transition-all duration-500 [transition-timing-function:var(--ease-apple)]",
+                  i === index ? "w-9 bg-foreground" : "w-1.5 bg-foreground/25 hover:bg-foreground/50",
                 )}
               />
             ))}
@@ -198,7 +198,7 @@ export function HeroSlider({
           <button
             onClick={() => go(index + 1, true)}
             aria-label={t.next}
-            className="grid h-11 w-11 place-items-center rounded-full border border-card-border bg-surface/60 text-foreground backdrop-blur transition-colors hover:border-primary hover:text-primary"
+            className="liquid liquid-clear grid h-11 w-11 place-items-center rounded-full text-foreground"
           >
             <ChevronLeft className="h-5 w-5" />
           </button>
@@ -210,7 +210,7 @@ export function HeroSlider({
                 setPaused(false);
               }}
               aria-label={takenOver.current ? t.play : t.pause}
-              className="grid h-11 w-11 place-items-center rounded-full border border-card-border bg-surface/60 text-foreground-muted backdrop-blur transition-colors hover:border-primary hover:text-primary"
+              className="liquid liquid-clear grid h-11 w-11 place-items-center rounded-full text-foreground-muted"
             >
               {takenOver.current ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}
             </button>
