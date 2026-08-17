@@ -54,10 +54,13 @@ export function SiteFooter({
       ? new Intl.DateTimeFormat("fa-IR-u-ca-persian", { year: "numeric" }).format(new Date())
       : new Date().getFullYear();
   return (
-    <footer className="relative overflow-hidden border-t border-card-border bg-background">
+    // `footer-dark` (globals.css) redefines the colour tokens for this
+    // subtree, so the logo, links, social pills and CTA button all invert
+    // themselves rather than each carrying a dark-mode class.
+    <footer className="footer-dark relative overflow-hidden">
       <div className="container-x relative py-20 md:py-24">
         {/* CTA strip */}
-        <div className="mb-20 flex flex-col items-start justify-between gap-8 rounded-[2rem] border border-card-border bg-surface-2 p-10 md:flex-row md:items-center md:p-14">
+        <div className="glass mb-20 flex flex-col items-start justify-between gap-8 rounded-[2rem] p-10 md:flex-row md:items-center md:p-14">
           <div>
             <h3 className="font-display text-2xl font-bold tracking-tight text-foreground md:text-3xl">
               {ctaHeading}
@@ -90,7 +93,7 @@ export function SiteFooter({
                   target="_blank"
                   rel="noreferrer"
                   aria-label={s.label}
-                  className="liquid liquid-clear grid h-11 w-11 place-items-center rounded-full text-foreground-muted hover:text-foreground"
+                  className="footer-social liquid-clear grid h-11 w-11 place-items-center rounded-full text-foreground-muted"
                 >
                   <SocialIcon platform={s.platform} className="h-[18px] w-[18px]" />
                 </a>
@@ -110,13 +113,13 @@ export function SiteFooter({
               <li className="flex items-center gap-2.5">
                 <Phone className="h-4 w-4 shrink-0 text-foreground-faint" />
                 {/* A phone number on a phone should be tappable. */}
-                <a href={`tel:${contact.phone}`} className="ltr-nums inline-flex min-h-11 items-center hover:text-foreground">
+                <a href={`tel:${contact.phone}`} className="footer-link ltr-nums inline-flex min-h-11 items-center">
                   {contact.phoneDisplay}
                 </a>
               </li>
               <li className="flex items-center gap-2.5">
                 <Mail className="h-4 w-4 shrink-0 text-foreground-faint" />
-                <a href={`mailto:${contact.email}`} className="ltr-nums inline-flex min-h-11 items-center hover:text-foreground">
+                <a href={`mailto:${contact.email}`} className="footer-link ltr-nums inline-flex min-h-11 items-center">
                   {contact.email}
                 </a>
               </li>
@@ -134,7 +137,7 @@ export function SiteFooter({
               <Link
                 key={n.href}
                 href={n.href}
-                className="inline-flex min-h-11 items-center px-1 hover:text-foreground"
+                className="footer-link inline-flex min-h-11 items-center px-1"
               >
                 {navLabel(n.href)}
               </Link>
@@ -158,7 +161,7 @@ function FooterCol({ title, links }: { title: string; links: { label: string; hr
       <ul className="flex flex-col text-sm text-foreground-muted">
         {links.map((l) => (
           <li key={l.href}>
-            <Link href={l.href} className="link-underline inline-flex min-h-11 items-center hover:text-foreground">
+            <Link href={l.href} className="footer-link link-underline inline-flex min-h-11 items-center">
               {l.label}
             </Link>
           </li>

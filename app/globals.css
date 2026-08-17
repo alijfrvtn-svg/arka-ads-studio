@@ -876,6 +876,138 @@ body {
 }
 
 /* ============================================================
+   Footer — black glass
+   ------------------------------------------------------------
+   The footer inverts by redefining tokens on one scope rather than by
+   restyling its contents. Everything inside already reads --foreground,
+   --glass-bg and friends, so the logo wordmark, the column links, the social
+   pills and the CTA button all flip on their own — and anything added to the
+   footer later inherits the inversion instead of arriving in black-on-black.
+
+   Contrast against the slab (composites to about #1c1c1c over the page):
+     #ffffff              17.9:1   headings, links
+     white 72%  (#b4b4b4)  9.4:1   body copy
+     white 55%  (#8f8f8f)  5.7:1   captions, legal
+   The accent flips too: the navy used on paper is 1.3:1 here, so the footer
+   takes the azure, which is 6.9:1 on the slab.
+   ============================================================ */
+.footer-dark {
+  --background: #0a0a0a;
+  --background-2: #101010;
+  --surface: rgba(255, 255, 255, 0.045);
+  --surface-2: rgba(255, 255, 255, 0.055);
+  --surface-3: rgba(255, 255, 255, 0.08);
+  --card: rgba(255, 255, 255, 0.045);
+  --card-border: rgba(255, 255, 255, 0.13);
+  --card-hover: rgba(255, 255, 255, 0.07);
+  --foreground: #ffffff;
+  --foreground-muted: rgba(255, 255, 255, 0.72);
+  --foreground-faint: rgba(255, 255, 255, 0.55);
+  --hairline: rgba(255, 255, 255, 0.13);
+
+  /* Ink and paper swap: the primary action has to be the light thing now. */
+  --primary: #ffffff;
+  --primary-foreground: #0a0a0a;
+  --accent: var(--accent-soft);
+  --ring: var(--accent-soft);
+
+  /* Glass, dark. Same physics, lit from a dark room. */
+  --glass-bg: rgba(255, 255, 255, 0.07);
+  --glass-bg-strong: rgba(255, 255, 255, 0.12);
+  --glass-border: rgba(255, 255, 255, 0.16);
+  --glass-highlight: rgba(255, 255, 255, 0.22);
+  --glass-shade: rgba(0, 0, 0, 0.5);
+  --glass-shadow: 0 1px 1px rgba(0, 0, 0, 0.5), 0 10px 30px -12px rgba(0, 0, 0, 0.9);
+
+  /* The raised pill inverts to white-on-black. */
+  --glass-raised-bg: linear-gradient(180deg, #ffffff 0%, #f0f0f0 55%, #e2e2e2 100%);
+  --glass-raised-fg: #0a0a0a;
+  --glass-raised-border: rgba(255, 255, 255, 0.85);
+  --glass-raised-bevel: inset 0 1px 0 rgba(255, 255, 255, 1), inset 0 -1px 1px rgba(0, 0, 0, 0.14),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.05);
+  --glass-raised-lift: 0 1px 2px rgba(0, 0, 0, 0.5), 0 8px 20px -6px rgba(0, 0, 0, 0.7),
+    0 24px 50px -16px rgba(0, 0, 0, 0.9);
+  --glass-raised-lift-hover: 0 1px 2px rgba(0, 0, 0, 0.55), 0 12px 26px -6px rgba(0, 0, 0, 0.75),
+    0 34px 66px -18px rgba(0, 0, 0, 0.95);
+
+  position: relative;
+  isolation: isolate;
+  color: var(--foreground);
+  /* Not flat black: a slab of smoked glass picks up a little of what is behind
+     it and is never one value top to bottom. */
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0) 22%),
+    linear-gradient(180deg, #121212 0%, #0a0a0a 45%, #000000 100%);
+  backdrop-filter: blur(24px) saturate(140%);
+}
+
+/* Specular pass: a wide diagonal sheen and a bright cut along the top edge —
+   the two things that separate polished glass from matte black paint. */
+.footer-dark::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      104deg,
+      rgba(255, 255, 255, 0.09) 0%,
+      rgba(255, 255, 255, 0.02) 22%,
+      rgba(255, 255, 255, 0) 42%,
+      rgba(255, 255, 255, 0.05) 60%,
+      rgba(255, 255, 255, 0) 76%
+    ),
+    radial-gradient(70% 40% at 50% 0%, rgba(255, 255, 255, 0.08), transparent 70%);
+}
+.footer-dark::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  height: 1px;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    to left,
+    transparent,
+    rgba(255, 255, 255, 0.35) 22%,
+    rgba(255, 255, 255, 0.5) 50%,
+    rgba(255, 255, 255, 0.35) 78%,
+    transparent
+  );
+}
+.footer-dark > * {
+  position: relative;
+  z-index: 2;
+}
+
+/* ————— footer hovers —————
+   On paper a link darkens to signal hover; there is nothing darker than white
+   here, so it goes the other way: muted lifts to full white, and the underline
+   sweep already built for links does the rest. */
+.footer-dark a {
+  transition: color 0.35s var(--ease-apple), opacity 0.35s var(--ease-apple);
+}
+.footer-link:hover {
+  color: #ffffff;
+}
+/* Social pills brighten and lift rather than changing hue. */
+.footer-social {
+  transition:
+    transform 0.45s var(--ease-apple),
+    background-color 0.45s var(--ease-apple),
+    border-color 0.45s var(--ease-apple),
+    color 0.45s var(--ease-apple);
+}
+.footer-social:hover {
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.32);
+  color: #ffffff;
+}
+
+/* ============================================================
    Poster scrim — department cards (components/home/Departments.tsx)
    ------------------------------------------------------------
    White type over an arbitrary poster is the hardest legibility case on the
