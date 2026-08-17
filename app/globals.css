@@ -660,33 +660,67 @@ body {
    (components/home/Workflow.tsx)
    ============================================================ */
 
-/* The paint sits under a white radial veil. Splashes are placed in the top and
-   bottom edges and the gutters, but an admin can rewrite the step copy to any
-   length, so the veil is the guarantee rather than the placement: it is opaque
-   through the middle band where the four columns live and clears toward the
-   edges where the paint is.
+/* The paint runs edge to edge — no section-wide veil.
+   ------------------------------------------------------------
+   The first version laid a white radial haze over the middle band. It kept the
+   text safe but pushed all the colour out to the rim and left a large white
+   void through the centre, which is the opposite of what this section is for.
 
-   Worst case is body copy (#545454) landing on the darkest colour in the set,
-   #37192c. Unveiled that is 1.9:1 — unreadable. Under the veil the middle band
-   composites to at least #f2f2f2, which puts the same text at 6.6:1 and the
-   headings at 16.5:1. The paint stays vivid at the edges, where nothing reads. */
+   Legibility is handled per text block instead, by `.wf-plate` below. */
 .wf-canvas {
-  --wf-veil: radial-gradient(
-    120% 78% at 50% 50%,
-    rgba(255, 255, 255, 0.96) 0%,
-    rgba(255, 255, 255, 0.94) 38%,
-    rgba(255, 255, 255, 0.72) 60%,
-    rgba(255, 255, 255, 0.3) 78%,
-    rgba(255, 255, 255, 0) 100%
-  );
   overflow: hidden;
 }
-.wf-canvas::after {
+
+/* ————— local clearing —————
+   A heavily blurred white radial sitting directly behind one block of text.
+   Blurred and edgeless, so it reads as a lighter passage in the painting rather
+   than as a panel laid on top of it — and because it is a DOM element rather
+   than a shape in the SVG, it tracks the text at every viewport size instead of
+   drifting as the artwork is sliced.
+
+   0.78 in the core is set by the worst case in the palette. Near-black ink on
+   each colour, raw and then under this clearing:
+
+                    raw    under plate
+     #cbe9f9       14.9        18.1
+     #FFB902       11.0        16.8
+     #FF6B5B        6.7        15.4
+     #37192c        1.2        12.6
+
+   The dark plum is the reason the plate exists at all: at 1.2:1 raw, text over
+   it is invisible, and it is the one colour that cannot simply be kept away
+   from the copy once the paint covers everything.
+
+   Body copy in this section is ink rather than the muted grey used elsewhere —
+   grey fails on every one of these colours (2.1–4.4:1) even under the plate. */
+.wf-plate {
+  position: relative;
+}
+.wf-plate::before {
   content: "";
   position: absolute;
-  inset: 0;
-  background: var(--wf-veil);
+  inset: -14% -8%;
+  z-index: 0;
+  border-radius: 50%;
+  background: radial-gradient(
+    62% 58% at 50% 50%,
+    rgba(255, 255, 255, 0.78) 0%,
+    rgba(255, 255, 255, 0.7) 45%,
+    rgba(255, 255, 255, 0.42) 68%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  filter: blur(18px);
   pointer-events: none;
+}
+.wf-plate > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* The section's copy is ink, not the site's muted grey — see the table above. */
+.wf-step h3,
+.wf-step p {
+  color: var(--foreground);
 }
 
 /* ————— step card —————
