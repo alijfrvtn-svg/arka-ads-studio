@@ -378,6 +378,28 @@ body {
   }
 }
 
+/* Wider measure for sections that are carrying artwork rather than text.
+   The 1240px container is set by the comfortable reading line; a row of four
+   posters is not reading, and at 1240 each one lands at ~270px, which is too
+   small for a dense collage to survive. This lets them breathe on large
+   screens and collapses to the normal container below it. */
+.container-wide {
+  margin-inline: auto;
+  width: 100%;
+  max-width: 1560px;
+  padding-inline: 1.5rem;
+}
+@media (min-width: 768px) {
+  .container-wide {
+    padding-inline: 2.5rem;
+  }
+}
+@media (min-width: 1280px) {
+  .container-wide {
+    padding-inline: 3rem;
+  }
+}
+
 /* Editorial measure — long-form copy should never run the full 1240px. */
 .container-narrow {
   margin-inline: auto;
@@ -632,6 +654,48 @@ body {
   }
 }
 
+
+/* ============================================================
+   Poster scrim — department cards (components/home/Departments.tsx)
+   ------------------------------------------------------------
+   White type over an arbitrary poster is the hardest legibility case on the
+   site: these artworks are fully saturated collages, so the same headline can
+   land on a yellow panel in one card and a navy one in the next. A flat tint
+   cannot fix that — at the strength a yellow panel needs, it would bury the
+   dark posters entirely.
+
+   So the scrim is bottom-weighted and it OWNS the bottom of the card. Text only
+   ever sits below the 55% line, and by there the gradient is already at 0.82,
+   so the composite is the same regardless of what the poster is doing
+   underneath. Worst case — pure white artwork:
+
+     alpha 0.97  ->  composite  8   ->  white text  19.4:1
+     alpha 0.92  ->  composite 20   ->  white text  17.1:1
+     alpha 0.82  ->  composite 46   ->  white text  12.6:1   (top of the copy)
+
+   All far past AA, and the floor is what matters here rather than the average:
+   it means no poster can ever be swapped in that breaks a card.
+
+   Above that line the gradient falls away to nothing, so the top half of the
+   artwork — where each poster puts its own headline — stays fully visible and
+   the card still reads as a poster rather than a darkened rectangle.
+   ============================================================ */
+.poster-scrim {
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.97) 0%,
+    rgba(0, 0, 0, 0.92) 22%,
+    rgba(0, 0, 0, 0.82) 42%,
+    rgba(0, 0, 0, 0.52) 60%,
+    rgba(0, 0, 0, 0.2) 76%,
+    rgba(0, 0, 0, 0.06) 100%
+  );
+}
+
+/* Deliberately not animated on hover. The scrim is fixed and the poster scales
+   underneath it, so the copy sits on exactly the same composite before and
+   after — which is the point of the numbers above. The hover affordance is
+   carried by the lift, the shadow, the push-in and the arrow. */
 
 /* ============================================================
    Header submenus — glassmorphism

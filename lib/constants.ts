@@ -67,6 +67,24 @@ export interface DepartmentDef {
  * the lot. Only the labels moved, to describe what each department actually
  * contains: FILM is photography, DIGITAL is web and SEO.
  */
+/**
+ * Poster artwork behind each department card on the homepage.
+ *
+ * Keyed by department id rather than stored on the Category row: there are
+ * exactly four departments and they are fixed, so a lookup here is simpler than
+ * a schema migration plus an upload field. To swap one, drop a replacement at
+ * the same path — the files are 4:5, which is the ratio the card is built to.
+ *
+ * A department with no entry falls back to a plain card, so this can never be
+ * the reason a department stops rendering.
+ */
+export const DEPARTMENT_POSTER: Record<string, string> = {
+  DESIGN: "/departments/design.webp",
+  FILM: "/departments/film.webp",
+  DIGITAL: "/departments/digital.webp",
+  STRATEGY: "/departments/strategy.webp",
+};
+
 export const DEPARTMENTS: DepartmentDef[] = [
   {
     key: "DESIGN",
