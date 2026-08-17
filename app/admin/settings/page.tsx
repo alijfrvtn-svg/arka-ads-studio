@@ -118,9 +118,9 @@ export default async function SettingsPage() {
           <Field label="آمار" hint="ترتیب ردیف‌ها همان ترتیب نمایش است. عدد و پسوند از ستون فارسی خوانده می‌شود.">
             <LangTabs
               tabs={[
-                { locale: "fa", content: <Repeater name="stats" initial={statRows} fields={STAT_FIELDS} addLabel="افزودن آمار" rowLabel={(r, i) => r.label || `آمار ${i + 1}`} /> },
-                { locale: "en", content: <Repeater name="statsEn" initial={statRowsEn} fields={STAT_FIELDS} addLabel="Add stat" rowLabel={(r, i) => r.label || `Stat ${i + 1}`} /> },
-                { locale: "ar", content: <Repeater name="statsAr" initial={statRowsAr} fields={STAT_FIELDS} addLabel="إضافة رقم" rowLabel={(r, i) => r.label || `رقم ${i + 1}`} /> },
+                { locale: "fa", content: <Repeater name="stats" initial={statRows} fields={STAT_FIELDS} addLabel="افزودن آمار" labelKey="label" labelFallback="آمار" /> },
+                { locale: "en", content: <Repeater name="statsEn" initial={statRowsEn} fields={STAT_FIELDS} addLabel="Add stat" labelKey="label" labelFallback="Stat" /> },
+                { locale: "ar", content: <Repeater name="statsAr" initial={statRowsAr} fields={STAT_FIELDS} addLabel="إضافة رقم" labelKey="label" labelFallback="رقم" /> },
               ]}
             />
           </Field>

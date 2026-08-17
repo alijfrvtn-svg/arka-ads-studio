@@ -122,9 +122,9 @@ export default async function ServiceForm({ params }: { params: Promise<{ id: st
           <Field label="پلن‌ها">
             <LangTabs
               tabs={[
-                { locale: "fa", content: <Repeater name="pricing" initial={pricingRowsFa} fields={PRICING_FIELDS} addLabel="افزودن پلن" rowLabel={(r, i) => r.name || `پلن ${i + 1}`} /> },
-                { locale: "en", content: <Repeater name="pricingEn" initial={pricingRowsEn} fields={PRICING_FIELDS} addLabel="Add plan" rowLabel={(r, i) => r.name || `Plan ${i + 1}`} /> },
-                { locale: "ar", content: <Repeater name="pricingAr" initial={pricingRowsAr} fields={PRICING_FIELDS} addLabel="إضافة باقة" rowLabel={(r, i) => r.name || `باقة ${i + 1}`} /> },
+                { locale: "fa", content: <Repeater name="pricing" initial={pricingRowsFa} fields={PRICING_FIELDS} addLabel="افزودن پلن" labelKey="name" labelFallback="پلن" /> },
+                { locale: "en", content: <Repeater name="pricingEn" initial={pricingRowsEn} fields={PRICING_FIELDS} addLabel="Add plan" labelKey="name" labelFallback="Plan" /> },
+                { locale: "ar", content: <Repeater name="pricingAr" initial={pricingRowsAr} fields={PRICING_FIELDS} addLabel="إضافة باقة" labelKey="name" labelFallback="باقة" /> },
               ]}
             />
           </Field>

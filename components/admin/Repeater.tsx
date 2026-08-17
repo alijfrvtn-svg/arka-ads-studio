@@ -42,7 +42,9 @@ export function Repeater({
   fields,
   initial,
   addLabel = "افزودن",
-  rowLabel,
+  labelKey,
+  labelFallback = "مورد",
+  rowTitles,
   locked = false,
   max,
 }: {
@@ -50,8 +52,25 @@ export function Repeater({
   fields: RepeaterField[];
   initial: Row[];
   addLabel?: string;
-  /** Heading for each row, e.g. (row, i) => row.department ?? `مورد ${i + 1}`. */
-  rowLabel?: (row: Row, index: number) => string;
+  /**
+   * Which field(s) to title a row with — first non-empty one wins, falling back
+   * to `${labelFallback} ${n}`.
+   *
+   * Deliberately data, not a `(row, i) => string` callback: every page using
+   * this is a Server Component, and a function prop cannot cross the RSC
+   * boundary. It type-checks and it builds, then throws at render — which is
+   * exactly how it shipped once already.
+   */
+  labelKey?: string | string[];
+  labelFallback?: string;
+  /**
+   * Fixed heading per row, by index — wins over `labelKey`.
+   *
+   * For `locked` sets whose rows are known up front and whose own field value
+   * is an id rather than anything a human wants to read (the hero slides store
+   * `DESIGN`, the editor should see «برندینگ و طراحی گرافیک»).
+   */
+  rowTitles?: string[];
   locked?: boolean;
   max?: number;
 }) {
@@ -75,6 +94,16 @@ export function Repeater({
 
   const payload = JSON.stringify(rows.filter((r) => Object.values(r).some((v) => v.trim())));
 
+  const titleOf = (row: Row, i: number) => {
+    if (rowTitles?.[i]) return rowTitles[i];
+    const keys = labelKey ? (Array.isArray(labelKey) ? labelKey : [labelKey]) : [];
+    for (const k of keys) {
+      const v = row[k]?.trim();
+      if (v) return v;
+    }
+    return `${labelFallback} ${i + 1}`;
+  };
+
   return (
     <div className="flex flex-col gap-3">
       <input type="hidden" name={name} value={payload} />
@@ -83,7 +112,7 @@ export function Repeater({
         <div key={i} className="rounded-xl border border-card-border bg-background/40 p-4">
           <div className="mb-3 flex items-center justify-between gap-2">
             <span className="text-xs font-semibold text-foreground">
-              {rowLabel ? rowLabel(row, i) : `مورد ${i + 1}`}
+              {titleOf(row, i)}
             </span>
             {!locked && (
               <div className="flex items-center gap-1">

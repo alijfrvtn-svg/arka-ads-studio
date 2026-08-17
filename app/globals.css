@@ -46,6 +46,20 @@
   --color-ink: #111111;
   --color-ink-black: #000000;
 
+  /* ————— CMS brand palette —————
+     Not used by the public site, which is ink-on-paper. These exist because
+     /admin and /portal still run the original blue identity and address it
+     through utilities (`bg-navy-ink`, `text-sky`, `border-sky/30`). Deleting
+     them once already blanked the login screens: the classes silently resolved
+     to nothing, so a dark panel lost its background while its white text
+     stayed white. */
+  --color-navy: #162d73;
+  --color-navy-deep: #0b1a45;
+  --color-navy-ink: #04060d;
+  --color-azure: #6699ff;
+  --color-sky: #a6c9ff;
+  --color-mist: #d3ebfe;
+
   --font-sans: var(--font-vazir), "Vazirmatn", ui-sans-serif, system-ui, sans-serif;
   /* Estedad, self-hosted (see app/layout.tsx). It covers Persian and Latin, so
      unlike the Syne it replaces, a heading no longer changes typeface halfway
@@ -618,6 +632,87 @@ body {
   }
 }
 
+
+/* ============================================================
+   Header submenus — glassmorphism
+   ------------------------------------------------------------
+   Applies to every dropdown in the header (services and industries alike).
+
+   The panel is translucent white over a heavy blur rather than a solid sheet,
+   so the page keeps showing through: over the hero's card deck or the marquee
+   the menu reads as a pane of glass laid on top of the site rather than a box
+   that replaced it. `saturate(180%)` matters as much as the blur — without it
+   the blurred backdrop desaturates and the whole panel goes grey and muddy.
+
+   Contrast is the constraint that shapes the numbers. This panel is dense with
+   small text, so the white is held at 0.86 rather than the 0.55 the buttons
+   use: at that alpha ink text keeps ~15:1 even when a dark photo scrolls
+   underneath, where a lighter panel would let it collapse. The blur is doing
+   the depth; the alpha is doing the legibility.
+   ============================================================ */
+.menu-glass {
+  background: rgba(255, 255, 255, 0.86);
+  border: 1px solid rgba(0, 0, 0, 0.07);
+  /* No hand-written -webkit- pair here. Lightning CSS reconciles the two
+     against the build targets and drops BOTH, which silently removes the blur
+     while every other declaration survives — the panel then renders as a flat
+     translucent sheet. Authoring the unprefixed property alone lets the build
+     add the prefix itself. */
+  backdrop-filter: blur(28px) saturate(180%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.03),
+    0 1px 2px rgba(0, 0, 0, 0.04),
+    0 24px 60px -20px rgba(0, 0, 0, 0.28);
+}
+
+/* No blur at all is better than a broken one: if the browser cannot composite
+   a backdrop filter, fall back to near-opaque white so the text stays readable
+   instead of sitting on a semi-transparent smear. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .menu-glass {
+    background: rgba(255, 255, 255, 0.98);
+  }
+}
+
+/* ————— per-column hover —————
+   Hovering one department lifts that column alone. Two signals, both cheap:
+   a soft wash behind it, and its own icon blown up as a watermark. */
+.menu-col {
+  transition:
+    background-color 0.4s var(--ease-apple),
+    box-shadow 0.4s var(--ease-apple);
+}
+.menu-col:hover {
+  background-color: rgba(0, 0, 0, 0.035);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.05);
+}
+
+/* The watermark. Alpha is the whole design here: it has to register as texture
+   and never as content, and it sits *behind* the links (the text nodes are
+   position:relative above it) so it cannot touch their contrast. */
+.menu-col-mark {
+  color: var(--accent);
+  opacity: 0;
+  transform: rotate(-8deg) scale(0.82);
+  transition:
+    opacity 0.5s var(--ease-apple),
+    transform 0.6s var(--ease-apple);
+}
+.menu-col:hover .menu-col-mark {
+  opacity: 0.07;
+  transform: rotate(0deg) scale(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .menu-col-mark {
+    transform: none;
+  }
+  .menu-col:hover .menu-col-mark {
+    transform: none;
+  }
+}
+
 /* ============================================================
    Surfaces
    ============================================================ */
@@ -738,6 +833,16 @@ h3 {
   );
   background-size: 280% 280%;
   animation: reel-pan 22s ease-in-out infinite;
+}
+
+/* Backdrop for the CMS sign-in panels. Deliberately separate from .reel-bg:
+   that one belongs to the public site and is light, and these panels carry
+   white type. */
+.cms-brand-bg {
+  background:
+    radial-gradient(120% 90% at 15% 0%, rgba(102, 153, 255, 0.28), transparent 60%),
+    radial-gradient(90% 80% at 90% 100%, rgba(22, 45, 115, 0.55), transparent 62%),
+    linear-gradient(160deg, #0b1a45 0%, #04060d 55%, #081231 100%);
 }
 
 .spotlight {

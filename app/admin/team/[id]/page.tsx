@@ -60,7 +60,7 @@ export default async function TeamMemberForm({ params }: { params: Promise<{ id:
               name="socials"
               initial={socialRows}
               addLabel="افزودن شبکه"
-              rowLabel={(r, i) => r.platform || `شبکه ${i + 1}`}
+              labelKey="platform" labelFallback="شبکه"
               fields={[
                 { key: "platform", label: "پلتفرم", placeholder: "instagram" },
                 { key: "href", label: "لینک", type: "url" as const, placeholder: "https://instagram.com/…" },

@@ -45,8 +45,8 @@ export default function LoginPage() {
     <div className="grid min-h-screen lg:grid-cols-2">
       {/* brand side */}
       <div className="relative hidden overflow-hidden lg:flex">
-        <div className="reel-bg absolute inset-0" />
-        <div className="absolute inset-0 bg-navy-ink/50" />
+        <div className="cms-brand-bg absolute inset-0" />
+        <div className="absolute inset-0 bg-navy-ink/40" />
         <div className="absolute inset-0 dotgrid opacity-30" />
         <div className="relative z-10 flex w-full flex-col justify-between p-12">
           <Logo tagline mono className="text-white [&_*]:text-white" />

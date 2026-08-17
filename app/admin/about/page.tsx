@@ -149,9 +149,9 @@ export default async function AboutPageAdmin() {
           <Field label="کارت‌های ارزش" hint="ترتیب ردیف‌ها همان ترتیب نمایش است.">
             <LangTabs
               tabs={[
-                { locale: "fa", content: <Repeater name="values" initial={valueRows(row?.values)} fields={VALUE_FIELDS} addLabel="افزودن ارزش" rowLabel={(r, i) => r.title || `ارزش ${i + 1}`} /> },
-                { locale: "en", content: <Repeater name="valuesEn" initial={valueRows(row?.valuesEn)} fields={VALUE_FIELDS} addLabel="Add value" rowLabel={(r, i) => r.title || `Value ${i + 1}`} /> },
-                { locale: "ar", content: <Repeater name="valuesAr" initial={valueRows(row?.valuesAr)} fields={VALUE_FIELDS} addLabel="إضافة قيمة" rowLabel={(r, i) => r.title || `قيمة ${i + 1}`} /> },
+                { locale: "fa", content: <Repeater name="values" initial={valueRows(row?.values)} fields={VALUE_FIELDS} addLabel="افزودن ارزش" labelKey="title" labelFallback="ارزش" /> },
+                { locale: "en", content: <Repeater name="valuesEn" initial={valueRows(row?.valuesEn)} fields={VALUE_FIELDS} addLabel="Add value" labelKey="title" labelFallback="Value" /> },
+                { locale: "ar", content: <Repeater name="valuesAr" initial={valueRows(row?.valuesAr)} fields={VALUE_FIELDS} addLabel="إضافة قيمة" labelKey="title" labelFallback="قيمة" /> },
               ]}
             />
           </Field>
@@ -204,9 +204,9 @@ export default async function AboutPageAdmin() {
           <Field label="رویدادها" hint="ترتیب ردیف‌ها همان ترتیب نمایش است.">
             <LangTabs
               tabs={[
-                { locale: "fa", content: <Repeater name="timeline" initial={timelineRows(row?.timeline)} fields={TIMELINE_FIELDS} addLabel="افزودن رویداد" rowLabel={(r, i) => r.title || `رویداد ${i + 1}`} /> },
-                { locale: "en", content: <Repeater name="timelineEn" initial={timelineRows(row?.timelineEn)} fields={TIMELINE_FIELDS} addLabel="Add milestone" rowLabel={(r, i) => r.title || `Milestone ${i + 1}`} /> },
-                { locale: "ar", content: <Repeater name="timelineAr" initial={timelineRows(row?.timelineAr)} fields={TIMELINE_FIELDS} addLabel="إضافة حدث" rowLabel={(r, i) => r.title || `حدث ${i + 1}`} /> },
+                { locale: "fa", content: <Repeater name="timeline" initial={timelineRows(row?.timeline)} fields={TIMELINE_FIELDS} addLabel="افزودن رویداد" labelKey="title" labelFallback="رویداد" /> },
+                { locale: "en", content: <Repeater name="timelineEn" initial={timelineRows(row?.timelineEn)} fields={TIMELINE_FIELDS} addLabel="Add milestone" labelKey="title" labelFallback="Milestone" /> },
+                { locale: "ar", content: <Repeater name="timelineAr" initial={timelineRows(row?.timelineAr)} fields={TIMELINE_FIELDS} addLabel="إضافة حدث" labelKey="title" labelFallback="حدث" /> },
               ]}
             />
           </Field>

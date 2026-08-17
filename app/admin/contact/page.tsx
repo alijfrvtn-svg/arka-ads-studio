@@ -125,9 +125,9 @@ export default async function ContactPageAdmin() {
           <Field label="لینک‌ها" hint="ترتیب ردیف‌ها همان ترتیب نمایش است.">
             <LangTabs
               tabs={[
-                { locale: "fa", content: <Repeater name="socials" initial={socialRows(row?.socials)} fields={SOCIAL_FIELDS} addLabel="افزودن شبکه" rowLabel={(r, i) => r.label || r.platform || `شبکه ${i + 1}`} /> },
-                { locale: "en", content: <Repeater name="socialsEn" initial={socialRows(row?.socialsEn)} fields={SOCIAL_FIELDS} addLabel="Add network" rowLabel={(r, i) => r.label || r.platform || `Network ${i + 1}`} /> },
-                { locale: "ar", content: <Repeater name="socialsAr" initial={socialRows(row?.socialsAr)} fields={SOCIAL_FIELDS} addLabel="إضافة شبكة" rowLabel={(r, i) => r.label || r.platform || `شبكة ${i + 1}`} /> },
+                { locale: "fa", content: <Repeater name="socials" initial={socialRows(row?.socials)} fields={SOCIAL_FIELDS} addLabel="افزودن شبکه" labelKey={["label", "platform"]} labelFallback="شبکه" /> },
+                { locale: "en", content: <Repeater name="socialsEn" initial={socialRows(row?.socialsEn)} fields={SOCIAL_FIELDS} addLabel="Add network" labelKey={["label", "platform"]} labelFallback="Network" /> },
+                { locale: "ar", content: <Repeater name="socialsAr" initial={socialRows(row?.socialsAr)} fields={SOCIAL_FIELDS} addLabel="إضافة شبكة" labelKey={["label", "platform"]} labelFallback="شبكة" /> },
               ]}
             />
           </Field>

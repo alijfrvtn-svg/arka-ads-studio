@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowUpLeft, ChevronDown, Menu, X } from "lucide-react";
 import { Logo } from "@/components/brand/Logo";
+import { Icon } from "@/components/ui/Icon";
 import { SiteSearch } from "@/components/search/SiteSearch";
 import { Button } from "@/components/ui/Button";
 import { Magnetic } from "@/components/fx/Magnetic";
@@ -146,16 +147,30 @@ export function SiteHeader({
               className="absolute inset-x-0 top-full hidden px-[max(1.25rem,calc((100vw-1360px)/2+1.25rem))] pt-3 lg:block"
               onMouseEnter={() => setMega(mega)}
             >
-              <div className="glass glass-strong overflow-hidden rounded-[1.75rem] p-3">
+              {/* Glassmorphism: the panel is translucent white over a heavy
+                  blur, so whatever the page is showing underneath — a hero
+                  card deck, the marquee — stays faintly present instead of
+                  being covered by a flat sheet. `saturate` is what stops the
+                  blurred backdrop going muddy. */}
+              <div className="menu-glass overflow-hidden rounded-[1.75rem] p-3">
                 {mega === "services" ? (
                   <div className="grid grid-cols-4 gap-2">
                     {departments.map((d) => (
-                      <div key={d.slug} className="rounded-2xl p-4">
-                        <p className="mb-3 flex items-center gap-2 text-xs font-bold tracking-wide text-foreground">
-                          <span className="h-1 w-1 rounded-full bg-foreground" />
+                      // Hovering a column lifts that department alone: a soft
+                      // wash plus its own icon blown up as a watermark behind
+                      // the list. The watermark is decorative and sits at very
+                      // low alpha, so it never competes with the link text.
+                      <div key={d.slug} className="menu-col group/col relative overflow-hidden rounded-2xl p-4">
+                        <Icon
+                          name={d.icon}
+                          aria-hidden
+                          className="menu-col-mark pointer-events-none absolute -left-4 -top-4 h-28 w-28"
+                        />
+                        <p className="relative mb-3 flex items-center gap-2 text-xs font-bold tracking-wide text-foreground">
+                          <span className="h-1 w-1 rounded-full bg-accent" />
                           {tr(locale, d.title, d.titleEn, d.titleAr)}
                         </p>
-                        <div className="flex flex-col">
+                        <div className="relative flex flex-col">
                           {services.filter((s) => s.department === d.slug).map((s) => (
                             <Link
                               key={s.slug}
@@ -170,12 +185,16 @@ export function SiteHeader({
                     ))}
                   </div>
                 ) : (
+                  // Same glass panel and the same hover wash as the services
+                  // columns — this menu is a flat list rather than four
+                  // columns, so the wash lands on each item instead of a
+                  // column, and there is no icon on an industry to watermark.
                   <div className="grid grid-cols-4 gap-1 p-2">
                     {industries.map((i) => (
                       <Link
                         key={i.slug}
                         href={`/industries/${i.slug}`}
-                        className="rounded-lg px-3 py-2 text-sm text-foreground-muted transition-colors duration-300 hover:bg-card-hover hover:text-foreground"
+                        className="menu-col rounded-xl px-3.5 py-2.5 text-sm text-foreground-muted hover:text-foreground"
                       >
                         {i.title}
                       </Link>

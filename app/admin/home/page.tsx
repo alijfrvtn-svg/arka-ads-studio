@@ -51,9 +51,8 @@ function showcaseRows(v: string | null | undefined) {
   });
 }
 
-const DEPT_LABEL: Record<string, string> = Object.fromEntries(
-  DEPARTMENTS.map((d) => [d.key, d.title]),
-);
+/** Row headings for the locked showcase editor — same order as showcaseRows. */
+const DEPT_TITLES = DEPARTMENTS.map((d) => d.title);
 
 const SHOWCASE_FIELDS = [
   { key: "title", label: "تیتر بالای کارت‌ها", placeholder: "برندینگ و طراحی گرافیک", wide: true },
@@ -105,7 +104,7 @@ export default async function HomePageAdmin() {
                       name="heroShowcase"
                       locked
                       initial={showcaseRows(row?.heroShowcase)}
-                      rowLabel={(r) => DEPT_LABEL[r.department] ?? r.department}
+                      rowTitles={DEPT_TITLES}
                       fields={SHOWCASE_FIELDS}
                     />
                   ),
@@ -117,7 +116,7 @@ export default async function HomePageAdmin() {
                       name="heroShowcaseEn"
                       locked
                       initial={showcaseRows(row?.heroShowcaseEn)}
-                      rowLabel={(r) => DEPT_LABEL[r.department] ?? r.department}
+                      rowTitles={DEPT_TITLES}
                       fields={SHOWCASE_FIELDS}
                     />
                   ),
@@ -129,7 +128,7 @@ export default async function HomePageAdmin() {
                       name="heroShowcaseAr"
                       locked
                       initial={showcaseRows(row?.heroShowcaseAr)}
-                      rowLabel={(r) => DEPT_LABEL[r.department] ?? r.department}
+                      rowTitles={DEPT_TITLES}
                       fields={SHOWCASE_FIELDS}
                     />
                   ),
@@ -301,7 +300,7 @@ export default async function HomePageAdmin() {
                       initial={stepRows(row?.workflowSteps)}
                       fields={STEP_FIELDS}
                       addLabel="افزودن گام"
-                      rowLabel={(r, i) => r.title || `گام ${i + 1}`}
+                      labelKey="title" labelFallback="گام"
                     />
                   ),
                 },
@@ -313,7 +312,7 @@ export default async function HomePageAdmin() {
                       initial={stepRows(row?.workflowStepsEn)}
                       fields={STEP_FIELDS}
                       addLabel="Add step"
-                      rowLabel={(r, i) => r.title || `Step ${i + 1}`}
+                      labelKey="title" labelFallback="Step"
                     />
                   ),
                 },
@@ -325,7 +324,7 @@ export default async function HomePageAdmin() {
                       initial={stepRows(row?.workflowStepsAr)}
                       fields={STEP_FIELDS}
                       addLabel="إضافة خطوة"
-                      rowLabel={(r, i) => r.title || `خطوة ${i + 1}`}
+                      labelKey="title" labelFallback="خطوة"
                     />
                   ),
                 },
