@@ -656,6 +656,113 @@ body {
 
 
 /* ============================================================
+   Process section — paint canvas + step interactions
+   (components/home/Workflow.tsx)
+   ============================================================ */
+
+/* The paint sits under a white radial veil. Splashes are placed in the top and
+   bottom edges and the gutters, but an admin can rewrite the step copy to any
+   length, so the veil is the guarantee rather than the placement: it is opaque
+   through the middle band where the four columns live and clears toward the
+   edges where the paint is.
+
+   Worst case is body copy (#545454) landing on the darkest colour in the set,
+   #37192c. Unveiled that is 1.9:1 — unreadable. Under the veil the middle band
+   composites to at least #f2f2f2, which puts the same text at 6.6:1 and the
+   headings at 16.5:1. The paint stays vivid at the edges, where nothing reads. */
+.wf-canvas {
+  --wf-veil: radial-gradient(
+    120% 78% at 50% 50%,
+    rgba(255, 255, 255, 0.96) 0%,
+    rgba(255, 255, 255, 0.94) 38%,
+    rgba(255, 255, 255, 0.72) 60%,
+    rgba(255, 255, 255, 0.3) 78%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  overflow: hidden;
+}
+.wf-canvas::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--wf-veil);
+  pointer-events: none;
+}
+
+/* ————— step card —————
+   Invisible at rest so the section keeps the open, uncluttered look it has now;
+   on hover a faint glass panel forms around the icon, title and copy together,
+   which is what tells you the three are one item. */
+.wf-step {
+  transition:
+    transform 0.55s var(--ease-apple),
+    opacity 0.55s var(--ease-apple),
+    background-color 0.55s var(--ease-apple),
+    box-shadow 0.55s var(--ease-apple),
+    backdrop-filter 0.55s var(--ease-apple);
+}
+.wf-step:hover {
+  transform: translateY(-5px);
+  background-color: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(14px) saturate(160%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 1px 2px rgba(0, 0, 0, 0.03),
+    0 18px 44px -20px rgba(0, 0, 0, 0.22);
+}
+
+/* Everything the cursor is NOT on recedes. 0.5 was the brief; 0.55 is where
+   the muted body copy still clears AA against the veil rather than turning
+   into grey noise the moment a neighbour is hovered. */
+.wf-dim {
+  opacity: 0.55;
+}
+
+/* The icon plate. Same clear-glass material as the rest of the site, pulled out
+   as its own class so the hover state can address it without fighting the
+   .liquid-clear hover. */
+.wf-chip {
+  color: var(--foreground);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(20px) saturate(180%);
+  box-shadow:
+    inset 0 1px 0 var(--glass-highlight),
+    inset 0 -1px 0 var(--glass-shade),
+    var(--glass-shadow);
+  transition:
+    color 0.5s var(--ease-apple),
+    border-color 0.5s var(--ease-apple),
+    box-shadow 0.5s var(--ease-apple);
+}
+/* The step the cursor is on: icon and step number take the accent. This is the
+   only colour in the section that is not paint. */
+.wf-step[data-active="true"] .wf-chip {
+  color: var(--accent-bright);
+}
+.wf-badge {
+  background: var(--foreground);
+  transition: background-color 0.5s var(--ease-apple);
+}
+.wf-step[data-active="true"] .wf-badge {
+  background: var(--accent-bright);
+}
+
+.wf-step:hover .wf-chip {
+  border-color: color-mix(in srgb, var(--accent-bright) 45%, transparent);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    0 1px 2px rgba(0, 0, 0, 0.05),
+    0 14px 32px -14px color-mix(in srgb, var(--accent-bright) 55%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wf-step:hover {
+    transform: none;
+  }
+}
+
+/* ============================================================
    Poster scrim — department cards (components/home/Departments.tsx)
    ------------------------------------------------------------
    White type over an arbitrary poster is the hardest legibility case on the
