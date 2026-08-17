@@ -98,7 +98,9 @@ function Orbits() {
             // Uneven steps: a fixed step would space them like clock marks.
             angle += 360 / (g.n * groups.length) + r() * 26 - 8;
             const rad = (angle * Math.PI) / 180;
-            const size = 46 + r() * 210;
+            // Rounded: unrounded these serialise as 17-digit floats and the ring
+            // alone adds ~2KB of inline style to every page load.
+            const size = Math.round(46 + r() * 210);
             // Ride just outside the CARD's rectangle, not on a plain ellipse.
             // The card is far taller than it is wide, so an ellipse that clears
             // it at the sides sits deep inside it at the top and bottom — which
@@ -120,11 +122,11 @@ function Orbits() {
                 style={{
                   width: size,
                   height: size,
-                  left: `calc(50% + ${(Math.cos(rad) * rx).toFixed(2)}% - ${size / 2}px)`,
-                  top: `calc(50% + ${(Math.sin(rad) * ry).toFixed(2)}% - ${size / 2}px)`,
+                  left: `calc(50% + ${(Math.cos(rad) * rx).toFixed(1)}% - ${size / 2}px)`,
+                  top: `calc(50% + ${(Math.sin(rad) * ry).toFixed(1)}% - ${size / 2}px)`,
                   background: INDUSTRY_PAINT[Math.floor(r() * INDUSTRY_PAINT.length)],
-                  opacity: 0.42 + r() * 0.3,
-                  filter: `blur(${(14 + r() * 22).toFixed(0)}px)`,
+                  opacity: Math.round((0.42 + r() * 0.3) * 100) / 100,
+                  filter: `blur(${Math.round(14 + r() * 22)}px)`,
                 }}
               />
             );
