@@ -132,3 +132,24 @@ export function faTimeAgo(date: Date | string): string {
   if (diff < 31536000) return rtf.format(-Math.floor(diff / 2592000), "month");
   return rtf.format(-Math.floor(diff / 31536000), "year");
 }
+
+/**
+ * Whether a background wants a black or a white label.
+ *
+ * Used by the homepage industry rows, where each row is a solid block of a
+ * colour that is still being finalised. Computing the answer instead of pairing
+ * hexes with label colours by hand means a palette change cannot leave text
+ * sitting at 3:1 on a colour nobody re-checked.
+ *
+ * Standard WCAG relative luminance, then whichever of the two scores higher.
+ */
+export function labelOn(hex: string): "#111111" | "#ffffff" {
+  const h = hex.replace("#", "");
+  const full = h.length === 3 ? h.split("").map((c) => c + c).join("") : h;
+  const rgb = [0, 2, 4].map((i) => parseInt(full.slice(i, i + 2), 16) / 255);
+  const lin = rgb.map((v) => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4));
+  const L = 0.2126 * lin[0] + 0.7152 * lin[1] + 0.0722 * lin[2];
+  const vsInk = (L + 0.05) / (0.0056 + 0.05); // #111111
+  const vsWhite = 1.05 / (L + 0.05);
+  return vsInk >= vsWhite ? "#111111" : "#ffffff";
+}

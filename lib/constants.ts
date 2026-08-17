@@ -82,13 +82,20 @@ export interface DepartmentDef {
  * Paint colours behind the industry rows on the homepage accordion.
  *
  * The coral and the gold are the client's own values. The blue and the violet
- * are read off the artwork they supplied and are the two worth confirming —
- * they are the whole reason this constant exists in one place: correcting a hex
- * here recolours every row, and nothing else has to change, because the copy
- * carries its own clearing rather than relying on any particular colour being
- * light enough (see `.ind-plate` in globals.css).
+ * are read off the artwork they supplied and are the two worth confirming.
+ *
+ * They are also chosen to be *legible*, which narrowed the options: the row is
+ * a solid block of this colour with the label straight on top, so each hex has
+ * to win against either black or white. A medium violet at #8B5CF6 reaches only
+ * 4.46:1 against ink and 4.23:1 against white — it fails both ways — so the
+ * violet here is a step deeper, which clears 5.7:1 in white while still reading
+ * as the violet in the artwork.
+ *
+ * Nothing downstream hardcodes which label colour goes with which row:
+ * `labelOn()` picks whichever of ink/white wins for the hex, so correcting a
+ * colour here cannot silently produce unreadable text.
  */
-export const INDUSTRY_PAINT = ["#FF6B5B", "#2B56D6", "#FFB902", "#8B5CF6"] as const;
+export const INDUSTRY_PAINT = ["#FF6B5B", "#2B56D6", "#FFB902", "#7C3AED"] as const;
 
 /**
  * Which colour each of the twelve rows gets.

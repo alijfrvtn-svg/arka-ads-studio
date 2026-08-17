@@ -5,7 +5,7 @@ import Link from "next/link";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowUpLeft, ChevronDown } from "lucide-react";
 import { Icon } from "@/components/ui/Icon";
-import { cn } from "@/lib/utils";
+import { cn, labelOn } from "@/lib/utils";
 import { INDUSTRY_PAINT, INDUSTRY_PAINT_ORDER } from "@/lib/constants";
 import { tr, ui } from "@/lib/i18n";
 import type { Locale } from "@/types";
@@ -44,57 +44,56 @@ export interface AccordionIndustry {
  * plain surface instead, so a half-populated list still looks deliberate.
  */
 /**
- * Filter defs for the row paint, rendered once for the whole list.
+ * The decorative orbit.
  *
- * feTurbulence is the expensive part of this effect, so the definitions are
- * shared by id across all twelve rows rather than repeated per row, and each
- * row draws only three shapes through them. Ids are document-global, so a
- * `filter="url(#ind-splat)"` inside any row's own <svg> resolves to these.
- */
-function PaintDefs() {
-  return (
-    <svg aria-hidden focusable="false" width="0" height="0" className="absolute">
-      <defs>
-        <filter id="ind-splat" x="-30%" y="-60%" width="160%" height="220%">
-          <feTurbulence type="fractalNoise" baseFrequency="0.014 0.03" numOctaves="3" seed="23" result="n" />
-          <feDisplacementMap in="SourceGraphic" in2="n" scale="46" xChannelSelector="R" yChannelSelector="G" />
-        </filter>
-        <filter id="ind-fleck" x="-90%" y="-90%" width="280%" height="280%">
-          <feTurbulence type="fractalNoise" baseFrequency="0.09" numOctaves="2" seed="59" result="n" />
-          <feDisplacementMap in="SourceGraphic" in2="n" scale="16" xChannelSelector="R" yChannelSelector="G" />
-        </filter>
-      </defs>
-    </svg>
-  );
-}
-
-/**
- * One row's paint: a torn band with a couple of flecks, in that row's colour.
+ * Circles in the row colours drifting around the list — unequal sizes, no
+ * symmetry, and slow enough (two to four minutes a revolution) that you notice
+ * it has moved rather than watching it move.
  *
- * `i` only shifts the shapes along so no two rows are identically composed —
- * the same three ellipses repeated twelve times would read as a texture rather
- * than as paint.
+ * Each circle is offset inside a wrapper that rotates about the block's centre,
+ * so rotating the wrapper carries the circle around an orbit. Only `transform`
+ * animates, which keeps the whole thing on the compositor.
+ *
+ * It lives inside an `overflow-hidden` frame: the orbits are wider than the
+ * list on purpose, and without the clip the widest of them would push the page
+ * into horizontal scroll on a narrow window.
  */
-function RowPaint({ colour, i }: { colour: string; i: number }) {
-  const shift = (i * 137) % 400;
+function Orbits() {
+  // size, distance from centre, start angle, duration, direction, colour index
+  const bodies = [
+    { s: 300, x: -44, y: -30, d: 260, rev: false, c: 0 },
+    { s: 190, x: 46, y: -38, d: 320, rev: true, c: 1 },
+    { s: 420, x: 52, y: 34, d: 300, rev: false, c: 3 },
+    { s: 150, x: -50, y: 40, d: 220, rev: true, c: 2 },
+    { s: 240, x: -38, y: 46, d: 380, rev: false, c: 1 },
+    { s: 120, x: 40, y: -18, d: 200, rev: true, c: 0 },
+  ];
   return (
-    <svg
-      aria-hidden
-      focusable="false"
-      className="pointer-events-none absolute inset-0 h-full w-full"
-      viewBox="0 0 1200 120"
-      preserveAspectRatio="none"
-    >
-      <g filter="url(#ind-splat)" opacity="0.9">
-        <ellipse cx={120 + shift} cy="46" rx="240" ry="42" fill={colour} />
-        <ellipse cx={760 - shift * 0.4} cy="82" rx="190" ry="34" fill={colour} opacity="0.75" />
-        <ellipse cx={1080 - shift * 0.2} cy="34" rx="150" ry="30" fill={colour} opacity="0.6" />
-      </g>
-      <g filter="url(#ind-fleck)">
-        <circle cx={420 + shift * 0.5} cy="22" r="7" fill={colour} opacity="0.8" />
-        <circle cx={640 - shift * 0.3} cy="104" r="5" fill={colour} opacity="0.7" />
-      </g>
-    </svg>
+    <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+      {bodies.map((b, i) => (
+        <div
+          key={i}
+          className="ind-orbit absolute inset-0"
+          style={{
+            animationDuration: `${b.d}s`,
+            animationDirection: b.rev ? "reverse" : "normal",
+          }}
+        >
+          <span
+            className="absolute rounded-full"
+            style={{
+              width: b.s,
+              height: b.s,
+              left: `calc(50% + ${b.x}% - ${b.s / 2}px)`,
+              top: `calc(50% + ${b.y}% - ${b.s / 2}px)`,
+              background: INDUSTRY_PAINT[b.c],
+              opacity: 0.16,
+              filter: "blur(46px)",
+            }}
+          />
+        </div>
+      ))}
+    </div>
   );
 }
 
@@ -135,19 +134,26 @@ export function IndustriesAccordion({
           )}
         </div>
 
-        <PaintDefs />
+        <div className="relative">
+          <Orbits />
 
-        <div className="overflow-hidden rounded-[1.75rem] border border-card-border bg-surface">
+          <div className="relative overflow-hidden rounded-[1.75rem] border border-card-border bg-surface">
           <div className="divide-y divide-card-border">
             {industries.map((ind, i) => {
               const isOpen = open === ind.id;
               const colour = INDUSTRY_PAINT[INDUSTRY_PAINT_ORDER[i % INDUSTRY_PAINT_ORDER.length]];
+              // Computed, never paired by hand — see labelOn() in lib/utils.
+              const label = labelOn(colour);
+              const onDark = label === "#ffffff";
               const panelId = `${baseId}-${ind.id}`;
               const title = tr(locale, ind.title, ind.titleEn, ind.titleAr);
               const excerpt = tr(locale, ind.excerpt, ind.excerptEn, ind.excerptAr);
               return (
-                <div key={ind.id} className="relative">
-                  <RowPaint colour={colour} i={i} />
+                <div key={ind.id} className="ind-row relative" style={{ background: colour }}>
+                  {/* The crystal shell: a diagonal facet, a top sheen and a
+                      bevelled rim, so the colour reads as something cast in
+                      glass rather than a flat fill. */}
+                  <span className="ind-crystal" aria-hidden />
                   <h3 className="relative">
                     <button
                       type="button"
@@ -155,32 +161,33 @@ export function IndustriesAccordion({
                       aria-expanded={isOpen}
                       aria-controls={panelId}
                       className={cn(
-                        "group flex w-full items-center justify-between gap-4 px-6 py-6 text-right transition-colors duration-500 [transition-timing-function:var(--ease-apple)] md:px-10",
-                        isOpen ? "bg-card-hover" : "hover:bg-card-hover",
+                        "group relative flex w-full items-center justify-between gap-4 px-6 py-6 text-right md:px-10",
                       )}
                     >
                       <span className="flex items-center gap-4">
                         <span
                           className={cn(
                             "grid h-11 w-11 shrink-0 place-items-center rounded-[12px] border transition-all duration-500 [transition-timing-function:var(--ease-apple)]",
-                            isOpen
-                              ? "border-transparent bg-foreground text-background"
-                              : "border-card-border text-foreground-faint group-hover:text-foreground",
+                            onDark
+                              ? "border-white/35 bg-white/15 text-white"
+                              : "border-black/20 bg-black/[0.07] text-[#111]",
+                            isOpen && (onDark ? "bg-white/25" : "bg-black/[0.12]"),
                           )}
                         >
                           <Icon name={ind.icon} className="h-5 w-5" />
                         </span>
-                        <span className="ind-plate text-right">
+                        <span className="text-right">
                           <span
-                            className={cn(
-                              "block font-display text-xl font-bold tracking-tight transition-colors duration-500 md:text-2xl",
-                              isOpen ? "text-foreground" : "text-foreground-muted group-hover:text-foreground",
-                            )}
+                            className="block font-display text-xl font-bold tracking-tight md:text-2xl"
+                            style={{ color: label }}
                           >
                             {title}
                           </span>
                           {locale === "fa" && ind.titleEn && (
-                            <span className="mt-0.5 block text-[0.6rem] uppercase tracking-[0.25em] text-foreground-faint">
+                            <span
+                              className="mt-0.5 block text-[0.6rem] uppercase tracking-[0.25em]"
+                              style={{ color: label, opacity: 0.72 }}
+                            >
                               {ind.titleEn}
                             </span>
                           )}
@@ -191,8 +198,9 @@ export function IndustriesAccordion({
                         aria-hidden
                         className={cn(
                           "h-5 w-5 shrink-0 transition-transform duration-500 [transition-timing-function:var(--ease-apple)]",
-                          isOpen ? "rotate-180 text-foreground" : "text-foreground-faint group-hover:text-foreground",
+                          isOpen && "rotate-180",
                         )}
+                        style={{ color: label, opacity: isOpen ? 1 : 0.75 }}
                       />
                     </button>
                   </h3>
@@ -267,6 +275,7 @@ export function IndustriesAccordion({
                 </div>
               );
             })}
+            </div>
           </div>
         </div>
       </div>
