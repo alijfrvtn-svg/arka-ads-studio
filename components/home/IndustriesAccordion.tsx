@@ -44,53 +44,91 @@ export interface AccordionIndustry {
  * plain surface instead, so a half-populated list still looks deliberate.
  */
 /**
- * The decorative orbit.
+ * Deterministic pseudo-random, so the ring is irregular but identical on the
+ * server and the client. Math.random() here would place the circles twice —
+ * once in the SSR html and again on hydration — and React would flag the
+ * mismatch.
+ */
+function rand(seed: number) {
+  let t = seed + 0x6d2b79f5;
+  return () => {
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+/**
+ * The circles ringing the list.
  *
- * Circles in the row colours drifting around the list — unequal sizes, no
- * symmetry, and slow enough (two to four minutes a revolution) that you notice
- * it has moved rather than watching it move.
+ * They sit on an ellipse around the card rather than behind it: the card is
+ * opaque, so anything behind it is simply invisible — which is exactly what the
+ * first version of this did, with the layer clipped to the card's own box and
+ * every circle either hidden underneath it or cut off at its edge.
  *
- * Each circle is offset inside a wrapper that rotates about the block's centre,
- * so rotating the wrapper carries the circle around an orbit. Only `transform`
- * animates, which keeps the whole thing on the compositor.
+ * Irregular by construction. Angles are stepped unevenly, and the radius, size,
+ * blur and opacity of each circle are jittered from a seeded generator, so
+ * nothing lines up and no two are the same size. They are split across five
+ * groups turning at different speeds and in both directions, which keeps the
+ * ring from reading as one rigid wheel.
  *
- * It lives inside an `overflow-hidden` frame: the orbits are wider than the
- * list on purpose, and without the clip the widest of them would push the page
- * into horizontal scroll on a narrow window.
+ * The section clips this layer. The ring is deliberately wider than the content,
+ * and unclipped the outermost circles would push the page into horizontal
+ * scroll on a narrow window.
  */
 function Orbits() {
-  // size, distance from centre, start angle, duration, direction, colour index
-  const bodies = [
-    { s: 300, x: -44, y: -30, d: 260, rev: false, c: 0 },
-    { s: 190, x: 46, y: -38, d: 320, rev: true, c: 1 },
-    { s: 420, x: 52, y: 34, d: 300, rev: false, c: 3 },
-    { s: 150, x: -50, y: 40, d: 220, rev: true, c: 2 },
-    { s: 240, x: -38, y: 46, d: 380, rev: false, c: 1 },
-    { s: 120, x: 40, y: -18, d: 200, rev: true, c: 0 },
+  const groups = [
+    { n: 8, dur: 240, rev: false },
+    { n: 7, dur: 310, rev: true },
+    { n: 7, dur: 190, rev: false },
+    { n: 6, dur: 380, rev: true },
+    { n: 6, dur: 280, rev: false },
   ];
+  const r = rand(9271);
+  let angle = 0;
   return (
-    <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
-      {bodies.map((b, i) => (
+    <div className="pointer-events-none absolute -inset-x-[26%] -inset-y-[10%] z-0" aria-hidden>
+      {groups.map((g, gi) => (
         <div
-          key={i}
+          key={gi}
           className="ind-orbit absolute inset-0"
-          style={{
-            animationDuration: `${b.d}s`,
-            animationDirection: b.rev ? "reverse" : "normal",
-          }}
+          style={{ animationDuration: `${g.dur}s`, animationDirection: g.rev ? "reverse" : "normal" }}
         >
-          <span
-            className="absolute rounded-full"
-            style={{
-              width: b.s,
-              height: b.s,
-              left: `calc(50% + ${b.x}% - ${b.s / 2}px)`,
-              top: `calc(50% + ${b.y}% - ${b.s / 2}px)`,
-              background: INDUSTRY_PAINT[b.c],
-              opacity: 0.16,
-              filter: "blur(46px)",
-            }}
-          />
+          {Array.from({ length: g.n }).map((_, i) => {
+            // Uneven steps: a fixed step would space them like clock marks.
+            angle += 360 / (g.n * groups.length) + r() * 26 - 8;
+            const rad = (angle * Math.PI) / 180;
+            const size = 46 + r() * 210;
+            // Ride just outside the CARD's rectangle, not on a plain ellipse.
+            // The card is far taller than it is wide, so an ellipse that clears
+            // it at the sides sits deep inside it at the top and bottom — which
+            // is how half the circles ended up hidden behind it. `t` is the
+            // distance from centre to the card edge along this angle, in layer
+            // percentages: the insets above put the card's half-width at 32.9%
+            // of the layer and its half-height at 41.7%.
+            const t = Math.min(
+              32.9 / Math.max(Math.abs(Math.cos(rad)), 1e-3),
+              41.7 / Math.max(Math.abs(Math.sin(rad)), 1e-3),
+            );
+            const k = 1.04 + r() * 0.26; // how far beyond the edge this one sits
+            const rx = t * k;
+            const ry = t * k;
+            return (
+              <span
+                key={i}
+                className="absolute rounded-full"
+                style={{
+                  width: size,
+                  height: size,
+                  left: `calc(50% + ${(Math.cos(rad) * rx).toFixed(2)}% - ${size / 2}px)`,
+                  top: `calc(50% + ${(Math.sin(rad) * ry).toFixed(2)}% - ${size / 2}px)`,
+                  background: INDUSTRY_PAINT[Math.floor(r() * INDUSTRY_PAINT.length)],
+                  opacity: 0.42 + r() * 0.3,
+                  filter: `blur(${(14 + r() * 22).toFixed(0)}px)`,
+                }}
+              />
+            );
+          })}
         </div>
       ))}
     </div>
@@ -120,7 +158,7 @@ export function IndustriesAccordion({
   if (!industries.length) return null;
 
   return (
-    <section id="industries" className="section">
+    <section id="industries" className="section relative overflow-hidden">
       <div className="container-x">
         <div className="mx-auto mb-14 max-w-2xl text-center">
           {eyebrow && <span className="eyebrow mx-auto w-fit">{eyebrow}</span>}
@@ -137,7 +175,7 @@ export function IndustriesAccordion({
         <div className="relative">
           <Orbits />
 
-          <div className="relative overflow-hidden rounded-[1.75rem] border border-card-border bg-surface">
+          <div className="relative z-10 overflow-hidden rounded-[1.75rem] border border-card-border bg-surface">
           <div className="divide-y divide-card-border">
             {industries.map((ind, i) => {
               const isOpen = open === ind.id;
