@@ -58,6 +58,11 @@ export const UI = {
     navJournal: "ژورنال",
     navContact: "تماس",
     ctaStartProject: "شروع پروژه",
+    // Button inside an open row of the homepage industries accordion.
+    industryCta: "اطلاعات کامل این صنعت",
+    industriesEyebrow: "صنایع",
+    industriesHeading: "در صنعت شما کار کرده‌ایم",
+    industriesDescription: "هر صنعت زبان بصری و مخاطب خودش را دارد. یکی را باز کنید تا ببینید برای آن چه می‌کنیم.",
     // Prefixes the department name on the homepage hero button, e.g.
     // "خدمات عکاسی و تصویربرداری". Overridden per slide from the CMS.
     heroShowcaseCta: "خدمات",
@@ -142,6 +147,10 @@ export const UI = {
     navJournal: "Journal",
     navContact: "Contact",
     ctaStartProject: "Start a Project",
+    industryCta: "Explore this industry",
+    industriesEyebrow: "Industries",
+    industriesHeading: "We have worked in your industry",
+    industriesDescription: "Every industry has its own visual language and audience. Open one to see what we do for it.",
     heroShowcaseCta: "Explore",
     marqueeHeading: "Everything your brand needs, under one roof",
     marqueeBody: "Twenty-eight specialist services across four departments — from the first sketch to the final report.",
@@ -223,6 +232,10 @@ export const UI = {
     navJournal: "المدونة",
     navContact: "تواصل معنا",
     ctaStartProject: "ابدأ مشروعك",
+    industryCta: "تفاصيل هذا القطاع",
+    industriesEyebrow: "القطاعات",
+    industriesHeading: "عملنا في قطاعك",
+    industriesDescription: "لكل قطاع لغته البصرية وجمهوره. افتح أحدها لترى ما نقدمه له.",
     heroShowcaseCta: "خدمات",
     marqueeHeading: "كل ما تحتاجه علامتك التجاري، تحت سقف واحد",
     marqueeBody: "ثمانٍ وعشرون خدمة متخصصة في أربعة أقسام؛ من أول رسم إلى آخر تقرير.",

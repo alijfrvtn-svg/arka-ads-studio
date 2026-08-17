@@ -5,19 +5,19 @@ import { FeaturedWork } from "@/components/home/FeaturedWork";
 import { Workflow } from "@/components/home/Workflow";
 import { StatsBar } from "@/components/home/StatsBar";
 import { Testimonials } from "@/components/home/Testimonials";
-import { FinalCTA } from "@/components/home/FinalCTA";
+import { IndustriesAccordion } from "@/components/home/IndustriesAccordion";
 import {
   getClients,
   getFeaturedProjects,
   getFeaturedTestimonials,
   getStats,
   getHomePage,
-  getContactPage,
   getCategories,
   getHeroShowcase,
+  getIndustries,
 } from "@/lib/queries";
 import { getLocale } from "@/lib/get-locale";
-import { tr } from "@/lib/i18n";
+import { tr, ui } from "@/lib/i18n";
 import { buildMetadata } from "@/lib/seo";
 import type { Metadata } from "next";
 
@@ -28,17 +28,18 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function HomePage() {
   const locale = await getLocale();
-  const [projects, stats, testimonials, clients, content, contact, departments, showcase] = await Promise.all([
+  const [projects, stats, testimonials, clients, content, departments, showcase, industries] = await Promise.all([
     getFeaturedProjects(7),
     getStats(),
     getFeaturedTestimonials(),
     getClients(),
     getHomePage(locale),
-    getContactPage(locale),
     getCategories("DEPARTMENT"),
     getHeroShowcase(locale),
+    getIndustries(),
   ]);
 
+  const t = ui(locale);
   const statData = stats.map((s) => ({ label: tr(locale, s.label, s.labelEn, s.labelAr), value: s.value, suffix: s.suffix }));
   const testimonialData = testimonials.map((t) => ({
     id: t.id,
@@ -59,7 +60,16 @@ export default async function HomePage() {
       <Workflow content={content} locale={locale} />
       <StatsBar stats={statData} locale={locale} />
       <Testimonials items={testimonialData} content={content} locale={locale} />
-      <FinalCTA content={content} phone={contact.phone} phoneDisplay={contact.phoneDisplay} />
+      {/* Replaced the closing CTA here (it still runs on /about). The footer
+          already carries a CTA strip on every page, so the last thing on the
+          homepage is better spent answering "do you work in my field". */}
+      <IndustriesAccordion
+        industries={industries}
+        eyebrow={t.industriesEyebrow}
+        heading={t.industriesHeading}
+        description={t.industriesDescription}
+        locale={locale}
+      />
     </>
   );
 }
