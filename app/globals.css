@@ -796,6 +796,41 @@ body {
   }
 }
 
+/* ————— industry row label clearing —————
+   The homepage accordion runs paint under every row, so the row's title sits
+   on a colour that is chosen per row and may be corrected later. Rather than
+   tune contrast per hex — which would have to be redone the moment a colour
+   changes — the label carries its own blurred clearing, exactly as the process
+   section does.
+
+   At 0.82 in the core the composite behind ink is at least #d5d5d5 for any
+   fully saturated colour, which is 10:1. That holds for a hex nobody has picked
+   yet, which is the point: the palette can be corrected in one constant with no
+   contrast work to repeat. */
+.ind-plate {
+  position: relative;
+}
+.ind-plate::before {
+  content: "";
+  position: absolute;
+  inset: -55% -14%;
+  z-index: 0;
+  border-radius: 50%;
+  background: radial-gradient(
+    58% 52% at 50% 50%,
+    rgba(255, 255, 255, 0.82) 0%,
+    rgba(255, 255, 255, 0.74) 48%,
+    rgba(255, 255, 255, 0.4) 72%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  filter: blur(14px);
+  pointer-events: none;
+}
+.ind-plate > * {
+  position: relative;
+  z-index: 1;
+}
+
 /* ============================================================
    Poster scrim — department cards (components/home/Departments.tsx)
    ------------------------------------------------------------

@@ -6,6 +6,7 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowUpLeft, ChevronDown } from "lucide-react";
 import { Icon } from "@/components/ui/Icon";
 import { cn } from "@/lib/utils";
+import { INDUSTRY_PAINT, INDUSTRY_PAINT_ORDER } from "@/lib/constants";
 import { tr, ui } from "@/lib/i18n";
 import type { Locale } from "@/types";
 
@@ -42,6 +43,61 @@ export interface AccordionIndustry {
  * from the CMS with nothing here to change. Rows with no cover open onto a
  * plain surface instead, so a half-populated list still looks deliberate.
  */
+/**
+ * Filter defs for the row paint, rendered once for the whole list.
+ *
+ * feTurbulence is the expensive part of this effect, so the definitions are
+ * shared by id across all twelve rows rather than repeated per row, and each
+ * row draws only three shapes through them. Ids are document-global, so a
+ * `filter="url(#ind-splat)"` inside any row's own <svg> resolves to these.
+ */
+function PaintDefs() {
+  return (
+    <svg aria-hidden focusable="false" width="0" height="0" className="absolute">
+      <defs>
+        <filter id="ind-splat" x="-30%" y="-60%" width="160%" height="220%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.014 0.03" numOctaves="3" seed="23" result="n" />
+          <feDisplacementMap in="SourceGraphic" in2="n" scale="46" xChannelSelector="R" yChannelSelector="G" />
+        </filter>
+        <filter id="ind-fleck" x="-90%" y="-90%" width="280%" height="280%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.09" numOctaves="2" seed="59" result="n" />
+          <feDisplacementMap in="SourceGraphic" in2="n" scale="16" xChannelSelector="R" yChannelSelector="G" />
+        </filter>
+      </defs>
+    </svg>
+  );
+}
+
+/**
+ * One row's paint: a torn band with a couple of flecks, in that row's colour.
+ *
+ * `i` only shifts the shapes along so no two rows are identically composed —
+ * the same three ellipses repeated twelve times would read as a texture rather
+ * than as paint.
+ */
+function RowPaint({ colour, i }: { colour: string; i: number }) {
+  const shift = (i * 137) % 400;
+  return (
+    <svg
+      aria-hidden
+      focusable="false"
+      className="pointer-events-none absolute inset-0 h-full w-full"
+      viewBox="0 0 1200 120"
+      preserveAspectRatio="none"
+    >
+      <g filter="url(#ind-splat)" opacity="0.9">
+        <ellipse cx={120 + shift} cy="46" rx="240" ry="42" fill={colour} />
+        <ellipse cx={760 - shift * 0.4} cy="82" rx="190" ry="34" fill={colour} opacity="0.75" />
+        <ellipse cx={1080 - shift * 0.2} cy="34" rx="150" ry="30" fill={colour} opacity="0.6" />
+      </g>
+      <g filter="url(#ind-fleck)">
+        <circle cx={420 + shift * 0.5} cy="22" r="7" fill={colour} opacity="0.8" />
+        <circle cx={640 - shift * 0.3} cy="104" r="5" fill={colour} opacity="0.7" />
+      </g>
+    </svg>
+  );
+}
+
 export function IndustriesAccordion({
   industries,
   heading,
@@ -79,16 +135,20 @@ export function IndustriesAccordion({
           )}
         </div>
 
+        <PaintDefs />
+
         <div className="overflow-hidden rounded-[1.75rem] border border-card-border bg-surface">
           <div className="divide-y divide-card-border">
-            {industries.map((ind) => {
+            {industries.map((ind, i) => {
               const isOpen = open === ind.id;
+              const colour = INDUSTRY_PAINT[INDUSTRY_PAINT_ORDER[i % INDUSTRY_PAINT_ORDER.length]];
               const panelId = `${baseId}-${ind.id}`;
               const title = tr(locale, ind.title, ind.titleEn, ind.titleAr);
               const excerpt = tr(locale, ind.excerpt, ind.excerptEn, ind.excerptAr);
               return (
-                <div key={ind.id}>
-                  <h3>
+                <div key={ind.id} className="relative">
+                  <RowPaint colour={colour} i={i} />
+                  <h3 className="relative">
                     <button
                       type="button"
                       onClick={() => setOpen(isOpen ? null : ind.id)}
@@ -110,7 +170,7 @@ export function IndustriesAccordion({
                         >
                           <Icon name={ind.icon} className="h-5 w-5" />
                         </span>
-                        <span className="text-right">
+                        <span className="ind-plate text-right">
                           <span
                             className={cn(
                               "block font-display text-xl font-bold tracking-tight transition-colors duration-500 md:text-2xl",

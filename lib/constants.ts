@@ -78,6 +78,32 @@ export interface DepartmentDef {
  * A department with no entry falls back to a plain card, so this can never be
  * the reason a department stops rendering.
  */
+/**
+ * Paint colours behind the industry rows on the homepage accordion.
+ *
+ * The coral and the gold are the client's own values. The blue and the violet
+ * are read off the artwork they supplied and are the two worth confirming —
+ * they are the whole reason this constant exists in one place: correcting a hex
+ * here recolours every row, and nothing else has to change, because the copy
+ * carries its own clearing rather than relying on any particular colour being
+ * light enough (see `.ind-plate` in globals.css).
+ */
+export const INDUSTRY_PAINT = ["#FF6B5B", "#2B56D6", "#FFB902", "#8B5CF6"] as const;
+
+/**
+ * Which colour each of the twelve rows gets.
+ *
+ * Three rows per colour, and no colour ever touches itself — the brief. A plain
+ * 0,1,2,3 cycle would satisfy both and look like a repeating stripe, so the
+ * order is shuffled while keeping the count exactly three each:
+ *
+ *   0 1 2 3 1 0 3 2 0 3 1 2
+ *
+ * Index into INDUSTRY_PAINT; rows beyond twelve wrap, so adding a thirteenth
+ * industry still gets a colour rather than nothing.
+ */
+export const INDUSTRY_PAINT_ORDER = [0, 1, 2, 3, 1, 0, 3, 2, 0, 3, 1, 2] as const;
+
 export const DEPARTMENT_POSTER: Record<string, string> = {
   DESIGN: "/departments/design.webp",
   FILM: "/departments/film.webp",
