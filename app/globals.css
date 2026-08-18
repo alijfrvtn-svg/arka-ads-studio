@@ -1101,6 +1101,48 @@ body {
   padding-top: clamp(1.5rem, 3vw, 3rem);
 }
 
+/* ————— service coverflow (components/services/ServiceArc.tsx) —————
+   The 3D lives on the cards, not here: each card carries its own
+   `perspective()` inside its transform, which keeps every card on its own
+   vanishing point. A single `perspective` on the row would put them all on one,
+   and the outer cards would shear rather than turn.
+
+   The scrollbar is hidden because the row already advertises itself: the cards
+   bleed past both edges and there are arrows under it. A visible native bar
+   across a curved row of cards reads as a mistake. */
+.arc-row {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  /* Room for the outer cards to drop and recede without being clipped. */
+  padding-inline: 2px;
+  overscroll-behavior-x: contain;
+}
+.arc-row::-webkit-scrollbar {
+  display: none;
+}
+
+.arc-card {
+  transform-origin: 50% 60%;
+  /* Only the settle after a nudge is animated. The scroll-linked transform is
+     rewritten every frame, so transitioning it would fight the scroll. */
+  transition: box-shadow 0.5s var(--ease-apple), border-color 0.5s var(--ease-apple);
+  backface-visibility: hidden;
+  will-change: transform;
+}
+.arc-card:hover {
+  border-color: rgba(0, 0, 0, 0.2);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 30px 64px -32px rgba(0, 0, 0, 0.4);
+}
+
+/* Without a transform the row is a plain horizontal scroller, which is the
+   right thing when the reader has asked for less motion. */
+@media (prefers-reduced-motion: reduce) {
+  .arc-card {
+    transform: none !important;
+    opacity: 1 !important;
+  }
+}
+
 /* ============================================================
    Poster scrim — department cards (components/home/Departments.tsx)
    ------------------------------------------------------------

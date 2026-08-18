@@ -60,6 +60,10 @@ export const UI = {
     ctaStartProject: "شروع پروژه",
     // Button inside an open row of the homepage industries accordion.
     industryCta: "اطلاعات کامل این صنعت",
+    // Coverflow row on /services. Labelled by reading direction, not by
+    // arrow shape: in RTL the earlier card sits to the RIGHT.
+    arcPrev: "کارت قبلی",
+    arcNext: "کارت بعدی",
     industriesEyebrow: "صنایع",
     industriesHeading: "در صنعت شما کار کرده‌ایم",
     industriesDescription: "هر صنعت زبان بصری و مخاطب خودش را دارد. یکی را باز کنید تا ببینید برای آن چه می‌کنیم.",
@@ -148,6 +152,8 @@ export const UI = {
     navContact: "Contact",
     ctaStartProject: "Start a Project",
     industryCta: "Explore this industry",
+    arcPrev: "Previous card",
+    arcNext: "Next card",
     industriesEyebrow: "Industries",
     industriesHeading: "We have worked in your industry",
     industriesDescription: "Every industry has its own visual language and audience. Open one to see what we do for it.",
@@ -233,6 +239,8 @@ export const UI = {
     navContact: "تواصل معنا",
     ctaStartProject: "ابدأ مشروعك",
     industryCta: "تفاصيل هذا القطاع",
+    arcPrev: "البطاقة السابقة",
+    arcNext: "البطاقة التالية",
     industriesEyebrow: "القطاعات",
     industriesHeading: "عملنا في قطاعك",
     industriesDescription: "لكل قطاع لغته البصرية وجمهوره. افتح أحدها لترى ما نقدمه له.",
