@@ -7,9 +7,9 @@ import { Reveal } from "@/components/fx/Reveal";
 import { ServiceArc } from "@/components/services/ServiceArc";
 import { Icon } from "@/components/ui/Icon";
 import { getServices } from "@/lib/queries";
-import { DEPARTMENTS } from "@/lib/constants";
+import { DEPARTMENTS, INDUSTRY_PAINT } from "@/lib/constants";
 import { buildMetadata } from "@/lib/seo";
-import { localeNumber } from "@/lib/utils";
+import { cn, labelOn, localeNumber } from "@/lib/utils";
 import { tr, ui } from "@/lib/i18n";
 import { getLocale } from "@/lib/get-locale";
 import type { Locale } from "@/types";
@@ -60,19 +60,41 @@ export default async function ServicesPage() {
       />
       <Section>
         <div className="space-y-24">
-          {DEPARTMENTS.map((dept) => {
+          {DEPARTMENTS.map((dept, di) => {
             const items = services.filter((s) => s.department === dept.key);
             if (!items.length) return null;
+            // One of the four site colours per department, and the label colour
+            // computed from it rather than paired by hand — see labelOn().
+            const colour = INDUSTRY_PAINT[di % INDUSTRY_PAINT.length];
+            const label = labelOn(colour);
+            const onDark = label === "#ffffff";
             return (
               <div key={dept.key} className="container-x">
+                {/* A full-width bar rather than a floating title: it spans the
+                    same container as the card row below, so the two line up
+                    instead of the heading hanging in the margin. `color` is set
+                    once and the icon chip and subtitle inherit it. */}
                 <Reveal>
-                  <div className="mb-8 flex items-center gap-3.5">
-                    <span className="liquid-clear grid h-10 w-10 place-items-center rounded-[11px] text-foreground">
-                      <Icon name={dept.icon} className="h-5 w-5" />
-                    </span>
-                    <div>
-                      <h2 className="font-display text-2xl font-bold tracking-tight text-foreground">{tr(locale, dept.title, dept.titleEn, dept.titleAr)}</h2>
-                      {locale === "fa" && <p className="text-[0.65rem] uppercase tracking-[0.25em] text-foreground-faint">{dept.titleEn}</p>}
+                  <div
+                    className="relative isolate mb-8 overflow-hidden rounded-[1.5rem] px-6 py-5 shadow-[0_1px_2px_rgba(0,0,0,0.06),0_18px_44px_-26px_rgba(0,0,0,0.4)] md:px-8"
+                    style={{ background: colour, color: label }}
+                  >
+                    <span className="crystal" aria-hidden />
+                    <div className="relative flex items-center gap-4">
+                      <span
+                        className={cn(
+                          "grid h-11 w-11 shrink-0 place-items-center rounded-[13px] border",
+                          onDark ? "border-white/35 bg-white/15" : "border-black/15 bg-black/[0.06]",
+                        )}
+                      >
+                        <Icon name={dept.icon} className="h-5 w-5" />
+                      </span>
+                      <div>
+                        <h2 className="font-display text-2xl font-bold tracking-tight">{tr(locale, dept.title, dept.titleEn, dept.titleAr)}</h2>
+                        {locale === "fa" && (
+                          <p className="text-[0.65rem] uppercase tracking-[0.25em] opacity-75">{dept.titleEn}</p>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </Reveal>
