@@ -133,6 +133,60 @@ export const INDUSTRY_PAINT = ["#FF6B5B", "#2B56D6", "#FFB902", "#7C3AED"] as co
 export const INDUSTRY_PAINT_ORDER = [0, 1, 2, 3, 1, 0, 3, 2, 0, 3, 1, 2] as const;
 
 /**
+ * The colour of each department bar on /services.
+ *
+ * Its own table rather than a slice of INDUSTRY_PAINT, which these used to
+ * borrow. That array also drives the homepage industry rows, so recolouring a
+ * department through it would have silently repainted the homepage — and the
+ * two sets are only coincidentally the same size.
+ *
+ * DIGITAL is the green sampled from its own card artwork (the UX/UI/SEO/web
+ * cards all carry it), so the bar and the row of cards under it are the same
+ * colour rather than two unrelated ones. Sampled across all seven cards at
+ * high saturation the modal green is #009A56.
+ *
+ * Every label colour is computed by labelOn(); the floor across the four is
+ * 5.18:1 (ink on the green), the widest 10.96:1 (ink on the gold).
+ */
+export const DEPARTMENT_PAINT: Record<string, string> = {
+  DESIGN: "#FF6B5B",
+  FILM: "#2B56D6",
+  DIGITAL: "#009A56",
+  STRATEGY: "#FFB902",
+};
+
+/**
+ * Where the plan cards start, per department, in Toman.
+ *
+ * A service's own `priceFrom` wins whenever it has one; only four of the
+ * thirty-two currently do, which is why there is a fallback at all. The four
+ * figures below are those same real prices used as the department floor
+ * (12M for design, 15M for web, and 30M for the two retainer-shaped
+ * services rounded down to a per-project floor), so nothing here is a number
+ * that appears nowhere else.
+ *
+ * This is the one place to change them.
+ */
+export const DEPARTMENT_PRICE_FROM: Record<string, number> = {
+  DESIGN: 12_000_000,
+  FILM: 18_000_000,
+  DIGITAL: 15_000_000,
+  STRATEGY: 20_000_000,
+};
+
+/**
+ * Each plan as a multiple of that starting figure, so the four cards stay in
+ * proportion whatever the service costs rather than carrying one fixed price
+ * list across a logo and a year-long partnership.
+ */
+export const PLAN_MULTIPLIER: Record<string, number> = {
+  starter: 1,
+  plus: 2,
+  pro: 3.5,
+  ultra: 6,
+};
+
+/**
  * Card artwork for the /services arc, keyed by service slug.
  *
  * Deliberately NOT the `cover` field. The homepage hero deck and the service

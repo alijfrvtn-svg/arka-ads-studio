@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowUpLeft } from "lucide-react";
-import { ServicesHero } from "@/components/services/ServicesHero";
+import { PageHero } from "@/components/ui/PageHero";
 import { Section, Container } from "@/components/ui/Section";
 import { Reveal } from "@/components/fx/Reveal";
 import { ServiceArc } from "@/components/services/ServiceArc";
 import { Icon } from "@/components/ui/Icon";
 import { getServices } from "@/lib/queries";
-import { DEPARTMENTS, INDUSTRY_PAINT } from "@/lib/constants";
+import { DEPARTMENTS, DEPARTMENT_PAINT } from "@/lib/constants";
 import { buildMetadata } from "@/lib/seo";
 import { cn, labelOn, localeNumber } from "@/lib/utils";
 import { tr, ui } from "@/lib/i18n";
@@ -52,7 +52,7 @@ export default async function ServicesPage() {
   const c = COPY[locale];
   return (
     <>
-      <ServicesHero
+      <PageHero
         eyebrow={ui(locale).navServices}
         breadcrumb={[{ label: ui(locale).navHome, href: "/" }, { label: ui(locale).navServices }]}
         title={<>{c.title} <span className="text-gradient">{c.highlight}</span></>}
@@ -60,12 +60,13 @@ export default async function ServicesPage() {
       />
       <Section>
         <div className="space-y-24">
-          {DEPARTMENTS.map((dept, di) => {
+          {DEPARTMENTS.map((dept) => {
             const items = services.filter((s) => s.department === dept.key);
             if (!items.length) return null;
-            // One of the four site colours per department, and the label colour
-            // computed from it rather than paired by hand — see labelOn().
-            const colour = INDUSTRY_PAINT[di % INDUSTRY_PAINT.length];
+            // Keyed by department rather than by position, so reordering
+            // DEPARTMENTS cannot quietly reassign the colours. The label colour
+            // is computed from the hex rather than paired by hand — labelOn().
+            const colour = DEPARTMENT_PAINT[dept.key] ?? "#FF6B5B";
             const label = labelOn(colour);
             const onDark = label === "#ffffff";
             return (

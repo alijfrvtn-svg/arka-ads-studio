@@ -200,16 +200,10 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
         </Section>
       )}
 
-      {/* Features, on the homepage process section's wave — same language, but
-          the geometry is generated because a service can have any number of
-          them and that section is hard-coded for four. */}
-      {features.length > 0 && (
-        <Section>
-          <Container>
-            <ServiceWaveFeatures features={features} locale={locale} />
-          </Container>
-        </Section>
-      )}
+      {/* Features, on the homepage process section's wave and its paint. Full
+          bleed, so the section brings its own canvas and container rather than
+          sitting inside one. */}
+      {features.length > 0 && <ServiceWaveFeatures features={features} locale={locale} />}
 
       {/* workflow */}
       {workflow.length > 0 && (
@@ -304,7 +298,13 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
       {/* cta */}
       <Section>
         <Container>
-          <ServicePlans serviceTitle={title} locale={locale} />
+          <ServicePlans
+            serviceTitle={title}
+            department={s.department}
+            priceFrom={s.priceFrom}
+            priceUnit={priceUnit}
+            locale={locale}
+          />
         </Container>
       </Section>
     </>

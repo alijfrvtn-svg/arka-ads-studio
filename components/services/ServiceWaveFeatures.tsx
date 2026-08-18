@@ -1,33 +1,45 @@
 "use client";
 
-import { useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion, useScroll, useSpring } from "framer-motion";
 import { Check } from "lucide-react";
+import { PaintCanvas } from "@/components/home/PaintCanvas";
+import { Reveal } from "@/components/fx/Reveal";
+import { Eyebrow } from "@/components/ui/Section";
 import { localeDigits } from "@/lib/utils";
 import type { Locale } from "@/types";
 
 /**
- * Service features, laid out on the same wave as the homepage process section.
+ * Service features, on the homepage process section's wave and its paint.
  *
- * That section's wave is hard-coded for exactly four steps; a service can have
- * any number of features, so the geometry is generated here instead of copied.
- * The rules are the same ones that made the original read as a wave rather than
- * a zigzag:
+ * Three things separate this from the homepage version:
  *
- *   - amplitude varies per column instead of alternating, so no two neighbours
- *     are mirror images;
- *   - the connector is a stroked path through the same points, not a scaled
- *     rectangle, because a curve cannot be produced by scaling one;
- *   - the row uses `gap-y` only, since a horizontal gap pulls the real column
- *     centres off the clean percentages the viewBox assumes and the line drifts
- *     off the markers.
+ *   1. That wave is hard-coded for exactly four steps. A service can have any
+ *      number, so the row wraps — and the moment it wraps, a connector drawn
+ *      across one row leaves every later row hanging unattached.
+ *   2. So the rows snake. Odd rows are placed in reverse, which puts the last
+ *      marker of a row directly above the first marker of the next and lets one
+ *      unbroken line run through every feature without doubling back across the
+ *      full width to start each row again.
+ *   3. The line is measured off the rendered page rather than computed from a
+ *      viewBox. Row heights depend on how the Persian copy happens to wrap,
+ *      which is not knowable in advance, so a percentage-based path drifts off
+ *      the markers as soon as one cell takes an extra line.
  */
-const AMPLITUDE = [0, 78, 22, 64, 34, 86, 14, 70, 44];
 
-/** Top of a feature cell to the centre of its check mark. */
-const MARK_CY = 34;
+/** Columns in a full row, from lg up. */
+const PER_ROW = 4;
 
-/** Written out so Tailwind can see them. */
+/**
+ * How far each column in a row is pushed down, in px.
+ *
+ * Uneven on purpose — a strict high-low alternation still reads as a repeating
+ * zigzag, which is the look the wave replaced.
+ */
+const AMPLITUDE = [0, 78, 22, 64];
+
+/** Written out so Tailwind can see them — a template-built class name produces
+ *  no rule at all. */
 const COLS: Record<number, string> = {
   1: "lg:grid-cols-1",
   2: "lg:grid-cols-2",
@@ -35,26 +47,28 @@ const COLS: Record<number, string> = {
   4: "lg:grid-cols-4",
 };
 
-function wave(n: number) {
-  return Array.from({ length: n }, (_, i) => AMPLITUDE[i % AMPLITUDE.length]);
-}
+const COPY: Record<Locale, { eyebrow: string; heading: string }> = {
+  fa: { eyebrow: "ویژگی‌ها", heading: "چه چیزی تحویل می‌گیرید" },
+  en: { eyebrow: "Features", heading: "What you get" },
+  ar: { eyebrow: "المزايا", heading: "ما الذي تحصل عليه" },
+};
 
 /**
- * Right to left, with the reading direction — the first feature is the
- * rightmost column in RTL, so column i sits at the far end of the box.
+ * Layout offset of `el` inside `root`, walked up the offsetParent chain.
+ *
+ * offsetTop/offsetLeft are layout values and ignore transforms, which is the
+ * whole point here: the reveal writes an inline transform on the cell while it
+ * animates, so a rect taken before that lands would put the line 26px low.
+ * `root` has to be positioned, or the walk runs straight past it.
  */
-function wavePath(offsets: number[]) {
-  const n = offsets.length;
-  const step = 1200 / n;
-  const pts = offsets.map((dy, i) => [1200 - step * (i + 0.5), MARK_CY + dy] as const);
-  let d = `M ${pts[0][0].toFixed(1)} ${pts[0][1]}`;
-  for (let i = 1; i < n; i++) {
-    const [x0, y0] = pts[i - 1];
-    const [x1, y1] = pts[i];
-    const cx = ((x0 + x1) / 2).toFixed(1);
-    d += ` C ${cx} ${y0}, ${cx} ${y1}, ${x1.toFixed(1)} ${y1}`;
+function offsetIn(el: HTMLElement, root: HTMLElement) {
+  let x = 0;
+  let y = 0;
+  for (let n: HTMLElement | null = el; n && n !== root; n = n.offsetParent as HTMLElement | null) {
+    x += n.offsetLeft;
+    y += n.offsetTop;
   }
-  return d;
+  return [x, y] as const;
 }
 
 export function ServiceWaveFeatures({
@@ -65,67 +79,182 @@ export function ServiceWaveFeatures({
   locale?: Locale;
 }) {
   const reduced = useReducedMotion();
+  const c = COPY[locale] ?? COPY.fa;
   const trackRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({ target: trackRef, offset: ["start 0.9", "center 0.55"] });
+  const seats = useRef<(HTMLDivElement | null)[]>([]);
+  const marks = useRef<(HTMLDivElement | null)[]>([]);
+  const [line, setLine] = useState<{ d: string; w: number; h: number } | null>(null);
+
+  const { scrollYProgress } = useScroll({ target: trackRef, offset: ["start 0.85", "end 0.6"] });
   const fill = useSpring(scrollYProgress, { stiffness: 90, damping: 26, mass: 0.35 });
+
+  const measure = useCallback(() => {
+    const track = trackRef.current;
+    if (!track) return;
+    const tr = track.getBoundingClientRect();
+    const pts: [number, number][] = [];
+
+    for (let i = 0; i < marks.current.length; i++) {
+      const seat = seats.current[i];
+      const mark = marks.current[i];
+      if (!seat || !mark) continue;
+      // The seat's rect, because it carries the wave offset as a transform and
+      // a rect includes transforms; the mark's position inside it as a layout
+      // offset, because the reveal's transform must not count. Mixing the two
+      // is deliberate.
+      const sr = seat.getBoundingClientRect();
+      const [ox, oy] = offsetIn(mark, seat);
+      pts.push([
+        sr.left - tr.left + ox + mark.offsetWidth / 2,
+        sr.top - tr.top + oy + mark.offsetHeight / 2,
+      ]);
+    }
+
+    if (pts.length < 2) {
+      setLine(null);
+      return;
+    }
+
+    let d = `M ${pts[0][0].toFixed(1)} ${pts[0][1].toFixed(1)}`;
+    for (let i = 1; i < pts.length; i++) {
+      const [x0, y0] = pts[i - 1];
+      const [x1, y1] = pts[i];
+      if (Math.abs(x1 - x0) >= Math.abs(y1 - y0)) {
+        // Along a row: horizontal control points give the S-curve.
+        const cx = ((x0 + x1) / 2).toFixed(1);
+        d += ` C ${cx} ${y0.toFixed(1)}, ${cx} ${y1.toFixed(1)}, ${x1.toFixed(1)} ${y1.toFixed(1)}`;
+      } else {
+        // Dropping to the next row, where the two markers sit at almost the
+        // same x — horizontal control points there would make the line bulge
+        // sideways and double back on itself.
+        const cy = ((y0 + y1) / 2).toFixed(1);
+        d += ` C ${x0.toFixed(1)} ${cy}, ${x1.toFixed(1)} ${cy}, ${x1.toFixed(1)} ${y1.toFixed(1)}`;
+      }
+    }
+    setLine({ d, w: tr.width, h: tr.height });
+  }, []);
+
+  useEffect(() => {
+    measure();
+    const track = trackRef.current;
+    if (!track) return;
+    // Covers viewport resize, the breakpoint change that turns the snake on and
+    // off, and a cell taking an extra line — all of which move the markers.
+    const ro = new ResizeObserver(() => measure());
+    ro.observe(track);
+    // Persian copy rewraps once Estedad lands, which shifts every row.
+    document.fonts?.ready.then(() => measure()).catch(() => {});
+    return () => ro.disconnect();
+  }, [measure, features.length]);
 
   if (!features.length) return null;
 
-  // Beyond four across the cells get too narrow for a Persian line, so long
-  // lists wrap — and the wave only applies to the row that shares a line.
-  const perRow = features.length >= 4 ? 4 : features.length;
-  const offsets = wave(perRow);
-  const box = MARK_CY + Math.max(...offsets) + 24;
+  const perRow = Math.min(features.length, PER_ROW);
 
   return (
-    // Static column classes rather than a computed value: Tailwind only emits
-    // what it can see in the source, so a template-built class name produces no
-    // rule at all.
-    <div ref={trackRef} className={`relative grid gap-y-10 sm:grid-cols-2 ${COLS[perRow]}`}>
-      {/* The connector, drawn only where the whole row shares one line. */}
-      <svg
-        aria-hidden
-        focusable="false"
-        className="pointer-events-none absolute inset-x-0 top-0 hidden w-full lg:block"
-        style={{ height: box }}
-        viewBox={`0 0 1200 ${box}`}
-        preserveAspectRatio="none"
-        fill="none"
-      >
-        <path d={wavePath(offsets)} stroke="var(--card-border)" strokeWidth="1" vectorEffect="non-scaling-stroke" />
-        <motion.path
-          d={wavePath(offsets)}
-          stroke="var(--accent-bright)"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-          vectorEffect="non-scaling-stroke"
-          style={reduced ? { pathLength: 1 } : { pathLength: fill }}
-        />
-      </svg>
+    <section className="section relative overflow-hidden">
+      {/* The same painting as the homepage process section. Legibility is not
+          handled by keeping paint away from the text but by the local clearing
+          each text block carries — see `.paint-plate` in globals.css. */}
+      <div className="paint-canvas absolute inset-0" aria-hidden>
+        <PaintCanvas />
+      </div>
 
-      {features.map((f, i) => (
-        <div
-          key={i}
-          className="wave-slot"
-          style={{ "--wf-y": `${offsets[i % perRow]}px` } as React.CSSProperties}
-        >
-          <motion.div
-            initial={reduced ? false : { opacity: 0, y: 26 }}
-            whileInView={reduced ? undefined : { opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.35 }}
-            transition={{ duration: 0.6, delay: (i % perRow) * 0.15, ease: [0.16, 1, 0.3, 1] }}
-            className="wf-step group relative flex flex-col items-center rounded-[1.5rem] px-5 pb-7 pt-5 text-center"
-          >
-            <div className="wf-chip relative z-10 mb-6 grid h-14 w-14 place-items-center rounded-[16px]">
-              <Check className="h-5 w-5" />
-              <span className="wf-badge absolute -right-2 -top-2 grid h-7 w-7 place-items-center rounded-full text-xs font-bold text-background">
-                {localeDigits(locale, String(i + 1).padStart(2, "0"))}
-              </span>
-            </div>
-            <p className="text-sm leading-relaxed text-foreground">{f}</p>
-          </motion.div>
+      <div className="container-x relative">
+        <div className="paint-plate mx-auto mb-20 max-w-2xl text-center">
+          <Reveal>
+            <Eyebrow>{c.eyebrow}</Eyebrow>
+          </Reveal>
+          <Reveal delay={0.05}>
+            <h2 className="mt-4 font-display text-3xl font-bold leading-[1.1] tracking-[-0.028em] text-foreground sm:text-4xl md:text-5xl">
+              {c.heading}
+            </h2>
+          </Reveal>
         </div>
-      ))}
-    </div>
+
+        {/* The row gap has to clear the deepest push (78px) or a low cell in one
+            row lands on a high cell in the next: the offset is a transform and
+            therefore invisible to layout. lg:gap-y-32 is 128px. */}
+        <div
+          ref={trackRef}
+          className={`relative grid gap-y-14 sm:grid-cols-2 lg:gap-y-32 lg:pb-20 ${COLS[perRow]}`}
+        >
+          {/* Drawn at 1:1 in px from the measured points, so no aspect-ratio
+              trickery and no non-scaling-stroke: one SVG unit is one pixel. */}
+          {line && (
+            <svg
+              aria-hidden
+              focusable="false"
+              className="pointer-events-none absolute left-0 top-0 hidden lg:block"
+              width={line.w}
+              height={line.h}
+              viewBox={`0 0 ${line.w} ${line.h}`}
+              fill="none"
+            >
+              <path d={line.d} stroke="var(--card-border)" strokeWidth="1" />
+              <motion.path
+                d={line.d}
+                stroke="var(--accent-bright)"
+                strokeWidth="1.75"
+                strokeLinecap="round"
+                style={reduced ? { pathLength: 1 } : { pathLength: fill }}
+              />
+            </svg>
+          )}
+
+          {features.map((f, i) => {
+            const row = Math.floor(i / perRow);
+            const j = i % perRow;
+            return (
+              // The wave offset lives on this wrapper rather than on the
+              // animated element inside: framer-motion writes `transform`
+              // inline while revealing, and an inline transform beats the
+              // stylesheet, so the offset would be wiped the moment the reveal
+              // landed.
+              <div
+                key={i}
+                ref={(el) => {
+                  seats.current[i] = el;
+                }}
+                className="wave-slot wave-seat relative"
+                style={
+                  {
+                    "--wf-y": `${AMPLITUDE[j % AMPLITUDE.length]}px`,
+                    // Column 1 is the rightmost in RTL. Odd rows count from the
+                    // far side so the row reads back the other way and the
+                    // snake closes.
+                    "--wf-col": row % 2 === 0 ? j + 1 : perRow - j,
+                    "--wf-row": row + 1,
+                  } as React.CSSProperties
+                }
+              >
+                <motion.div
+                  initial={reduced ? false : { opacity: 0, y: 26 }}
+                  whileInView={reduced ? undefined : { opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.35 }}
+                  transition={{ duration: 0.6, delay: j * 0.15, ease: [0.16, 1, 0.3, 1] }}
+                  className="wf-step group relative flex flex-col items-center rounded-[1.5rem] px-5 pb-8 pt-5 text-center"
+                >
+                  <div
+                    ref={(el) => {
+                      marks.current[i] = el;
+                    }}
+                    className="wf-chip relative z-10 mb-7 grid h-16 w-16 place-items-center rounded-[18px]"
+                  >
+                    <Check className="h-6 w-6" />
+                    <span className="wf-badge absolute -right-2 -top-2 grid h-8 w-8 place-items-center rounded-full text-xs font-bold text-background">
+                      {localeDigits(locale, String(i + 1).padStart(2, "0"))}
+                    </span>
+                  </div>
+                  <div className="paint-plate">
+                    <p className="text-base font-medium leading-[1.9] md:text-lg md:leading-[1.85]">{f}</p>
+                  </div>
+                </motion.div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
   );
 }
