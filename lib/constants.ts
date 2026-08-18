@@ -132,6 +132,31 @@ export const INDUSTRY_PAINT = ["#FF6B5B", "#2B56D6", "#FFB902", "#7C3AED"] as co
  */
 export const INDUSTRY_PAINT_ORDER = [0, 1, 2, 3, 1, 0, 3, 2, 0, 3, 1, 2] as const;
 
+/**
+ * Card artwork for the /services arc, keyed by service slug.
+ *
+ * Deliberately NOT the `cover` field. The homepage hero deck and the service
+ * page hero both read `cover`, so putting these there would have replaced the
+ * hero cards too — which was explicitly not wanted. A separate source keeps the
+ * two sets independent: this one is the /services arc and nothing else.
+ *
+ * A slug with no entry falls back to the plain card, so a missing file can
+ * never be the reason a service stops rendering.
+ */
+export const SERVICE_CARD_IMAGE: Record<string, string> = Object.fromEntries(
+  [
+    "logo-design", "visual-identity", "typography", "brand-book", "packaging-design",
+    "advertising-design", "social-media-design",
+    "ui-design", "ux-design", "web-development", "technical-seo", "keyword-research",
+    "content-seo", "local-seo",
+    "product-photography", "food-photography", "architecture-photography",
+    "advertising-photography", "industrial-photography", "corporate-portrait",
+    "lifestyle-photography",
+    "audience-persona", "social-media-management", "performance-marketing",
+    "content-strategy", "digital-strategy", "campaign-design", "copywriting",
+  ].map((slug) => [slug, `/service-cards/${slug}.webp`]),
+);
+
 export const DEPARTMENT_POSTER: Record<string, string> = {
   DESIGN: "/departments/design.webp",
   FILM: "/departments/film.webp",

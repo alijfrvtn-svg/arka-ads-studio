@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef } from "react";
 import Link from "next/link";
 import { ArrowUpLeft, ChevronLeft, ChevronRight } from "lucide-react";
 import { Icon } from "@/components/ui/Icon";
+import { SERVICE_CARD_IMAGE } from "@/lib/constants";
 import { cn, localeNumber } from "@/lib/utils";
 import { tr, ui } from "@/lib/i18n";
 import type { Locale } from "@/types";
@@ -135,18 +136,21 @@ export function ServiceArc({
   return (
     <div className="relative">
       <div ref={scroller} className="arc-row flex snap-x snap-mandatory gap-5 overflow-x-auto pb-8 pt-10">
-        {services.map((s) => (
+        {services.map((s) => {
+          // The arc's own artwork, not `cover` — see SERVICE_CARD_IMAGE.
+          const art = SERVICE_CARD_IMAGE[s.slug] ?? s.cover;
+          return (
           <Link
             key={s.id}
             href={`/services/${s.slug}`}
             data-arc-card
             className="arc-card group relative flex min-h-[360px] w-[268px] shrink-0 snap-center flex-col overflow-hidden rounded-[1.5rem] border border-card-border bg-surface p-6 sm:w-[290px]"
           >
-            {s.cover && (
+            {art && (
               <>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src={s.cover}
+                  src={art}
                   alt=""
                   loading="lazy"
                   className="absolute inset-0 h-full w-full object-cover"
@@ -154,11 +158,16 @@ export function ServiceArc({
                 <div className="poster-scrim absolute inset-0" aria-hidden />
               </>
             )}
-            <div className="relative flex h-full flex-1 flex-col">
+            {/* `justify-end` is the whole fix for legibility here: the artwork
+                carries its own title across the top, so copy laid over it
+                collided with the printed one. Pushing the text to the foot of
+                the card puts it on the dense end of the scrim and leaves the
+                artwork's own heading visible above it. */}
+            <div className="relative flex h-full flex-1 flex-col justify-end">
               <div
                 className={cn(
-                  "mb-5 grid h-12 w-12 place-items-center rounded-[13px]",
-                  s.cover ? "glass-onmedia" : "liquid-clear text-foreground",
+                  "absolute right-0 top-0 grid h-12 w-12 place-items-center rounded-[13px]",
+                  art ? "glass-onmedia" : "liquid-clear text-foreground",
                 )}
               >
                 <Icon name={s.icon} className="h-5 w-5" />
@@ -166,20 +175,20 @@ export function ServiceArc({
               <h3
                 className={cn(
                   "font-display text-lg font-bold tracking-tight",
-                  s.cover ? "text-white" : "text-foreground",
+                  art ? "text-white" : "text-foreground",
                 )}
               >
                 {tr(locale, s.title, s.titleEn, s.titleAr)}
               </h3>
               {s.tagline && (
-                <p className={cn("mt-1.5 text-xs", s.cover ? "text-white/70" : "text-foreground-faint")}>
+                <p className={cn("mt-1.5 text-xs", art ? "text-white/70" : "text-foreground-faint")}>
                   {tr(locale, s.tagline, s.taglineEn, s.taglineAr)}
                 </p>
               )}
               <p
                 className={cn(
-                  "mt-3 flex-1 text-sm leading-relaxed",
-                  s.cover ? "text-white/85" : "text-foreground-muted",
+                  "mt-3 text-sm leading-relaxed",
+                  art ? "text-white/85" : "text-foreground-muted",
                 )}
               >
                 {tr(locale, s.excerpt, s.excerptEn, s.excerptAr)}
@@ -198,7 +207,7 @@ export function ServiceArc({
                 <span
                   className={cn(
                     "inline-flex items-center gap-1 text-sm font-semibold",
-                    s.cover ? "text-white" : "text-foreground",
+                    art ? "text-white" : "text-foreground",
                   )}
                 >
                   {detailsLabel}
@@ -207,7 +216,8 @@ export function ServiceArc({
               </div>
             </div>
           </Link>
-        ))}
+          );
+        })}
       </div>
 
       {/* Arrows add to native scroll and drag rather than replacing them — the
