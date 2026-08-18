@@ -1143,6 +1143,24 @@ body {
   }
 }
 
+/* ————— services hero lattice —————
+   Hairlines are drawn by the cells themselves — a top and start border each,
+   with the wall closing the far edges. One rule instead of an overlay grid that
+   would have to be kept in step with the cell spans. */
+.grid-wall {
+  border-inline-end: 1px solid #eaeaea;
+  border-block-end: 1px solid #eaeaea;
+}
+.grid-cell {
+  border-block-start: 1px solid #eaeaea;
+  border-inline-start: 1px solid #eaeaea;
+}
+/* Tinted cells lift slightly toward their own colour on hover, so the wall
+   answers the cursor without any cell changing size and reflowing the grid. */
+.grid-cell[style*="color-mix"]:hover {
+  filter: saturate(1.5) brightness(0.98);
+}
+
 /* ============================================================
    Poster scrim — department cards (components/home/Departments.tsx)
    ------------------------------------------------------------
