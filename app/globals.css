@@ -887,9 +887,13 @@ body {
 }
 
 /* ============================================================
-   Footer — black glass
+   Ink surface — black glass
    ------------------------------------------------------------
-   The footer inverts by redefining tokens on one scope rather than by
+   Shared by the footer and the stats band. Both are slabs of smoked black
+   glass carrying white type, so the material is defined once and applied by
+   class rather than described twice.
+
+   It inverts by redefining tokens on one scope rather than by
    restyling its contents. Everything inside already reads --foreground,
    --glass-bg and friends, so the logo wordmark, the column links, the social
    pills and the CTA button all flip on their own — and anything added to the
@@ -902,7 +906,7 @@ body {
    The accent flips too: the navy used on paper is 1.3:1 here, so the footer
    takes the azure, which is 6.9:1 on the slab.
    ============================================================ */
-.footer-dark {
+.ink-surface {
   --background: #0a0a0a;
   --background-2: #101010;
   --surface: rgba(255, 255, 255, 0.045);
@@ -954,7 +958,7 @@ body {
 
 /* Specular pass: a wide diagonal sheen and a bright cut along the top edge —
    the two things that separate polished glass from matte black paint. */
-.footer-dark::before {
+.ink-surface::before {
   content: "";
   position: absolute;
   inset: 0;
@@ -971,7 +975,7 @@ body {
     ),
     radial-gradient(70% 40% at 50% 0%, rgba(255, 255, 255, 0.08), transparent 70%);
 }
-.footer-dark::after {
+.ink-surface::after {
   content: "";
   position: absolute;
   inset-inline: 0;
@@ -988,7 +992,7 @@ body {
     transparent
   );
 }
-.footer-dark > * {
+.ink-surface > * {
   position: relative;
   z-index: 2;
 }
@@ -997,21 +1001,21 @@ body {
    On paper a link darkens to signal hover; there is nothing darker than white
    here, so it goes the other way: muted lifts to full white, and the underline
    sweep already built for links does the rest. */
-.footer-dark a {
+.ink-surface a {
   transition: color 0.35s var(--ease-apple), opacity 0.35s var(--ease-apple);
 }
-.footer-link:hover {
+.ink-surface .u-link:hover {
   color: #ffffff;
 }
 /* Social pills brighten and lift rather than changing hue. */
-.footer-social {
+.ink-surface .u-pill {
   transition:
     transform 0.45s var(--ease-apple),
     background-color 0.45s var(--ease-apple),
     border-color 0.45s var(--ease-apple),
     color 0.45s var(--ease-apple);
 }
-.footer-social:hover {
+.ink-surface .u-pill:hover {
   transform: translateY(-2px);
   background: rgba(255, 255, 255, 0.16);
   border-color: rgba(255, 255, 255, 0.32);
@@ -1035,6 +1039,15 @@ body {
   aspect-ratio: 900 / 153;
   background-color: currentColor;
   mask: url("/brand/arka-wordmark.webp") center / contain no-repeat;
+}
+
+/* The cards stacked behind the quote. Pure depth — no content, no tab stop.
+   `transform-origin` at the bottom keeps them fanning from the base of the
+   stack rather than pivoting about their middles, which is what makes a pile
+   of cards read as a pile. */
+.tm-ghost {
+  transform-origin: 50% 100%;
+  pointer-events: none;
 }
 
 /* ============================================================
