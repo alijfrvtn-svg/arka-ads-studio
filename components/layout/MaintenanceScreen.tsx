@@ -28,7 +28,7 @@ export function MaintenanceScreen() {
     <div className="grid min-h-screen place-items-center bg-background px-6 text-center">
       <div>
         <div className="mb-8 flex justify-center">
-          <Logo tagline={false} />
+          <Logo className="h-8" />
         </div>
         <h1 className="font-display text-3xl font-bold tracking-[-0.03em] text-foreground md:text-4xl">
           سایت موقتاً در حال تعمیر و نگهداری است

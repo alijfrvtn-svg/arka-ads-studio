@@ -30,7 +30,7 @@ import {
   PanelRight,
   type LucideIcon,
 } from "lucide-react";
-import { Logo, LogoMark } from "@/components/brand/Logo";
+import { Logo } from "@/components/brand/Logo";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { AdminSearch } from "./AdminSearch";
 import { NotificationBell, type NotificationItem } from "@/components/notifications/NotificationBell";
@@ -214,7 +214,7 @@ export function AdminShell({
             <Menu className="h-5 w-5" />
           </button>
           <div className="lg:hidden">
-            <LogoMark className="h-7 w-7" />
+            <Logo className="h-5" />
           </div>
           <div className="hidden items-center gap-2 md:flex">
             <h1 className="font-display text-lg font-bold text-foreground">{current?.label ?? "پنل مدیریت"}</h1>

@@ -1008,6 +1008,25 @@ body {
 }
 
 /* ============================================================
+   Brand mark
+   ------------------------------------------------------------
+   The wordmark is a single alpha asset painted with currentColor through a
+   mask, not a coloured image. One file therefore serves every context: ink on
+   the white pages, white on the black footer, and whatever a future surface
+   needs — it inherits its colour like text does.
+
+   Deliberately unprefixed. Lightning CSS adds -webkit-mask from the build
+   targets; hand-writing the pair is what silently dropped BOTH declarations
+   when it was done for backdrop-filter.
+   ============================================================ */
+.arka-logo {
+  display: block;
+  aspect-ratio: 900 / 153;
+  background-color: currentColor;
+  mask: url("/brand/arka-wordmark.webp") center / contain no-repeat;
+}
+
+/* ============================================================
    Poster scrim — department cards (components/home/Departments.tsx)
    ------------------------------------------------------------
    White type over an arbitrary poster is the hardest legibility case on the

@@ -3,6 +3,9 @@ import type { Department, Role, TaskPriority, TaskStatus } from "@/types";
 export const SITE = {
   name: "آرکا",
   nameEn: "ARKA",
+  // Kept for structured data, where the registered entity name is the
+  // correct value. Nothing on the page prints it any more — the visible
+  // copyright is just "ARKA", per the brand change.
   legalName: "ARKA Digital Marketing",
   tagline: "دیجیتال مارکتینگ",
   positioning: "استودیو خلاقیت، پروداکشن و دیجیتال مارکتینگ",

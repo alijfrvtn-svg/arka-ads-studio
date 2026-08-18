@@ -67,7 +67,6 @@ export const metadata: Metadata = {
   },
   twitter: { card: "summary_large_image" },
   robots: { index: true, follow: true },
-  icons: { icon: "/icon.svg" },
   verification: { google: "ayWrAgIiSbeyN0W6I9VUoW-pcLxNN-sUSPoxDS_azeg" },
 };
 

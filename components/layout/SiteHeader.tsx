@@ -80,7 +80,7 @@ export function SiteHeader({
           )}
         >
           <Link href="/" aria-label="آرکا" className="shrink-0">
-            <Logo tagline={!scrolled} />
+            <Logo className={scrolled ? "h-6" : "h-7"} />
           </Link>
 
           {/* desktop nav */}

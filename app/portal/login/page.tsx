@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowLeft, Eye, EyeOff, Loader2, Lock, Mail, ShieldCheck } from "lucide-react";
-import { Logo, LogoMark } from "@/components/brand/Logo";
+import { Logo } from "@/components/brand/Logo";
 import { SITE } from "@/lib/constants";
 
 export default function PortalLoginPage() {
@@ -49,7 +49,7 @@ export default function PortalLoginPage() {
         <div className="absolute inset-0 bg-navy-ink/40" />
         <div className="absolute inset-0 dotgrid opacity-30" />
         <div className="relative z-10 flex w-full flex-col justify-between p-12">
-          <Logo tagline mono className="text-white [&_*]:text-white" />
+          <Logo className="h-9 text-white" />
           <div>
             <motion.h2
               initial={{ opacity: 0, y: 20 }}
@@ -86,7 +86,7 @@ export default function PortalLoginPage() {
       <div className="flex items-center justify-center bg-background p-6">
         <div className="w-full max-w-sm">
           <div className="mb-8 lg:hidden">
-            <LogoMark className="h-11 w-11" />
+            <Logo className="h-7" />
           </div>
           <h1 className="font-display text-3xl font-bold text-foreground">خوش آمدید 👋</h1>
           <p className="mt-2 text-foreground-muted">برای ورود به پنل کاربران، وارد شوید.</p>

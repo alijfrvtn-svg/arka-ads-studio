@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { LogOut, ListTodo, CalendarDays } from "lucide-react";
-import { LogoMark } from "@/components/brand/Logo";
+import { Logo } from "@/components/brand/Logo";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { NotificationBell, type NotificationItem } from "@/components/notifications/NotificationBell";
 import { IdleLogout } from "@/components/auth/IdleLogout";
@@ -45,7 +45,7 @@ export function PortalShell({
       <IdleLogout loginPath="/portal/login" />
       <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-card-border bg-surface/80 px-4 backdrop-blur-xl md:px-6">
         <Link href="/portal" className="flex items-center gap-2">
-          <LogoMark className="h-8 w-8" />
+          <Logo className="h-6" />
           <span className="hidden font-display text-lg font-bold text-foreground sm:block">پنل کاربران</span>
         </Link>
         <nav className="flex items-center gap-1">

@@ -81,7 +81,7 @@ export function SiteFooter({
         {/* columns */}
         <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-5">
           <div className="lg:col-span-2">
-            <Logo tagline />
+            <Logo className="h-8" />
             <p className="mt-5 max-w-xs text-sm leading-relaxed text-foreground-muted">
               {description}
             </p>
@@ -130,7 +130,7 @@ export function SiteFooter({
         {/* bottom */}
         <div className="mt-16 flex flex-col items-center justify-between gap-4 border-t border-card-border pt-8 text-sm text-foreground-faint md:flex-row">
           <p className="text-center md:text-right">
-            © {year} {SITE.legalName}. {copyright}
+            © {year} {SITE.nameEn}. {copyright}
           </p>
           <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-0 md:justify-start">
             {NAV.slice(1).map((n) => (

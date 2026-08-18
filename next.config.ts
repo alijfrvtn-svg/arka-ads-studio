@@ -26,6 +26,16 @@ const nextConfig: NextConfig = {
     optimizePackageImports: ["lucide-react", "framer-motion"],
   },
   /**
+   * Default is 60s. Every prerendered page here opens with several Prisma
+   * queries against a Neon instance in us-east, and a build run from a slow or
+   * distant link spends most of that budget on round-trips rather than on
+   * rendering — /journal fetches posts, categories, contact and settings before
+   * it can emit a byte. Netlify builds in the same region and never comes close;
+   * this only buys headroom for builds run from elsewhere, and costs nothing
+   * when the queries are fast.
+   */
+  staticPageGenerationTimeout: 300,
+  /**
    * The four original service pages were broad SEO landing pages; the service
    * list is now 28 focused pages under four departments. These are permanent
    * moves, not deletions — each old URL is indexed and has whatever authority it
