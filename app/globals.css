@@ -728,6 +728,7 @@ body {
    on hover a faint glass panel forms around the icon, title and copy together,
    which is what tells you the three are one item. */
 .wf-step {
+  --wf-y: 0px;
   transition:
     transform 0.55s var(--ease-apple),
     opacity 0.55s var(--ease-apple),
@@ -788,6 +789,16 @@ body {
     inset 0 1px 0 rgba(255, 255, 255, 1),
     0 1px 2px rgba(0, 0, 0, 0.05),
     0 14px 32px -14px color-mix(in srgb, var(--accent-bright) 55%, transparent);
+}
+
+/* The wave itself. On its own wrapper so it survives the reveal animation,
+   which writes an inline transform on the step inside. Only from lg, where the
+   four steps share a row — stacked below that, an offset is just broken
+   spacing. */
+@media (min-width: 1024px) {
+  .wf-slot {
+    transform: translateY(var(--wf-y, 0px));
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -99,6 +99,56 @@ function PaintCanvas() {
   );
 }
 
+/**
+ * The wave.
+ *
+ * `WAVE[i]` is how far step i is pushed down, in px, and the same numbers place
+ * the curve's control points — one source for both, so the line cannot drift
+ * off the icons.
+ *
+ * Deliberately uneven. A strict high-low-high-low alternation still reads as a
+ * repeating pattern, which is the "symmetrical" look this replaces; varying the
+ * amplitude makes it a wave instead of a zigzag.
+ *
+ * Only applied from `lg`, where the four steps sit in one row. Stacked one or
+ * two per row below that, an offset would just look like broken spacing.
+ */
+const WAVE = [0, 88, 24, 76];
+/** Distance from the top of a step box to the centre of its icon chip.
+ *  Measured against the rendered page, not derived from the padding — the step
+ *  has its own top padding and the chip its own margin, and a value guessed
+ *  from the classes sat the curve 28px high. */
+const CHIP_CY = 84;
+/** SVG box height; the viewBox matches it 1:1 so y units are px. */
+const WAVE_BOX = CHIP_CY + Math.max(...WAVE) + 24;
+
+/**
+ * The connector, drawn right to left — the reading direction, and the direction
+ * the progress fills.
+ *
+ * In RTL the first step is the RIGHTMOST column, so step i sits at
+ * x = 1050 - i*300 in a 1200-wide box (four columns, centres at 12.5%…87.5%).
+ * The path therefore starts at the right and the dash offset fills from there.
+ *
+ * Those centres ignore the 32px grid gap, which pulls the real ones to roughly
+ * 11.5% / 37.2% / 62.8% / 88.5% — about 12px at the outer two on a 1150px row.
+ * Left as is deliberately: a viewBox cannot express `50% - 16px`, so matching
+ * exactly would mean dropping the gap or measuring the columns at runtime, and
+ * 12px lands well inside a 72px icon. Measured against the rendered page, the
+ * inner two steps sit 1px off the curve and the outer two 12px.
+ */
+function wavePath() {
+  const pts = WAVE.map((dy, i) => [1050 - i * 300, CHIP_CY + dy] as const);
+  let d = `M ${pts[0][0]} ${pts[0][1]}`;
+  for (let i = 1; i < pts.length; i++) {
+    const [x0, y0] = pts[i - 1];
+    const [x1, y1] = pts[i];
+    const cx = (x0 + x1) / 2;      // horizontal control points -> smooth S-curves
+    d += ` C ${cx} ${y0}, ${cx} ${y1}, ${x1} ${y1}`;
+  }
+  return d;
+}
+
 export function Workflow({ content, locale = "fa" }: { content: HomeContent; locale?: Locale }) {
   const reduced = useReducedMotion();
   const trackRef = useRef<HTMLDivElement>(null);
@@ -131,25 +181,52 @@ export function Workflow({ content, locale = "fa" }: { content: HomeContent; loc
 
         <div
           ref={trackRef}
-          className="relative grid gap-8 md:grid-cols-2 lg:grid-cols-4"
+          className="relative grid gap-8 md:grid-cols-2 lg:grid-cols-4 lg:pb-[88px]"
           onMouseLeave={() => setActive(null)}
         >
-          {/* Track + fill. The fill is scaled rather than sized so it animates
-              on the compositor; `origin-right` is what makes it travel right to
-              left, with the reading direction. */}
-          <div className="pointer-events-none absolute inset-x-0 top-9 hidden h-px lg:block">
-            <div className="absolute inset-0 bg-gradient-to-l from-transparent via-card-border to-transparent" />
-            <motion.div
-              className="absolute inset-0 origin-right bg-gradient-to-l from-transparent via-[var(--accent-bright)] to-transparent"
-              style={reduced ? { scaleX: 1 } : { scaleX: fill }}
+          {/* The connector. A stroked path rather than a scaled div, because a
+              curve cannot be produced by scaling a rectangle — and `pathLength`
+              lets the fill run along the curve itself instead of across a box.
+              `preserveAspectRatio="none"` stretches it to whatever width the
+              grid is; `vector-effect` keeps the stroke 1px through that. */}
+          <svg
+            aria-hidden
+            focusable="false"
+            className="pointer-events-none absolute inset-x-0 top-0 hidden w-full lg:block"
+            style={{ height: WAVE_BOX }}
+            viewBox={`0 0 1200 ${WAVE_BOX}`}
+            preserveAspectRatio="none"
+            fill="none"
+          >
+            <path
+              d={wavePath()}
+              stroke="var(--card-border)"
+              strokeWidth="1"
+              vectorEffect="non-scaling-stroke"
             />
-          </div>
+            <motion.path
+              d={wavePath()}
+              stroke="var(--accent-bright)"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              vectorEffect="non-scaling-stroke"
+              style={reduced ? { pathLength: 1 } : { pathLength: fill }}
+            />
+          </svg>
 
           {content.workflowSteps.map((s, i) => {
             const dimmed = active !== null && active !== i;
             return (
-              <motion.div
+              // The offset lives on this wrapper, not on the animated element.
+              // framer-motion writes `transform` inline while revealing, and an
+              // inline transform beats the stylesheet — so putting the wave on
+              // the same node would have it wiped the moment the reveal landed.
+              <div
                 key={i}
+                className="wf-slot"
+                style={{ "--wf-y": `${WAVE[i] ?? 0}px` } as React.CSSProperties}
+              >
+              <motion.div
                 // Explicit per-index delay rather than parent variants — the
                 // same reason as the hero deck: nothing to inherit, nothing to
                 // get stuck in.
@@ -181,6 +258,7 @@ export function Workflow({ content, locale = "fa" }: { content: HomeContent; loc
                   <p className="mt-2.5 max-w-xs text-sm leading-relaxed">{s.desc}</p>
                 </div>
               </motion.div>
+              </div>
             );
           })}
         </div>
