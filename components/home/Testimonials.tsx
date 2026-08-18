@@ -7,7 +7,8 @@ import { ChevronLeft, ChevronRight, Quote, Star } from "lucide-react";
 import { Section, Container, SectionHeading } from "@/components/ui/Section";
 import { HighlightedTitle } from "@/components/ui/HighlightedTitle";
 import { ui } from "@/lib/i18n";
-import { localeDigits } from "@/lib/utils";
+import { localeDigits, labelOn } from "@/lib/utils";
+import { SITE_PAINT } from "@/lib/constants";
 import type { HomeContent } from "@/lib/queries";
 import type { Locale } from "@/types";
 
@@ -36,6 +37,14 @@ export function Testimonials({ items, content, locale = "fa" }: { items: T[]; co
 
   if (!n) return null;
   const t = items[i];
+  // One colour per testimonial, cycling the site's six. The label colour is
+  // computed rather than paired by hand — two of the six are near-white and
+  // near-black, so any single choice would fail at one end.
+  const colour = SITE_PAINT[i % SITE_PAINT.length];
+  const label = labelOn(colour);
+  // The cards behind take the next colours, so the stack reads as a deck rather
+  // than as one card with two grey shadows.
+  const behind = [1, 2].map((d) => SITE_PAINT[(i + d) % SITE_PAINT.length]);
 
   return (
     <Section id="testimonials">
@@ -59,17 +68,24 @@ export function Testimonials({ items, content, locale = "fa" }: { items: T[]; co
           <div className="relative" style={{ perspective: 1200 }}>
             <span
               aria-hidden
-              className="tm-ghost absolute inset-x-6 -top-5 h-full rounded-[1.75rem] border border-card-border bg-surface"
-              style={{ transform: "rotate(-1.6deg) scale(0.955)", opacity: 0.55 }}
+              className="tm-ghost absolute inset-x-6 -top-5 h-full rounded-[1.75rem]"
+              style={{ transform: "rotate(-1.6deg) scale(0.955)", background: behind[0], opacity: 0.55 }}
             />
             <span
               aria-hidden
-              className="tm-ghost absolute inset-x-11 -top-9 h-full rounded-[1.75rem] border border-card-border bg-surface"
-              style={{ transform: "rotate(1.9deg) scale(0.91)", opacity: 0.32 }}
+              className="tm-ghost absolute inset-x-11 -top-9 h-full rounded-[1.75rem]"
+              style={{ transform: "rotate(1.9deg) scale(0.91)", background: behind[1], opacity: 0.32 }}
             />
 
-            <div className="relative rounded-[1.75rem] border border-card-border bg-surface px-7 py-12 shadow-[0_1px_2px_rgba(0,0,0,0.03),0_28px_64px_-34px_rgba(0,0,0,0.3)] md:px-14 md:py-14">
-              <Quote className="mx-auto mb-9 h-10 w-10 text-foreground/15" />
+            {/* `color` is set once here and everything inside inherits it, so
+                the quote, the name, the stars and the borders all follow the
+                card's own contrast decision instead of each hardcoding one. */}
+            <div
+              className="relative isolate overflow-hidden rounded-[1.75rem] px-7 py-12 shadow-[0_1px_2px_rgba(0,0,0,0.06),0_30px_70px_-32px_rgba(0,0,0,0.45)] md:px-14 md:py-14"
+              style={{ background: colour, color: label }}
+            >
+              <span className="crystal" aria-hidden />
+              <Quote className="relative mx-auto mb-9 h-10 w-10 opacity-25" />
               <div className="min-h-[210px]">
                 <AnimatePresence mode="wait">
                   <motion.blockquote
@@ -78,9 +94,9 @@ export function Testimonials({ items, content, locale = "fa" }: { items: T[]; co
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -20 }}
                     transition={{ duration: 0.4 }}
-                    className="text-center"
+                    className="relative text-center"
                   >
-                    <p className="font-display text-2xl font-medium leading-relaxed tracking-tight text-foreground md:text-[1.7rem]">
+                    <p className="font-display text-2xl font-medium leading-relaxed tracking-tight md:text-[1.7rem]">
                       «{t.quote}»
                     </p>
                     <div className="mt-10 flex items-center justify-center gap-4">
@@ -90,18 +106,18 @@ export function Testimonials({ items, content, locale = "fa" }: { items: T[]; co
                           alt={t.author}
                           width={56}
                           height={56}
-                          className="h-14 w-14 rounded-full border border-card-border object-cover"
+                          className="h-14 w-14 rounded-full border-2 border-current object-cover opacity-95"
                         />
                       )}
                       <div className="text-right">
-                        <div className="font-bold text-foreground">{t.author}</div>
-                        <div className="text-sm text-foreground-muted">
+                        <div className="font-bold">{t.author}</div>
+                        <div className="text-sm opacity-75">
                           {t.role}
                           {t.company ? ` · ${t.company}` : ""}
                         </div>
                         <div className="mt-1.5 flex gap-0.5">
                           {Array.from({ length: t.rating }).map((_, k) => (
-                            <Star key={k} className="h-3.5 w-3.5 fill-foreground text-foreground" />
+                            <Star key={k} className="h-3.5 w-3.5 fill-current" />
                           ))}
                         </div>
                       </div>

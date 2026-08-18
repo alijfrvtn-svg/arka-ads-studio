@@ -98,6 +98,24 @@ export interface DepartmentDef {
  * `labelOn()` picks whichever of ink/white wins for the hex, so correcting a
  * colour here cannot silently produce unreadable text.
  */
+/**
+ * Every colour the site paints with. The industry rows use the first four; the
+ * testimonial deck cycles all six.
+ *
+ * The last two are the extremes and are the reason nothing hardcodes a text
+ * colour against these: #cbe9f9 is nearly white and #37192c is nearly black, so
+ * a single label colour would fail on one end or the other. `labelOn()` picks
+ * per hex, which keeps the whole set usable as a background.
+ */
+export const SITE_PAINT = [
+  "#FF6B5B",
+  "#2B56D6",
+  "#FFB902",
+  "#7C3AED",
+  "#cbe9f9",
+  "#37192c",
+] as const;
+
 export const INDUSTRY_PAINT = ["#FF6B5B", "#2B56D6", "#FFB902", "#7C3AED"] as const;
 
 /**

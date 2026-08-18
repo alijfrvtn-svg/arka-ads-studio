@@ -193,7 +193,7 @@ export function IndustriesAccordion({
                   {/* The crystal shell: a diagonal facet, a top sheen and a
                       bevelled rim, so the colour reads as something cast in
                       glass rather than a flat fill. */}
-                  <span className="ind-crystal" aria-hidden />
+                  <span className="crystal" aria-hidden />
                   <h3 className="relative">
                     <button
                       type="button"

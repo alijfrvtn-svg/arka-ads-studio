@@ -820,7 +820,7 @@ body {
   isolation: isolate;
 }
 
-/* The crystal shell.
+/* The crystal shell. Shared by the industry rows and the testimonial deck.
    Three things together read as cast glass rather than a flat fill: a diagonal
    facet running across the row, a sheen falling from the top edge, and a
    bevelled rim — bright along the top, shaded along the bottom. All of it is
@@ -830,7 +830,7 @@ body {
    `mix-blend-mode: soft-light` on the facet is what stops it looking like a
    grey wash: it brightens and deepens the colour it sits on instead of
    whitening it. */
-.ind-crystal {
+.crystal {
   position: absolute;
   inset: 0;
   z-index: 0;
@@ -858,7 +858,7 @@ body {
 }
 
 /* Content sits above the shell. */
-.ind-row > *:not(.ind-crystal) {
+.ind-row > *:not(.crystal) {
   position: relative;
   z-index: 1;
 }
