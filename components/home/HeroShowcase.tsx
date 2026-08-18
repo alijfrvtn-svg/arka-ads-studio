@@ -80,6 +80,8 @@ function centre<T extends { slug: string }>(cards: T[], slug?: string) {
 
 /** How long the outgoing deck takes to clear the frame, in ms. */
 const EXIT_MS = 520;
+/** Autoplay dwell per slide. */
+const AUTOPLAY_MS = 20_000;
 
 /**
  * Homepage hero: a deck of service cards per department, stepped through by
@@ -97,8 +99,10 @@ const EXIT_MS = 520;
  * Leaving, the whole deck exits upward and the copy fades, so the two slides
  * never occupy the same space.
  *
- * Advance is manual only. An auto-advancing hero moves the CTA out from under
- * the cursor, which is the classic reason carousels lose the click.
+ * Advances on its own every 20s, and by hand at any time. Autoplay stops on
+ * hover and on keyboard focus — an auto-advancing hero that moves the CTA out
+ * from under the cursor is the classic reason carousels lose the click, and
+ * pausing on approach is what makes the two safe together.
  */
 export function HeroShowcase({
   slides,
@@ -126,6 +130,7 @@ export function HeroShowcase({
   // "out" while the current deck is clearing, "in" once the next one is up.
   const [phase, setPhase] = useState<"in" | "out">("in");
   const [reduced, setReduced] = useState(false);
+  const [paused, setPaused] = useState(false);
   const busy = useRef(false);
   const timer = useRef(0);
   const count = slides.length;
@@ -177,6 +182,37 @@ export function HeroShowcase({
     [step, index, count],
   );
 
+  /**
+   * Autoplay, 20s a slide.
+   *
+   * Three things stop it, and all three matter for a carousel that holds the
+   * page's primary CTA:
+   *   - hover or keyboard focus, so it cannot move the button out from under a
+   *     cursor or a tab stop mid-reach;
+   *   - a hidden tab, since advancing a deck nobody is looking at is a repaint
+   *     for nothing;
+   *   - prefers-reduced-motion, which is exactly what a slideshow that moves on
+   *     its own is about.
+   * It keeps running after a manual click rather than switching off — the
+   * arrows are a way to get ahead of it, not a way to take it over.
+   */
+  useEffect(() => {
+    if (reduced || count < 2 || paused) return;
+    // A timeout re-armed on `index`, not an interval: advancing by hand
+    // restarts the dwell, so a slide you just chose still gets its full 20s
+    // instead of being taken away a moment later by a tick already in flight.
+    // It also routes through `go`, so autoplay uses the same exit-then-enter
+    // transition as the arrows rather than swapping the deck underneath it.
+    const id = window.setTimeout(() => go(1), AUTOPLAY_MS);
+    return () => window.clearTimeout(id);
+  }, [reduced, count, paused, index, go]);
+
+  useEffect(() => {
+    const onVis = () => setPaused(document.hidden);
+    document.addEventListener("visibilitychange", onVis);
+    return () => document.removeEventListener("visibilitychange", onVis);
+  }, []);
+
   if (!count) return null;
   const slide = slides[index];
   const leaving = phase === "out";
@@ -191,6 +227,10 @@ export function HeroShowcase({
       )}
       aria-roledescription="carousel"
       aria-label={t.region}
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+      onFocusCapture={() => setPaused(true)}
+      onBlurCapture={() => setPaused(false)}
       onKeyDown={(e) => {
         // RTL: ArrowLeft advances visually, so map by reading direction.
         if (e.key === "ArrowLeft") go(locale === "en" ? -1 : 1);

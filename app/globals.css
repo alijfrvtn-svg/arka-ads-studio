@@ -666,8 +666,8 @@ body {
    text safe but pushed all the colour out to the rim and left a large white
    void through the centre, which is the opposite of what this section is for.
 
-   Legibility is handled per text block instead, by `.wf-plate` below. */
-.wf-canvas {
+   Legibility is handled per text block instead, by `.paint-plate` below. */
+.paint-canvas {
   overflow: hidden;
 }
 
@@ -693,10 +693,10 @@ body {
 
    Body copy in this section is ink rather than the muted grey used elsewhere —
    grey fails on every one of these colours (2.1–4.4:1) even under the plate. */
-.wf-plate {
+.paint-plate {
   position: relative;
 }
-.wf-plate::before {
+.paint-plate::before {
   content: "";
   position: absolute;
   inset: -14% -8%;
@@ -712,7 +712,7 @@ body {
   filter: blur(18px);
   pointer-events: none;
 }
-.wf-plate > * {
+.paint-plate > * {
   position: relative;
   z-index: 1;
 }
@@ -796,7 +796,7 @@ body {
    four steps share a row — stacked below that, an offset is just broken
    spacing. */
 @media (min-width: 1024px) {
-  .wf-slot {
+  .wave-slot {
     transform: translateY(var(--wf-y, 0px));
   }
 }
