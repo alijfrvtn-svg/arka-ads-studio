@@ -157,6 +157,21 @@ export const SERVICE_CARD_IMAGE: Record<string, string> = Object.fromEntries(
   ].map((slug) => [slug, `/service-cards/${slug}.webp`]),
 );
 
+/**
+ * Gradient for the long description panel on a service page, by department.
+ *
+ * Each is a dark two-stop pair, so the panel carries white type at high
+ * contrast — the copy is the longest read on the page and it should feel like
+ * a held passage rather than more body text on white. The four are the values
+ * supplied for each department.
+ */
+export const DEPARTMENT_DESC_GRADIENT: Record<string, [string, string]> = {
+  DESIGN: ["#101320", "#1F2339"],
+  DIGITAL: ["#03554e", "#022b27"],
+  FILM: ["#736a9e", "#3b3361"],
+  STRATEGY: ["#2b0223", "#550343"],
+};
+
 export const DEPARTMENT_POSTER: Record<string, string> = {
   DESIGN: "/departments/design.webp",
   FILM: "/departments/film.webp",

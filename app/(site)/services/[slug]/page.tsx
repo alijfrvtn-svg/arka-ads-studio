@@ -3,6 +3,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowUpLeft, Check } from "lucide-react";
 import { db } from "@/lib/db";
+import { DEPARTMENT_DESC_GRADIENT } from "@/lib/constants";
+import { ServiceWaveFeatures } from "@/components/services/ServiceWaveFeatures";
+import { ServicePlans } from "@/components/services/ServicePlans";
 import { PageHero } from "@/components/ui/PageHero";
 import { Section, Container, SectionHeading } from "@/components/ui/Section";
 import { Reveal } from "@/components/fx/Reveal";
@@ -17,10 +20,10 @@ import { tr, trArr, ui } from "@/lib/i18n";
 import { getLocale } from "@/lib/get-locale";
 import type { Faq, PricingTier, WorkflowStep, Locale } from "@/types";
 
-const COPY: Record<Locale, { defaultEyebrow: string; relatedProjects: string; readyHeading: (t: string) => string }> = {
-  fa: { defaultEyebrow: "سرویس", relatedProjects: "پروژه‌های مرتبط", readyHeading: (t) => `آماده شروع ${t} هستید؟` },
-  en: { defaultEyebrow: "Service", relatedProjects: "Related Projects", readyHeading: (t) => `Ready to start ${t}?` },
-  ar: { defaultEyebrow: "خدمة", relatedProjects: "مشاريع ذات صلة", readyHeading: (t) => `هل أنت مستعد لبدء ${t}؟` },
+const COPY: Record<Locale, { defaultEyebrow: string; relatedProjects: string }> = {
+  fa: { defaultEyebrow: "سرویس", relatedProjects: "پروژه‌های مرتبط" },
+  en: { defaultEyebrow: "Service", relatedProjects: "Related Projects" },
+  ar: { defaultEyebrow: "خدمة", relatedProjects: "مشاريع ذات صلة" },
 };
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
@@ -64,6 +67,8 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
   const pricing = trArr<PricingTier>(locale, s.pricing, s.pricingEn, s.pricingAr);
   const title = tr(locale, s.title, s.titleEn, s.titleAr);
   const description = tr(locale, s.description, s.descriptionEn, s.descriptionAr);
+  // Falls back to the branding pair so an unknown department still renders.
+  const grad = DEPARTMENT_DESC_GRADIENT[s.department] ?? DEPARTMENT_DESC_GRADIENT.DESIGN;
   const priceUnit = tr(locale, s.priceUnit || "تومان", s.priceUnitEn, s.priceUnitAr);
   const c = COPY[locale];
 
@@ -153,23 +158,31 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
         </PageHero>
       )}
 
-      {/* The full service description.
+      {/* The full service description, in a panel coloured by department.
           ------------------------------------------------------------
-          The showcase deck replaced PageHero on these pages and PageHero was
-          what used to render this text, so it silently disappeared — the hero
-          only carries the short tagline. It gets its own section here, on the
-          editorial measure rather than the full 1240px, because it is the one
-          long-form paragraph on the page and a 1240px line of Persian is
-          unreadable. */}
+          This is the longest read on the page, so it is held rather than left
+          as more grey body text on white. The gradient is the department's own
+          pair; type is PURE white on all four rather than white/85, because the
+          photography pair (#736a9e → #3b3361) is light enough that 85% lands at
+          3.47:1 and fails. At full white the worst of the four is 4.90:1
+          against its lightest stop. */}
       {description && (
         <Section className="!pb-0">
-          <div className="container-narrow">
+          <Container>
             <Reveal>
-              <p className="text-lg leading-[2.1] text-foreground-muted md:text-xl md:leading-[2.05]">
-                {description}
-              </p>
+              <div
+                className="relative isolate overflow-hidden rounded-[2rem] px-7 py-12 md:px-16 md:py-16"
+                style={{
+                  background: `linear-gradient(155deg, ${grad[0]} 0%, ${grad[1]} 100%)`,
+                }}
+              >
+                <span className="crystal" aria-hidden />
+                <p className="relative mx-auto max-w-3xl text-base leading-[2.15] text-white md:text-lg md:leading-[2.1]">
+                  {description}
+                </p>
+              </div>
             </Reveal>
-          </div>
+          </Container>
         </Section>
       )}
 
@@ -187,22 +200,13 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
         </Section>
       )}
 
-      {/* features */}
+      {/* Features, on the homepage process section's wave — same language, but
+          the geometry is generated because a service can have any number of
+          them and that section is hard-coded for four. */}
       {features.length > 0 && (
         <Section>
           <Container>
-            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {features.map((f, i) => (
-                <Reveal key={i} delay={i * 0.05}>
-                  <div className="flex items-start gap-3.5 rounded-2xl border border-card-border bg-surface-2 p-6">
-                    <span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-foreground text-background">
-                      <Check className="h-3.5 w-3.5" />
-                    </span>
-                    <span className="text-foreground">{f}</span>
-                  </div>
-                </Reveal>
-              ))}
-            </div>
+            <ServiceWaveFeatures features={features} locale={locale} />
           </Container>
         </Section>
       )}
@@ -300,16 +304,7 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
       {/* cta */}
       <Section>
         <Container>
-          <div className="relative overflow-hidden rounded-[2.5rem] border border-card-border bg-surface-2 p-16 text-center">
-            <div className="relative">
-              <h2 className="font-display text-3xl font-extrabold tracking-[-0.03em] text-foreground md:text-4xl">{c.readyHeading(title)}</h2>
-              <Link href="/contact" className="liquid liquid-raised mt-10 inline-flex items-center gap-2 rounded-full px-9 py-4 font-semibold">
-                <span className="inline-flex items-center gap-2">
-                  {ui(locale).serviceCtaTalk} <ArrowUpLeft className="h-5 w-5" />
-                </span>
-              </Link>
-            </div>
-          </div>
+          <ServicePlans serviceTitle={title} locale={locale} />
         </Container>
       </Section>
     </>
