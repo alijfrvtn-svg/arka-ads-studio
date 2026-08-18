@@ -1085,6 +1085,22 @@ body {
   bottom: 0;
 }
 
+/* ————— painted band —————
+   Two sections sharing one canvas still each bring a full section rhythm, and
+   back to back that put ~440px of empty paint between them — the band read as
+   two paintings with a gap rather than one continuous ground.
+
+   Only the two paddings that actually touch are trimmed; the band keeps its
+   full breathing room against the white sections above and below it. The
+   process row also carries its own 88px of wave depth at the bottom, which is
+   why the first section keeps more than the second. */
+.painted-band > section:not(:last-child) {
+  padding-bottom: clamp(1rem, 2vw, 2rem);
+}
+.painted-band > section + section {
+  padding-top: clamp(1.5rem, 3vw, 3rem);
+}
+
 /* ============================================================
    Poster scrim — department cards (components/home/Departments.tsx)
    ------------------------------------------------------------

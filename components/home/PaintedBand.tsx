@@ -8,6 +8,12 @@ import { PaintCanvas } from "./PaintCanvas";
  * butted together rather than one continuous ground. Hoisting the canvas to a
  * band that spans both removes the seam by removing the second painting.
  *
+ * It also closes the join. Each section carries a full `.section` rhythm — up
+ * to 176px top and bottom — which is right between two sections on white but
+ * left ~440px of empty canvas where these two meet, so the band reads as two
+ * paintings with a gap rather than one. The rule in globals.css trims only the
+ * two paddings that touch.
+ *
  * Sections inside pass `painted={false}` so they render transparent and let this
  * one show through. They keep their own canvas when used alone — StatsBar still
  * appears by itself on /about — which is why this is a wrapper rather than
@@ -19,7 +25,7 @@ export function PaintedBand({ children }: { children: React.ReactNode }) {
       <div className="paint-canvas absolute inset-0" aria-hidden>
         <PaintCanvas />
       </div>
-      <div className="relative">{children}</div>
+      <div className="painted-band relative">{children}</div>
     </div>
   );
 }
