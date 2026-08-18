@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowUpLeft } from "lucide-react";
-import { ServicesGridHero } from "@/components/services/ServicesGridHero";
+import { ServicesHero } from "@/components/services/ServicesHero";
 import { Section, Container } from "@/components/ui/Section";
 import { Reveal } from "@/components/fx/Reveal";
 import { ServiceArc } from "@/components/services/ServiceArc";
@@ -52,12 +52,11 @@ export default async function ServicesPage() {
   const c = COPY[locale];
   return (
     <>
-      <ServicesGridHero
+      <ServicesHero
         eyebrow={ui(locale).navServices}
         breadcrumb={[{ label: ui(locale).navHome, href: "/" }, { label: ui(locale).navServices }]}
         title={<>{c.title} <span className="text-gradient">{c.highlight}</span></>}
         description={c.description}
-        services={services.map((s) => ({ slug: s.slug, title: tr(locale, s.title, s.titleEn, s.titleAr) }))}
       />
       <Section>
         <div className="space-y-24">

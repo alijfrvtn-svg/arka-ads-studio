@@ -1143,22 +1143,44 @@ body {
   }
 }
 
-/* ————— services hero lattice —————
-   Hairlines are drawn by the cells themselves — a top and start border each,
-   with the wall closing the far edges. One rule instead of an overlay grid that
-   would have to be kept in step with the cell spans. */
-.grid-wall {
-  border-inline-end: 1px solid #eaeaea;
-  border-block-end: 1px solid #eaeaea;
+/* ————— services hero bloom —————
+   Eight wide radials in the brand colours, all pushed through one heavy blur so
+   their edges dissolve into each other. Individually they would read as eight
+   coloured blobs; at this radius and blur they read as one wash, which is the
+   point — the section still looks like white paper that happens to be lit from
+   below rather than like a decorated panel.
+
+   The mask is what keeps it honest: the bloom is at full strength along the
+   bottom edge and gone by the top of its own box, which sits below every line
+   of type. Text therefore stays ink on white and the gradient never has to be
+   dimmed to protect it. */
+.services-bloom {
+  background:
+    radial-gradient(46% 62% at 8% 100%, #FF6E42 0%, transparent 70%),
+    radial-gradient(40% 58% at 24% 96%, #C8203A 0%, transparent 72%),
+    radial-gradient(44% 60% at 40% 104%, #C21E56 0%, transparent 70%),
+    radial-gradient(42% 56% at 56% 94%, #5A2D53 0%, transparent 72%),
+    radial-gradient(46% 62% at 70% 102%, #5CBFAC 0%, transparent 70%),
+    radial-gradient(40% 56% at 84% 96%, #8BC53D 0%, transparent 72%),
+    radial-gradient(44% 60% at 96% 100%, #0F4C3A 0%, transparent 70%),
+    radial-gradient(52% 46% at 50% 108%, #5B1F2A 0%, transparent 74%);
+  filter: blur(64px) saturate(126%);
+  opacity: 0.42;
+  mask-image: linear-gradient(to top, #000 0%, #000 34%, transparent 96%);
 }
-.grid-cell {
-  border-block-start: 1px solid #eaeaea;
-  border-inline-start: 1px solid #eaeaea;
+
+@media (prefers-reduced-motion: no-preference) {
+  .services-bloom {
+    animation: bloom-drift 34s ease-in-out infinite alternate;
+  }
 }
-/* Tinted cells lift slightly toward their own colour on hover, so the wall
-   answers the cursor without any cell changing size and reflowing the grid. */
-.grid-cell[style*="color-mix"]:hover {
-  filter: saturate(1.5) brightness(0.98);
+@keyframes bloom-drift {
+  from {
+    transform: translate3d(-1.5%, 0, 0) scale(1);
+  }
+  to {
+    transform: translate3d(1.5%, -2%, 0) scale(1.06);
+  }
 }
 
 /* ============================================================
