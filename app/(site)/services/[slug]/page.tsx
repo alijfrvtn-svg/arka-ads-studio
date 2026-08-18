@@ -165,9 +165,15 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
           pair; type is PURE white on all four rather than white/85, because the
           photography pair (#736a9e → #3b3361) is light enough that 85% lands at
           3.47:1 and fails. At full white the worst of the four is 4.90:1
-          against its lightest stop. */}
+          against its lightest stop.
+
+          The section keeps its full bottom padding. It used to be `!pb-0`,
+          which was invisible while the next section was white — but the
+          features band is painted now and full bleed, so with no padding the
+          panel's rounded bottom sat straight on the paint with not one pixel
+          of white between two saturated slabs. */}
       {description && (
-        <Section className="!pb-0">
+        <Section>
           <Container>
             <Reveal>
               <div
