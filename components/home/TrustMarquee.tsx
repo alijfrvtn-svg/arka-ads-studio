@@ -10,7 +10,7 @@ export function TrustMarquee({
 }) {
   const row = clients.length ? clients : [{ name: "برند" }];
   return (
-    <div className="border-y border-card-border bg-surface-2 py-10">
+    <div className="seam-top seam-bottom py-10">
       <p className="container-x mb-8 text-center text-[0.7rem] uppercase tracking-[0.3em] text-foreground-faint">
         {caption}
       </p>

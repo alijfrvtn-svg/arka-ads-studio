@@ -128,7 +128,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
 
       {/* related */}
       {related.length > 0 && (
-        <section className="border-t border-card-border bg-surface-2 py-20">
+        <section className="seam-top bg-surface-2 py-20">
           <Container className="max-w-5xl">
             <h2 className="mb-10 font-display text-2xl font-bold tracking-tight text-foreground">{ui(locale).relatedPosts}</h2>
             <div className="grid gap-6 sm:grid-cols-2">

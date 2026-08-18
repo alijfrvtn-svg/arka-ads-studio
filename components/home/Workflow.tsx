@@ -59,7 +59,16 @@ function wavePath() {
   return d;
 }
 
-export function Workflow({ content, locale = "fa" }: { content: HomeContent; locale?: Locale }) {
+export function Workflow({
+  content,
+  locale = "fa",
+  painted = true,
+}: {
+  content: HomeContent;
+  locale?: Locale;
+  /** False when a <PaintedBand> is supplying the ground. */
+  painted?: boolean;
+}) {
   const reduced = useReducedMotion();
   const trackRef = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState<number | null>(null);
@@ -76,9 +85,14 @@ export function Workflow({ content, locale = "fa" }: { content: HomeContent; loc
   return (
     <Section id="process" className="relative overflow-hidden">
       {/* Paint first, then a white veil, then the content — see globals.css. */}
-      <div className="paint-canvas absolute inset-0" aria-hidden>
-        <PaintCanvas />
-      </div>
+      {/* Suppressed when a <PaintedBand> above is already painting, so the
+          two sections share one continuous ground instead of meeting on the
+          seam between two canvases. */}
+      {painted && (
+        <div className="paint-canvas absolute inset-0" aria-hidden>
+          <PaintCanvas />
+        </div>
+      )}
 
       <div className="container-wide relative">
         <SectionHeading

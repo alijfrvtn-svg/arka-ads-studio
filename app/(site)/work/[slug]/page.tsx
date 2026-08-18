@@ -110,7 +110,7 @@ export default async function CaseStudy({ params }: { params: Promise<{ slug: st
       </section>
 
       {/* meta bar */}
-      <div className="border-y border-card-border bg-surface/40">
+      <div className="seam-top seam-bottom bg-surface/40">
         <Container>
           <div className="grid grid-cols-2 gap-6 py-8 md:grid-cols-4">
             <Meta icon={Users2} label={ui(locale).metaClient} value={p.client ? tr(locale, p.client.name, p.client.nameEn, p.client.nameEn) : "—"} />

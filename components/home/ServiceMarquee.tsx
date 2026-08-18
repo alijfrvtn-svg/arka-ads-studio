@@ -53,7 +53,7 @@ export function ServiceMarquee({
   const rows = [cards.slice(0, half), cards.slice(half)];
 
   return (
-    <section className="relative overflow-hidden border-t border-card-border bg-background py-20 md:py-28">
+    <section className="seam-top relative overflow-hidden bg-background py-20 md:py-28">
       <div className="flex flex-col gap-5">
         <MarqueeRow cards={rows[0]} direction="ltr" />
         <MarqueeRow cards={rows[1]} direction="rtl" />

@@ -1050,6 +1050,41 @@ body {
   pointer-events: none;
 }
 
+/* ————— section seams —————
+   A hard 1px rule across the full width is the loudest way to separate two
+   sections, and on a page this open it reads as a ruled line drawn on paper.
+   These fade to nothing at both ends instead, so the join is felt rather than
+   drawn.
+
+   Only for SECTION boundaries. Cards, posters and framed panels keep their real
+   borders — an edge that defines an object has to be continuous, or the object
+   stops looking like one. */
+.seam-top,
+.seam-bottom {
+  position: relative;
+}
+.seam-top::before,
+.seam-bottom::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  height: 1px;
+  pointer-events: none;
+  background: linear-gradient(
+    to left,
+    transparent 0%,
+    var(--card-border) 22%,
+    var(--card-border) 78%,
+    transparent 100%
+  );
+}
+.seam-top::before {
+  top: 0;
+}
+.seam-bottom::after {
+  bottom: 0;
+}
+
 /* ============================================================
    Poster scrim — department cards (components/home/Departments.tsx)
    ------------------------------------------------------------

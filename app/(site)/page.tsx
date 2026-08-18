@@ -3,6 +3,7 @@ import { TrustMarquee } from "@/components/home/TrustMarquee";
 import { Departments } from "@/components/home/Departments";
 import { FeaturedWork } from "@/components/home/FeaturedWork";
 import { Workflow } from "@/components/home/Workflow";
+import { PaintedBand } from "@/components/home/PaintedBand";
 import { StatsBar } from "@/components/home/StatsBar";
 import { Testimonials } from "@/components/home/Testimonials";
 import { IndustriesAccordion } from "@/components/home/IndustriesAccordion";
@@ -57,8 +58,11 @@ export default async function HomePage() {
       <TrustMarquee clients={clients.map((c) => ({ name: tr(locale, c.name, c.nameEn, c.nameEn) }))} caption={content.trustCaption} />
       <Departments content={content} departments={departments} locale={locale} />
       <FeaturedWork projects={projects} content={content} locale={locale} />
-      <Workflow content={content} locale={locale} />
-      <StatsBar stats={statData} locale={locale} />
+      {/* One canvas across both: painted separately they met on a hard seam. */}
+      <PaintedBand>
+        <Workflow content={content} locale={locale} painted={false} />
+        <StatsBar stats={statData} locale={locale} painted={false} />
+      </PaintedBand>
       <Testimonials items={testimonialData} content={content} locale={locale} />
       {/* Replaced the closing CTA here (it still runs on /about). The footer
           already carries a CTA strip on every page, so the last thing on the

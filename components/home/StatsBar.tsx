@@ -53,7 +53,16 @@ function wavePath() {
  * scroll-driven fill here would have fought the counters — two clocks for one
  * event.
  */
-export function StatsBar({ stats, locale = "fa" }: { stats: { label: string; value: number; suffix: string }[]; locale?: Locale }) {
+export function StatsBar({
+  stats,
+  locale = "fa",
+  painted = true,
+}: {
+  stats: { label: string; value: number; suffix: string }[];
+  locale?: Locale;
+  /** False when a <PaintedBand> is supplying the ground. */
+  painted?: boolean;
+}) {
   const reduced = useReducedMotion();
   const rowRef = useRef<HTMLDivElement>(null);
   // Same trigger and margin the counters use, so they cannot start apart.
@@ -73,9 +82,14 @@ export function StatsBar({ stats, locale = "fa" }: { stats: { label: string; val
 
   return (
     <section className="section relative overflow-hidden">
-      <div className="paint-canvas absolute inset-0" aria-hidden>
-        <PaintCanvas />
-      </div>
+      {/* Suppressed when a <PaintedBand> above is already painting, so the
+          two sections share one continuous ground instead of meeting on the
+          seam between two canvases. */}
+      {painted && (
+        <div className="paint-canvas absolute inset-0" aria-hidden>
+          <PaintCanvas />
+        </div>
+      )}
 
       <div className="container-wide relative">
         <div ref={rowRef} className="relative grid grid-cols-2 gap-y-16 md:grid-cols-3 lg:grid-cols-5 lg:pb-[88px]">
