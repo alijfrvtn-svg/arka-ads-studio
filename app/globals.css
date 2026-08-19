@@ -298,6 +298,14 @@
 html {
   scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
+  /* The header is fixed, and without this every in-page jump — the skip link,
+     #testimonials, #process, an anchor in a shared URL — parks the target at
+     y=0, which is underneath it. The heading you were sent to lands behind the
+     glass bar and the section appears to start mid-sentence.
+
+     6.5rem clears the bar in both its states: 104px unscrolled, 76px once it
+     condenses, which is what it will be by the time a jump has finished. */
+  scroll-padding-top: 6.5rem;
 }
 
 body {
