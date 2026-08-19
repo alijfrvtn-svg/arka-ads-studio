@@ -4,9 +4,9 @@ import { notFound } from "next/navigation";
 import { ArrowUpLeft, Check } from "lucide-react";
 import { db } from "@/lib/db";
 import { Section, Container, SectionHeading } from "@/components/ui/Section";
-import { Reveal } from "@/components/fx/Reveal";
 import { ProjectCard } from "@/components/work/ProjectCard";
 import { IndustryHero } from "@/components/industries/IndustryHero";
+import { WaveList } from "@/components/ui/WaveList";
 import { buildMetadata } from "@/lib/seo";
 import { tr, trArr, ui } from "@/lib/i18n";
 import { getLocale } from "@/lib/get-locale";
@@ -80,23 +80,25 @@ export default async function IndustryPage({ params }: { params: Promise<{ slug:
     <>
       <IndustryHero title={title} description={description} cover={ind.cover} heroVideo={ind.heroVideo} locale={locale} />
 
-      {/* approach */}
+      {/* approach — on the wave, over the paint.
+          ------------------------------------------------------------
+          Each line is written in two halves: what is actually hard about this
+          industry, then what we do about it. They are split on the first
+          Persian semicolon, and a line without one simply renders whole — so
+          editing these by hand in the admin can shape the emphasis but cannot
+          break the section. */}
       {approach.length > 0 && (
-        <Section>
-          <Container>
-            <SectionHeading eyebrow={ui(locale).industryApproachEyebrow} title={c.approachTitle(title)} className="mb-12 max-w-3xl" />
-            <div className="grid gap-5 md:grid-cols-2">
-              {approach.map((a, i) => (
-                <Reveal key={i} delay={i * 0.06}>
-                  <div className="flex h-full items-start gap-4 rounded-[1.5rem] border border-card-border bg-surface p-7">
-                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-foreground font-bold text-background">{i + 1}</span>
-                    <p className="text-foreground">{a}</p>
-                  </div>
-                </Reveal>
-              ))}
-            </div>
-          </Container>
-        </Section>
+        <WaveList
+          items={approach.map((a) => {
+            const at = a.indexOf("؛ ");
+            return at === -1
+              ? { lead: a }
+              : { lead: a.slice(0, at + 1), rest: a.slice(at + 2) };
+          })}
+          eyebrow={ui(locale).industryApproachEyebrow}
+          heading={c.approachTitle(title)}
+          locale={locale}
+        />
       )}
 
       {/* portfolio */}
