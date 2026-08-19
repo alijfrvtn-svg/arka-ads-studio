@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Sparkles, Target, Gem, Zap, type LucideIcon } from "lucide-react";
 import { AboutHero } from "@/components/about/AboutHero";
+import { AboutTimeline } from "@/components/about/AboutTimeline";
 import { Section, Container, SectionHeading, Eyebrow } from "@/components/ui/Section";
 import { Reveal } from "@/components/fx/Reveal";
 import { StatsBar } from "@/components/home/StatsBar";
@@ -9,7 +10,7 @@ import { SocialIcon } from "@/components/layout/SocialIcon";
 import { getStats, getTeam, getAboutPage } from "@/lib/queries";
 import { buildMetadata } from "@/lib/seo";
 import { tr, ui } from "@/lib/i18n";
-import { parseArr, labelOn, localeDigits, cn } from "@/lib/utils";
+import { parseArr, labelOn, cn } from "@/lib/utils";
 import { INDUSTRY_PAINT } from "@/lib/constants";
 import { getLocale } from "@/lib/get-locale";
 import { HighlightedTitle } from "@/components/ui/HighlightedTitle";
@@ -157,26 +158,12 @@ export default async function AboutPage() {
         </Container>
       </Section>
 
-      {/* timeline */}
-      <Section>
-        <Container className="max-w-3xl">
-          <SectionHeading align="center" eyebrow={a.timelineEyebrow} title={a.timelineHeading} className="mx-auto mb-16 max-w-2xl" />
-          <div className="relative border-r-2 border-card-border pr-8">
-            {a.timeline.map((t, i) => (
-              <Reveal key={t.year + t.title} delay={i * 0.08}>
-                <div className="relative pb-10 last:pb-0">
-                  <span className="absolute -right-[41px] top-1 grid h-5 w-5 place-items-center rounded-full border-2 border-foreground bg-background">
-                    <span className="h-2 w-2 rounded-full bg-foreground" />
-                  </span>
-                  <span className="font-display text-2xl font-extrabold text-gradient ltr-nums">{localeDigits(locale, t.year)}</span>
-                  <h3 className="mt-1.5 font-display text-lg font-bold tracking-tight text-foreground">{t.title}</h3>
-                  <p className="mt-1 text-foreground-muted">{t.desc}</p>
-                </div>
-              </Reveal>
-            ))}
-          </div>
-        </Container>
-      </Section>
+      <AboutTimeline
+        eyebrow={a.timelineEyebrow}
+        heading={a.timelineHeading}
+        items={a.timeline}
+        locale={locale}
+      />
 
       {/* BTS gallery */}
       <Section className="bg-background-2">
