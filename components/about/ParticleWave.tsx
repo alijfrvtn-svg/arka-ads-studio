@@ -40,9 +40,9 @@ const BLEND = 3;
 /** Column count at full width. Narrow screens get proportionally fewer — the
  *  spacing is what reads, not the absolute count, and a phone should not be
  *  asked to place a desktop's worth of dots every frame. */
-const COLS = 150;
-const ROWS = 34;
-const MIN_COLS = 68;
+const COLS = 192;
+const ROWS = 38;
+const MIN_COLS = 84;
 
 /**
  * The dent under the pointer.
@@ -162,23 +162,32 @@ export function ParticleWave({ className }: { className?: string }) {
       ctx.clearRect(0, 0, w, h);
 
       // ── the surface ──
-      // The band fills most of the frame and the mask on the canvas thins its
-      // top, so the copy sits on a mist and the solid body stays low.
-      const baseY = h * 0.56;
-      const bandH = h * 0.82;
+      // The band runs off the bottom of the frame rather than stopping inside
+      // it: the nearest rows sit past h and are clipped, so the wave cannot
+      // leave a white margin under itself wherever the sine happens to lift it.
+      // The mask on the canvas thins the top, so the copy still sits on a mist.
+      const baseY = h * 0.66;
+      const bandH = h * 0.98;
       const amp = h * 0.2;
 
       // Bucket the dots by alpha band, then draw each band in one pass.
       const buckets: number[][] = Array.from({ length: BANDS }, () => []);
 
-      const cols = Math.max(MIN_COLS, Math.min(COLS, Math.round(w / 8.5)));
+      // Spacing, not count, is what reads — and the rows are now up to 1.37x
+      // the canvas wide, so the same count spread over more ground came out a
+      // third thinner. The divisor is set from the spread to hold the gap
+      // between dots where it was.
+      const cols = Math.max(MIN_COLS, Math.min(COLS, Math.round(w / 6.7)));
 
       for (let ri = 0; ri < ROWS; ri++) {
         // 0 far, 1 near.
         const d = ri / (ROWS - 1);
-        // Rows spread apart as they come forward, which is the whole of the
-        // perspective — no matrix, no z divide.
-        const spread = 0.72 + 0.4 * d;
+        // Rows widen as they come forward, which is the whole of the
+        // perspective — no matrix, no z divide. It starts above 1 so even the
+        // farthest row is wider than the canvas: at 0.72 the back of the
+        // surface was inset by 14% a side and left white wedges in the top
+        // corners. Depth still reads, from size and opacity and the spacing.
+        const spread = 1.05 + 0.32 * d;
         const size = 1.7 + 2.7 * d;
         // Reaches 1 at the front row: the nearest dots are the full hex on
         // white rather than a tint of it, and depth comes off the far rows
