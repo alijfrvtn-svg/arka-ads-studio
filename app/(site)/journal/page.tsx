@@ -46,10 +46,11 @@ export default async function JournalPage() {
   ]);
   const c = COPY[locale];
 
-  // The cover is the featured post, or the newest one if nothing is flagged.
-  // It comes out of the grid below, so the page never shows it twice.
-  const featured = posts.find((p) => p.featured) ?? posts[0] ?? null;
-  const rest = featured ? posts.filter((p) => p.id !== featured.id) : posts;
+  // The deck is the five most-read, ranked by views rather than by taste —
+  // the top one has 833 against 12-25 for the rest, so the order is not a
+  // close call. The grid below still lists all nine: the deck is a spotlight,
+  // not a replacement for the archive.
+  const top = [...posts].sort((a, b) => b.views - a.views).slice(0, 5);
 
   // The taxonomy table has no POST rows, so the journal's categories are the
   // distinct strings the posts carry — the same list JournalFilter falls back
@@ -69,25 +70,21 @@ export default async function JournalPage() {
         breadcrumb={[{ label: ui(locale).navHome, href: "/" }, { label: ui(locale).navJournal }]}
         title={<>{c.title} <span className="text-gradient">{c.highlight}</span></>}
         description={c.description}
-        post={
-          featured
-            ? {
-                slug: featured.slug,
-                title: tr(locale, featured.title, featured.titleEn, featured.titleAr),
-                excerpt: tr(locale, featured.excerpt, featured.excerptEn, featured.excerptAr),
-                cover: featured.cover,
-                category: tr(locale, featured.category, featured.categoryEn, featured.categoryAr),
-                readingMinutes: featured.readingMinutes,
-              }
-            : null
-        }
-        categoryIndex={featured ? Math.max(0, catOrder.indexOf(featured.category)) : 0}
+        posts={top.map((p) => ({
+          slug: p.slug,
+          title: tr(locale, p.title, p.titleEn, p.titleAr),
+          excerpt: tr(locale, p.excerpt, p.excerptEn, p.excerptAr),
+          cover: p.cover,
+          category: tr(locale, p.category, p.categoryEn, p.categoryAr),
+          readingMinutes: p.readingMinutes,
+          colourIndex: Math.max(0, catOrder.indexOf(p.category)),
+        }))}
         minMinutes={minMinutes}
         maxMinutes={maxMinutes}
         locale={locale}
       />
       <section className="pb-24">
-        <JournalFilter posts={rest} categories={categories} locale={locale} />
+        <JournalFilter posts={posts} categories={categories} locale={locale} />
       </section>
     </>
   );
