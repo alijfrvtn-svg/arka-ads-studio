@@ -838,6 +838,18 @@ body {
    There is no white plate behind the text any more — the point of the change
    was that the row should read as one coloured card. */
 .ind-row {
+  /* Both of these are for the .crystal inside.
+     ------------------------------------------------------------
+     `isolation` keeps its soft-light blending inside this row. `position` is
+     what gives it something to be `inset: 0` against — without it the crystal
+     resolves against the initial containing block and paints a viewport-sized
+     gradient instead of a row-sized one. Twelve rows did exactly that on
+     /industries and hazed the whole page over.
+
+     Declared here rather than left to a `relative` at each call site, because
+     forgetting it is silent: nothing errors, the row just quietly gets a
+     full-page overlay. */
+  position: relative;
   isolation: isolate;
 }
 
@@ -850,7 +862,10 @@ body {
 
    `mix-blend-mode: soft-light` on the facet is what stops it looking like a
    grey wash: it brightens and deepens the colour it sits on instead of
-   whitening it. */
+   whitening it.
+
+   Its host must be positioned. `.ind-row` handles that; anything else using
+   this needs its own `relative`, or the shell sizes itself to the page. */
 .crystal {
   position: absolute;
   inset: 0;

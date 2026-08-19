@@ -225,7 +225,7 @@ export function IndustryShowcase({ industries, locale = "fa" }: { industries: In
                 // should drive the stage exactly as the pointer does.
                 onMouseEnter={() => pick(i)}
                 onFocus={() => pick(i)}
-                className="ind-row group block px-5 py-5 md:px-7"
+                className="ind-row relative group block px-5 py-5 md:px-7"
                 style={{ background: colour, color: label }}
               >
                 {/* The cast-glass shell, as on the homepage: a diagonal facet, a
