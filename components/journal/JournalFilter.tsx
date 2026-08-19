@@ -4,7 +4,8 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { Clock } from "lucide-react";
-import { cn, localeDate, localeNumber } from "@/lib/utils";
+import { cn, localeDate, localeNumber, paintSeed } from "@/lib/utils";
+import { INDUSTRY_PAINT } from "@/lib/constants";
 import { tr, ui } from "@/lib/i18n";
 import type { CategoryItem } from "@/lib/queries";
 import type { Locale } from "@/types";
@@ -25,6 +26,12 @@ interface Post {
   readingMinutes: number;
   publishedAt: Date;
   author?: { name: string; avatar: string | null } | null;
+}
+
+/** A stable one of the four per category, so a card without a cover still
+    looks placed rather than arbitrary. */
+function colourIndex(category: string): number {
+  return paintSeed(category) % INDUSTRY_PAINT.length;
 }
 
 export function JournalFilter({
@@ -57,6 +64,8 @@ export function JournalFilter({
    * already requires a click, so the script is plainly running — animates
    * exactly as before.
    */
+  /** Covers whose file 404s — see the card background. */
+  const [dead, setDead] = useState<string[]>([]);
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
   const list = cat === ALL ? posts : posts.filter((p) => p.category === cat);
@@ -95,9 +104,23 @@ export function JournalFilter({
                 transition={{ duration: 0.35 }}
               >
                 <Link href={`/journal/${p.slug}`} className="group flex h-full flex-col overflow-hidden rounded-[1.5rem] border border-card-border bg-surface transition-all duration-700 [transition-timing-function:var(--ease-apple)] hover:-translate-y-1.5 hover:border-foreground/25 hover:shadow-[0_1px_2px_rgba(0,0,0,0.04),0_28px_60px_-32px_rgba(0,0,0,0.35)]">
-                  <div className="relative aspect-[16/10] overflow-hidden">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={p.cover} alt="" className="h-full w-full object-cover transition-all duration-[900ms] [transition-timing-function:var(--ease-apple)] group-hover:scale-[1.04]" />
+                  <div
+                    className="relative aspect-[16/10] overflow-hidden"
+                    // The card's own category colour, showing through wherever
+                    // the cover does not. Two of the published covers are dead
+                    // files, and a card whose picture is a broken-image icon
+                    // reads as a broken site rather than as a missing upload.
+                    style={{ background: INDUSTRY_PAINT[colourIndex(p.category) % INDUSTRY_PAINT.length] }}
+                  >
+                    {!dead.includes(p.id) && (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={p.cover}
+                        alt=""
+                        onError={() => setDead((d) => (d.includes(p.id) ? d : [...d, p.id]))}
+                        className="h-full w-full object-cover transition-all duration-[900ms] [transition-timing-function:var(--ease-apple)] group-hover:scale-[1.04]"
+                      />
+                    )}
                     <span className="glass-onmedia absolute right-3 top-3 rounded-full px-3 py-1 text-xs">{tr(locale, labels.get(p.category)?.title ?? p.category, labels.get(p.category)?.titleEn, labels.get(p.category)?.titleAr)}</span>
                   </div>
                   <div className="flex flex-1 flex-col p-6">

@@ -7,6 +7,7 @@ import { motion, useReducedMotion } from "framer-motion";
 import { ArrowUpLeft, Clock } from "lucide-react";
 import { INDUSTRY_PAINT } from "@/lib/constants";
 import { labelOn, localeDigits } from "@/lib/utils";
+import { useMediaQuery, DESKTOP } from "@/lib/use-media";
 import type { Locale } from "@/types";
 
 /**
@@ -45,8 +46,20 @@ export interface DeckPost {
   colourIndex: number;
 }
 
-/** Where a card sits, by how far it is from the front. */
-function seat(depth: number, last: boolean) {
+/**
+ * Where a card sits, by how far it is from the front.
+ *
+ * `flat` is the phone, for the same reason as the testimonials deck: five
+ * stacked, scaled, rotated cards with a drag gesture is a mouse object. Here it
+ * becomes one cover at a time crossing into the next, on the same five-second
+ * clock, with the same dots underneath.
+ */
+function seat(depth: number, last: boolean, flat: boolean) {
+  if (flat) {
+    return depth === 0
+      ? { y: 0, scale: 1, rotate: 0, opacity: 1, zIndex: 30 }
+      : { y: 0, scale: 1, rotate: 0, opacity: 0, zIndex: 0 };
+  }
   if (last) return { y: -240, scale: 1.03, rotate: -3.5, opacity: 0, zIndex: 40 };
   switch (depth) {
     case 0:
@@ -80,6 +93,8 @@ export function JournalDeck({
   const [i, setI] = useState(0);
   const [held, setHeld] = useState(false);
   const [failed, setFailed] = useState<string[]>([]);
+  /** The stacked deck is desktop only; a phone gets one cover at a time. */
+  const rich = useMediaQuery(DESKTOP);
   const n = posts.length;
 
   const go = useCallback((d: number) => setI((p) => (p + d + n) % n), [n]);
@@ -109,10 +124,10 @@ export function JournalDeck({
           const depth = (k - i + n) % n;
           const isFront = depth === 0;
           const thrown = n >= 3 && depth === n - 1;
-          const s = seat(depth, thrown);
+          const s = seat(depth, thrown, !rich);
           const colour = INDUSTRY_PAINT[p.colourIndex % INDUSTRY_PAINT.length];
           const chipLabel = labelOn(colour);
-          const showMedia = isFront || thrown;
+          const showMedia = isFront || (thrown && rich);
           const dead = failed.includes(p.slug);
 
           return (
@@ -136,7 +151,7 @@ export function JournalDeck({
                   ? { duration: 0 }
                   : { type: "spring", stiffness: 210, damping: 26, mass: 0.9, opacity: { duration: 0.45 } }
               }
-              drag={isFront && n > 1 && !reduced ? "y" : false}
+              drag={isFront && n > 1 && !reduced && rich ? "y" : false}
               dragConstraints={{ top: 0, bottom: 0 }}
               dragElastic={{ top: 0.65, bottom: 0.1, left: 0, right: 0 }}
               onDragStart={() => setHeld(true)}

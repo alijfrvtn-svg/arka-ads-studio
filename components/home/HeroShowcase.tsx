@@ -8,6 +8,7 @@ import { Typewriter } from "@/components/fx/Typewriter";
 import { Magnetic } from "@/components/fx/Magnetic";
 import { cn } from "@/lib/utils";
 import { MARQUEE_SMALL_VARIANTS, smallVariant } from "@/lib/marquee-variants";
+import { useMediaQuery } from "@/lib/use-media";
 import type { Locale } from "@/types";
 
 export interface ShowcaseCard {
@@ -46,16 +47,25 @@ const LABELS: Record<Locale, { prev: string; next: string; go: string; region: s
  * document but the fan is a picture, not text, so it is positioned with explicit
  * left/right transforms and stays identical in both directions.
  */
-function fan(i: number, total: number, compact = false) {
+function fan(i: number, total: number, compact = false, narrow = false) {
   const mid = (total - 1) / 2;
   const offset = i - mid; // -3 … +3 for seven cards
   // Spacing is a fraction of the card width, so the fan keeps its shape at both
   // sizes instead of the compact deck spilling out of its box.
-  const step = compact ? 88 : 118;
+  //
+  // `narrow` is a phone. At the desktop step of 118 the seven cards spanned
+  // 905px — measured on a 375px screen, six of the seven hung off one edge or
+  // the other and the outermost sat 265px past it. A hand of cards is meant to
+  // overlap, so the phone closes the fan rather than dropping cards from it:
+  // a third of the step and half the rake, which brings the whole spread
+  // inside 375 with every card still on screen.
+  const step = narrow ? 38 : compact ? 88 : 118;
   return {
     x: offset * step,
-    y: Math.abs(offset) * (compact ? 19 : 26),
-    rotate: offset * 7.5,
+    y: Math.abs(offset) * (narrow ? 12 : compact ? 19 : 26),
+    // Less rake as well as less spread: a rotated card's bounding box is wider
+    // than the card, and at 22.5deg that alone was pushing 56px past each end.
+    rotate: offset * (narrow ? 4 : 7.5),
     // Middle card sits on top, outer cards recede behind their neighbours.
     z: total - Math.abs(offset),
   };
@@ -151,6 +161,9 @@ export function HeroShowcase({
    */
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
+
+  /** Below sm the fan closes up — see `fan()`. */
+  const wide = useMediaQuery("(min-width: 640px)");
 
   useEffect(() => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -290,13 +303,13 @@ export function HeroShowcase({
         <div
           className="relative flex w-full items-center justify-center"
           style={{
-            height: compact ? "clamp(14rem, 26vw, 19rem)" : "clamp(17rem, 34vw, 25rem)",
+            height: compact ? "clamp(12rem, 26vw, 19rem)" : "clamp(14rem, 34vw, 25rem)",
             perspective: 1400,
           }}
         >
           <div key={index} className="absolute inset-0 flex items-center justify-center">
             {cards.map((card, i) => {
-              const g = fan(i, cards.length, compact);
+              const g = fan(i, cards.length, compact, !wide);
               const focused = !!focusSlug && card.slug === focusSlug;
               return (
                 <motion.div
@@ -460,7 +473,7 @@ function ShowcaseCardFace({
          follows from the height rather than being set independently. */
       className={cn(
         "group block aspect-[4/5] overflow-hidden rounded-[1.25rem] border bg-surface transition-shadow duration-700 [transition-timing-function:var(--ease-apple)]",
-        compact ? "h-[clamp(9rem,17vw,12.5rem)]" : "h-[clamp(11rem,22vw,16rem)]",
+        compact ? "h-[clamp(7.5rem,17vw,12.5rem)]" : "h-[clamp(9rem,22vw,16rem)]",
         focused
           ? "border-foreground/25 shadow-[0_3px_6px_rgba(0,0,0,0.08),0_48px_90px_-30px_rgba(0,0,0,0.55)]"
           : "border-card-border shadow-[0_1px_2px_rgba(0,0,0,0.05),0_22px_48px_-24px_rgba(0,0,0,0.4)] hover:shadow-[0_2px_4px_rgba(0,0,0,0.07),0_36px_70px_-28px_rgba(0,0,0,0.5)]",

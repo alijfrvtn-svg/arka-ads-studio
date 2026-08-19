@@ -8,6 +8,7 @@ import { Section, Container, SectionHeading } from "@/components/ui/Section";
 import { HighlightedTitle } from "@/components/ui/HighlightedTitle";
 import { ui } from "@/lib/i18n";
 import { localeDigits, labelOn } from "@/lib/utils";
+import { useMediaQuery, DESKTOP } from "@/lib/use-media";
 import { SITE_PAINT } from "@/lib/constants";
 import type { HomeContent } from "@/lib/queries";
 import type { Locale } from "@/types";
@@ -48,7 +49,21 @@ interface T {
  */
 
 /** Where a card sits, by how far it is from the front. */
-function seat(depth: number, last: boolean) {
+/**
+ * Where a card sits, by how far it is from the front.
+ *
+ * `flat` is the phone. The deck — ten cards stacked, each scaled, rotated and
+ * held at its own opacity, the front one draggable and the leaving one flying
+ * over the top — is a lot of composited layers for a screen this size, and the
+ * gesture it is built around is a mouse throw. On a phone it becomes one card
+ * at a time crossing into the next, on the same clock, with the same dots.
+ */
+function seat(depth: number, last: boolean, flat: boolean) {
+  if (flat) {
+    return depth === 0
+      ? { y: 0, scale: 1, rotate: 0, opacity: 1, zIndex: 30 }
+      : { y: 0, scale: 1, rotate: 0, opacity: 0, zIndex: 0 };
+  }
   // The card that has just been thrown. Above the front card's z so it passes
   // over the deck rather than under it.
   if (last) return { y: -300, scale: 1.02, rotate: -6, opacity: 0, zIndex: 40 };
@@ -87,6 +102,9 @@ export function Testimonials({ items, content, locale = "fa" }: { items: T[]; co
   // would grow and shrink under the reader as the deck turns.
   const longest = items.reduce((a, b) => (b.quote.length > a.quote.length ? b : a), items[0]);
 
+  /** The stacked deck is desktop only; a phone gets one card at a time. */
+  const rich = useMediaQuery(DESKTOP);
+
   return (
     // The fan overhangs its container by ~25px a side, which is by design: on
     // desktop the gutter absorbs it. On a phone the gutter is 24px, so the
@@ -103,7 +121,7 @@ export function Testimonials({ items, content, locale = "fa" }: { items: T[]; co
         />
 
         <div className="relative mx-auto max-w-3xl">
-          <div className="relative" style={{ perspective: 1400 }}>
+          <div className="relative" style={rich ? { perspective: 1400 } : undefined}>
             {/* the sizer */}
             <div className="pointer-events-none invisible px-7 py-12 md:px-14 md:py-14" aria-hidden>
               <div className="mb-9 h-10" />
@@ -120,7 +138,7 @@ export function Testimonials({ items, content, locale = "fa" }: { items: T[]; co
               // others are plain colour by design.
               const isFront = depth === 0;
               const thrown = n >= 3 && depth === n - 1;
-              const s = seat(depth, thrown);
+              const s = seat(depth, thrown, !rich);
               // Each testimonial keeps its own colour wherever it sits in the
               // deck, so the cards behind are the real next ones rather than a
               // decorative guess at them.
@@ -151,7 +169,7 @@ export function Testimonials({ items, content, locale = "fa" }: { items: T[]; co
                       ? { duration: 0 }
                       : { type: "spring", stiffness: 210, damping: 26, mass: 0.9, opacity: { duration: 0.45 } }
                   }
-                  drag={isFront && n > 1 ? "y" : false}
+                  drag={isFront && n > 1 && rich ? "y" : false}
                   dragConstraints={{ top: 0, bottom: 0 }}
                   dragElastic={{ top: 0.65, bottom: 0.1, left: 0, right: 0 }}
                   onDragStart={() => setHeld(true)}

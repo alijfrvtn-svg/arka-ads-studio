@@ -85,7 +85,13 @@ export default async function AboutPage() {
               return (
                 <Reveal key={v.title} delay={i * 0.08} className="h-full">
                   <div
-                    className="ind-row group aspect-[4/5] overflow-hidden rounded-[1.75rem] transition-all duration-700 [transition-timing-function:var(--ease-apple)] hover:-translate-y-1.5 hover:shadow-[0_1px_2px_rgba(0,0,0,0.1),0_36px_70px_-30px_rgba(0,0,0,0.5)]"
+                    /* 4:5 is a poster ratio, and it is right in the four-up
+                       grid it was drawn for. Stacked full-width on a phone the
+                       same ratio made each card 327x409 — half a screen apiece
+                       for a heading and one sentence, four of them in a row.
+                       Below sm the height comes from the content instead, with
+                       a floor so they still read as posters. */
+                    className="ind-row group min-h-[13rem] overflow-hidden rounded-[1.75rem] transition-all duration-700 [transition-timing-function:var(--ease-apple)] hover:-translate-y-1.5 hover:shadow-[0_1px_2px_rgba(0,0,0,0.1),0_36px_70px_-30px_rgba(0,0,0,0.5)] sm:aspect-[4/5] sm:min-h-0"
                     style={{ background: colour, color: label }}
                   >
                     {/* The cast-glass shell, as on every other coloured surface
@@ -132,7 +138,7 @@ export default async function AboutPage() {
               return (
                 <Reveal key={m.id} delay={i * 0.06}>
                   <div className="group relative overflow-hidden rounded-[1.5rem] border border-card-border">
-                    <div className="relative aspect-[4/5]">
+                    <div className="relative aspect-[4/3] sm:aspect-[4/5]">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={m.avatar || ""} alt={m.name} className="h-full w-full object-cover transition-all duration-700 [transition-timing-function:var(--ease-apple)] group-hover:scale-[1.03]" />
                       {/* Near-opaque under the name, clear above it — team photos vary too

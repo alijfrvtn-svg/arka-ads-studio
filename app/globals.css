@@ -708,81 +708,47 @@ body {
 
 /* Which of the two compositions is on show.
    ------------------------------------------------------------
-   The wide one is the section's shape on a desktop; below lg the section is a
-   tall column and a landscape painting cropped to fit it is not a painting any
-   more — measured, 9% of its width survived. The portrait composition takes
-   over there. Both live in the DOM; only one is ever rasterised. */
-.paint-portrait {
-  display: none;
-}
+   The wide one is the section's shape on a desktop. Below lg there is no SVG
+   at all.
 
+   The portrait composition that used to run here was the right *picture* — it
+   fixed a crop that was throwing away 91% of the artwork — but it was still a
+   filtered SVG covering roughly 375x1950, and that is a layer iOS Safari
+   discards first when it needs memory and is slow to rebuild. Scrolling down
+   the band was laboured; scrolling back up showed white where the painting had
+   been, then it crawled back in. That is the browser re-rasterising
+   feTurbulence, and no amount of tuning the filter makes it cheap enough to be
+   worth what it costs a phone.
+
+   So a phone gets paint made of gradients: the same four colours, poured down
+   the band in the same order, as radial stops the compositor draws for free.
+   Nothing to rasterise, nothing to discard, nothing to rebuild. It is a softer
+   painting — no torn edges, no flecks — which is the trade, and it is the one
+   worth making for a surface this size. */
 @media (max-width: 1023px) {
   .paint-landscape {
     display: none;
   }
 
-  .paint-portrait {
-    display: block;
+  /* Poured, not thrown. Percentages so the wash keeps its proportions
+     whatever height the band happens to be — 1957px on the homepage, 1563 on
+     an industry page — and `background-attachment` left alone so it scrolls
+     with the section rather than sitting still behind it. */
+  .paint-canvas {
+    background-image:
+      radial-gradient(58% 13% at 18% 4%, rgba(255, 107, 91, 0.62) 0%, rgba(255, 107, 91, 0) 100%),
+      radial-gradient(54% 12% at 86% 15%, rgba(255, 185, 2, 0.55) 0%, rgba(255, 185, 2, 0) 100%),
+      radial-gradient(60% 13% at 14% 31%, rgba(203, 233, 249, 0.85) 0%, rgba(203, 233, 249, 0) 100%),
+      radial-gradient(52% 12% at 88% 45%, rgba(255, 185, 2, 0.45) 0%, rgba(255, 185, 2, 0) 100%),
+      radial-gradient(58% 13% at 16% 58%, rgba(55, 25, 44, 0.3) 0%, rgba(55, 25, 44, 0) 100%),
+      radial-gradient(54% 12% at 87% 71%, rgba(203, 233, 249, 0.8) 0%, rgba(203, 233, 249, 0) 100%),
+      radial-gradient(58% 13% at 15% 84%, rgba(255, 107, 91, 0.5) 0%, rgba(255, 107, 91, 0) 100%),
+      radial-gradient(52% 11% at 86% 95%, rgba(255, 185, 2, 0.42) 0%, rgba(255, 185, 2, 0) 100%),
+      /* one long wash down the middle so the two columns read as one band */
+      radial-gradient(70% 34% at 50% 50%, rgba(203, 233, 249, 0.32) 0%, rgba(203, 233, 249, 0) 100%);
   }
 }
 
-/* The portrait canvas carries its own cost control rather than having one
-   imposed here. It used to be this: below lg the wide painting's displacement
-   filters were replaced with a flat CSS blur, because feTurbulence at four
-   octaves across a full-width canvas is the most expensive thing the site
-   rasterises. That rule is gone because the canvas it was written for is no
-   longer drawn at these widths — the portrait one is, and it is built cheap:
-   two octaves instead of four, over a box a quarter the width. Overriding it
-   here would only flatten artwork that is already within budget. */
-
-/* Grain is a full-screen overlay-blended layer, so the entire hero — video
-   included — has to composite through it every frame. At 0.13 over a 6in
-   screen it is below the noise floor of the panel it is drawn on. Phones
-   only: on a tablet the hero is large enough for it to still do its job. */
-@media (max-width: 767px) {
-  .film-grain {
-    display: none;
-  }
-}
-
-/* The orbiting circles behind the industry rows are decorative, and they are
-   the worst possible shape for a phone: thirty-odd elements each carrying a
-   14-36px blur, all of them inside an element that animates forever. Blur is
-   re-rasterised as the layer transforms, so this is per-frame work for
-   something nobody is looking at. */
-@media (max-width: 1023px) {
-  .ind-orbits {
-    display: none;
-  }
-}
-
-/* The live wave on the About hero fades in over its own top third, so the
-   headline sits on a thinning field rather than on the body of the surface.
-   Masking the canvas rather than lowering the dots' alpha keeps the colour at
-   full strength where it is actually seen. */
-.about-wave {
-  /* Reaches full strength at 42% rather than 46%, and is already at 0.45 by
-     15%. The fade is only there to thin the field the headline sits on; it was
-     also dimming the body of the surface, which is the part that is supposed
-     to be the colour. */
-  mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.45) 15%, #000 42%, #000 100%);
-}
-
-/* ————— a painted section that arrives and leaves —————
-   The homepage band butts against white on both edges on purpose: it is one
-   long stretch of colour and the hard line reads as the edge of a canvas.
-
-   A painted section dropped between two others cannot do that. On the industry
-   pages it landed straight under the hero photograph, so a photograph ended and
-   full-strength paint began on one horizontal line with no air between them.
-
-   Fading the canvas — not the section — is what keeps the whitespace rule: the
-   section still carries its full 176px of padding, and now that padding is
-   actually white, with the colour coming up through it instead of starting at
-   its edge. The band is the divider, and it divides by dissolving.
-
-   The stops are proportional so the fade scales with the section rather than
-   eating a fixed slice of a short one. */
 .paint-canvas-soft {
   mask-image: linear-gradient(
     to bottom,
@@ -2011,6 +1977,30 @@ h3 {
 }
 
 /* prose (journal / case study body) */
+/* Article tables scroll rather than crush.
+   ------------------------------------------------------------
+   A four-column table inside a 327px column gives each column about 80px, and
+   at that width every Persian cell wraps to three or four lines — the header
+   row alone became twelve. The table is not too wide for the page, it is too
+   narrow for its own content.
+
+   `display: block` turns it into a scrollable box while the rows inside still
+   lay out as a table, and a floor under each cell keeps the columns readable
+   instead of letting the squeeze come back. The result is a table you push
+   sideways, which is what a table on a phone has to be. */
+@media (max-width: 767px) {
+  .prose-arka table {
+    display: block;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+  }
+
+  .prose-arka table th,
+  .prose-arka table td {
+    min-width: 8.5rem;
+  }
+}
+
 .prose-arka {
   color: var(--foreground-muted);
   line-height: 2.15;
