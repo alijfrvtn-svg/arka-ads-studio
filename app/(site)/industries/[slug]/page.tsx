@@ -1,50 +1,82 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowUpLeft, Check } from "lucide-react";
 import { db } from "@/lib/db";
-import { Section, Container, SectionHeading } from "@/components/ui/Section";
-import { ProjectCard } from "@/components/work/ProjectCard";
+import { SERVICE_CARD_IMAGE } from "@/lib/constants";
 import { IndustryHero } from "@/components/industries/IndustryHero";
 import { WaveList } from "@/components/ui/WaveList";
+import { IndustryRelated } from "@/components/industries/IndustryRelated";
 import { buildMetadata } from "@/lib/seo";
 import { tr, trArr, ui } from "@/lib/i18n";
+import { localeDigits } from "@/lib/utils";
 import { getLocale } from "@/lib/get-locale";
 import type { Locale } from "@/types";
 
 const COPY: Record<Locale, {
   metaTitlePrefix: string;
   approachTitle: (t: string) => string;
+  articlesEyebrow: string;
+  articlesTitle: (t: string) => string;
   portfolioTitle: (t: string) => string;
-  ctaHeading: (t: string) => string;
-  ctaBody: string;
-  ctaButton: string;
+  sampleLabel: string;
+  sampleArticle: (n: string) => string;
+  sampleArticleMeta: string;
+  sampleWork: (n: string) => string;
+  sampleWorkMeta: string;
 }> = {
   fa: {
     metaTitlePrefix: "صنعت",
     approachTitle: (t) => `چگونه به صنعت ${t} نگاه می‌کنیم`,
+    articlesEyebrow: "ژورنال",
+    articlesTitle: (t) => `مقاله‌های صنعت ${t}`,
     portfolioTitle: (t) => `پروژه‌های صنعت ${t}`,
-    ctaHeading: (t) => `برند شما در صنعت ${t} فعال است؟`,
-    ctaBody: "بیایید درباره‌ی رشد برند شما گفت‌وگو کنیم.",
-    ctaButton: "شروع گفت‌وگو",
+    sampleLabel: "نمونه",
+    sampleArticle: (n) => `عنوان مقالهٔ ${n} در این صنعت`,
+    sampleArticleMeta: "این کارت با انتشار مقاله و تیک‌زدن این صنعت پر می‌شود",
+    sampleWork: (n) => `نمونه‌کار ${n} در این صنعت`,
+    sampleWorkMeta: "این کارت با انتشار پروژه و انتخاب این صنعت پر می‌شود",
   },
   en: {
     metaTitlePrefix: "Industry",
     approachTitle: (t) => `How we approach the ${t} industry`,
+    articlesEyebrow: "Journal",
+    articlesTitle: (t) => `${t} industry articles`,
     portfolioTitle: (t) => `${t} industry projects`,
-    ctaHeading: (t) => `Is your brand active in ${t}?`,
-    ctaBody: "Let's talk about growing your brand.",
-    ctaButton: "Start the conversation",
+    sampleLabel: "Sample",
+    sampleArticle: (n) => `Article ${n} title for this industry`,
+    sampleArticleMeta: "Fills in once an article is published and tagged to this industry",
+    sampleWork: (n) => `Project ${n} in this industry`,
+    sampleWorkMeta: "Fills in once a project is published and tagged to this industry",
   },
   ar: {
     metaTitlePrefix: "صناعة",
     approachTitle: (t) => `كيف ننظر إلى صناعة ${t}`,
+    articlesEyebrow: "المدونة",
+    articlesTitle: (t) => `مقالات صناعة ${t}`,
     portfolioTitle: (t) => `مشاريع صناعة ${t}`,
-    ctaHeading: (t) => `هل علامتك التجارية نشطة في صناعة ${t}؟`,
-    ctaBody: "لنتحدث عن تنمية علامتك التجارية.",
-    ctaButton: "ابدأ الحوار",
+    sampleLabel: "نموذج",
+    sampleArticle: (n) => `عنوان المقال ${n} في هذه الصناعة`,
+    sampleArticleMeta: "يمتلئ عند نشر مقال وربطه بهذه الصناعة",
+    sampleWork: (n) => `مشروع ${n} في هذه الصناعة`,
+    sampleWorkMeta: "يمتلئ عند نشر مشروع وربطه بهذه الصناعة",
   },
 };
+
+/**
+ * Artwork for the placeholder cards.
+ *
+ * The service-card set is 28 real, already-optimised files the site is serving
+ * anyway, so a placeholder costs nothing extra and looks like the rest of the
+ * work rather than like a grey box. Picked from the slug so a given industry
+ * always shows the same three, and offset so its articles and its projects do
+ * not show the same pictures.
+ */
+const SAMPLE_ART = Object.values(SERVICE_CARD_IMAGE);
+
+function samples(slug: string, offset: number, n = 3): string[] {
+  let seed = 0;
+  for (let i = 0; i < slug.length; i++) seed = (seed * 31 + slug.charCodeAt(i)) % 9973;
+  return Array.from({ length: n }, (_, i) => SAMPLE_ART[(seed + offset + i * 5) % SAMPLE_ART.length]);
+}
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
@@ -101,34 +133,50 @@ export default async function IndustryPage({ params }: { params: Promise<{ slug:
         />
       )}
 
-      {/* portfolio */}
-      {ind.projects.length > 0 && (
-        <Section className="bg-background-2">
-          <Container>
-            <SectionHeading eyebrow={ui(locale).portfolioEyebrow} title={c.portfolioTitle(title)} className="mb-10" />
-            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {ind.projects.map((p) => <ProjectCard key={p.id} project={p} locale={locale} />)}
-            </div>
-          </Container>
-        </Section>
-      )}
+      {/* Related reading.
+          ------------------------------------------------------------
+          Placeholders for now, by request. There is no Post-to-Industry
+          relation yet, so nothing can be ticked against an industry — until
+          there is, every industry shows the same three sample cards, and they
+          are marked as samples rather than dressed up as articles. */}
+      <IndustryRelated
+        eyebrow={c.articlesEyebrow}
+        heading={c.articlesTitle(title)}
+        items={samples(ind.slug, 0).map((image, i) => ({
+          key: `post-${i}`,
+          title: c.sampleArticle(localeDigits(locale, i + 1)),
+          meta: c.sampleArticleMeta,
+          image,
+        }))}
+        sampleLabel={c.sampleLabel}
+      />
 
-      {/* cta */}
-      <Section>
-        <Container>
-          <div className="relative overflow-hidden rounded-[2.5rem] border border-card-border bg-surface-2 p-16 text-center">
-            <div className="relative">
-              <h2 className="font-display text-3xl font-extrabold tracking-[-0.03em] text-foreground md:text-4xl">{c.ctaHeading(title)}</h2>
-              <p className="mx-auto mt-4 max-w-xl text-foreground-muted">{c.ctaBody}</p>
-              <Link href="/contact" className="liquid liquid-raised mt-10 inline-flex items-center gap-2 rounded-full px-9 py-4 font-semibold">
-                <span className="inline-flex items-center gap-2">
-                  {c.ctaButton} <ArrowUpLeft className="h-5 w-5" />
-                </span>
-              </Link>
-            </div>
-          </div>
-        </Container>
-      </Section>
+      {/* Related work. Real projects when this industry has any — the relation
+          for those already exists — and the same placeholders when it does
+          not, which is currently every industry, since nothing is published. */}
+      <IndustryRelated
+        className="bg-background-2"
+        eyebrow={ui(locale).portfolioEyebrow}
+        heading={c.portfolioTitle(title)}
+        items={
+          ind.projects.length
+            ? ind.projects.map((p) => ({
+                key: p.id,
+                title: tr(locale, p.title, p.titleEn, p.titleAr),
+                meta: p.client?.name ?? tr(locale, p.category, p.categoryEn, p.categoryAr),
+                image: p.cover,
+                href: `/work/${p.slug}`,
+              }))
+            : samples(ind.slug, 3).map((image, i) => ({
+                key: `work-${i}`,
+                title: c.sampleWork(localeDigits(locale, i + 1)),
+                meta: c.sampleWorkMeta,
+                image,
+              }))
+        }
+        sampleLabel={c.sampleLabel}
+      />
+
     </>
   );
 }
