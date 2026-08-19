@@ -57,7 +57,16 @@ export function WorkFilter({
 
   return (
     <div>
-      <div className="glass glass-strong sticky top-[72px] z-20 -mx-4 mb-12 rounded-none border-x-0 px-4 py-3.5">
+      {/* Full bleed without a negative margin.
+          ------------------------------------------------------------
+          This carried `-mx-4 px-4`, which is the usual way to break a bar out
+          of a padded container — but its parent is the page's full width
+          already, so the pair only made the bar 32px wider than the document
+          and pushed 16px past the right edge, giving the whole page a
+          horizontal scroll. The glass spans edge to edge on its own, and the
+          `container-x` inside is what lines the chips up with the grid
+          below. */}
+      <div className="glass glass-strong sticky top-[72px] z-20 mb-12 rounded-none border-x-0 py-3.5">
         <div className="container-x flex gap-2 overflow-x-auto">
           {cats.map((c) => (
             <button
