@@ -101,6 +101,17 @@ export function WorkCinematicHero({ locale = "fa" }: { locale?: Locale }) {
   const [wantSound, setWantSound] = useState(true);
   const [started, setStarted] = useState(false);
 
+  /**
+   * Whether the client has taken over.
+   *
+   * This block is the page's h1. framer-motion writes `initial` into the
+   * server HTML, so starting it at `opacity: 0` shipped the title of /work
+   * invisible until the bundle hydrated — over a video that was already
+   * playing behind it. Drawn in place on the first render instead.
+   */
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
   // The frame drifts and closes in a little as the page scrolls off it. Scroll
   // linked rather than timed, so it tracks the reader instead of running on its
   // own clock.
@@ -261,7 +272,7 @@ export function WorkCinematicHero({ locale = "fa" }: { locale?: Locale }) {
 
         <div className="container-x pb-14 md:pb-20">
           <motion.div
-            initial={reduced ? false : { opacity: 0, y: 32 }}
+            initial={reduced || !mounted ? false : { opacity: 0, y: 32 }}
             animate={reduced ? undefined : { opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
           >

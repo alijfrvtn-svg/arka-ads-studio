@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion, useScroll, useSpring } from "framer-motion";
 import { Section, SectionHeading } from "@/components/ui/Section";
 import { Icon } from "@/components/ui/Icon";
@@ -72,6 +72,17 @@ export function Workflow({
   const reduced = useReducedMotion();
   const trackRef = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState<number | null>(null);
+
+  /**
+   * Whether the client has taken over.
+   *
+   * framer-motion writes `initial` into the server-rendered HTML, so an
+   * entrance that begins at `opacity: 0` ships these invisible and leaves them
+   * that way until the bundle hydrates. The first render is drawn in place;
+   * everything after it animates exactly as before.
+   */
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   // The connector fills as the row crosses the viewport: empty when the row is
   // still low on screen, full once it has settled into the middle. Spring, not
@@ -154,7 +165,7 @@ export function Workflow({
                 // Explicit per-index delay rather than parent variants — the
                 // same reason as the hero deck: nothing to inherit, nothing to
                 // get stuck in.
-                initial={reduced ? false : { opacity: 0, y: 28 }}
+                initial={reduced || !mounted ? false : { opacity: 0, y: 28 }}
                 whileInView={reduced ? undefined : { opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.35 }}
                 transition={{ duration: 0.65, delay: i * 0.2, ease: [0.16, 1, 0.3, 1] }}

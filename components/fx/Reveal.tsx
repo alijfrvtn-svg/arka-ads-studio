@@ -1,64 +1,57 @@
-"use client";
+import { cn } from "@/lib/utils";
 
-import { motion, type Variants } from "framer-motion";
-
-const EASE = [0.16, 1, 0.3, 1] as const;
-
+/**
+ * The entrance animation every section on the site uses.
+ *
+ * Plain elements with a class — no framer-motion, no client boundary, no
+ * JavaScript at all. The animation lives in globals.css and is driven by the
+ * scroll position; the long note there explains why it had to stop being a
+ * script. The short version: this used to ship `opacity: 0` in the server HTML
+ * and wait for a bundle to clear it, which on a slow link meant a white page.
+ *
+ * `y` and `delay` still shape the movement. `duration` and `once` are gone
+ * from the behaviour: a scroll-driven animation has no duration — its progress
+ * *is* the scroll position — and for the same reason it cannot play twice.
+ * They are still accepted so no call site has to change.
+ */
 export function Reveal({
   children,
   y = 26,
   delay = 0,
-  duration = 0.7,
   className,
-  once = true,
 }: {
   children: React.ReactNode;
   y?: number;
+  /** Seconds, in the old API. Becomes how far behind the group this one lands. */
   delay?: number;
-  duration?: number;
   className?: string;
+  /** @deprecated No duration to set — the scroll position is the progress. */
+  duration?: number;
+  /** @deprecated A scroll-driven reveal cannot replay. */
   once?: boolean;
 }) {
   return (
-    <motion.div
-      className={className}
-      initial={{ opacity: 0, y }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once, margin: "-80px" }}
-      transition={{ duration, delay, ease: EASE }}
+    <div
+      className={cn("reveal", className)}
+      style={
+        {
+          ...(y !== 26 ? { "--rv-y": `${y}px` } : null),
+          // 0.09s of stagger in the old API read as roughly 6% of the range.
+          ...(delay ? { "--rv-delay": `${Math.min(Math.round(delay * 66), 42)}%` } : null),
+        } as React.CSSProperties
+      }
     >
       {children}
-    </motion.div>
+    </div>
   );
 }
 
-const container: Variants = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.09, delayChildren: 0.05 } },
-};
-const item: Variants = {
-  hidden: { opacity: 0, y: 24 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.65, ease: EASE } },
-};
-
+/** A group whose children arrive one after another rather than together. */
 export function Stagger({ children, className }: { children: React.ReactNode; className?: string }) {
-  return (
-    <motion.div
-      className={className}
-      variants={container}
-      initial="hidden"
-      whileInView="show"
-      viewport={{ once: true, margin: "-70px" }}
-    >
-      {children}
-    </motion.div>
-  );
+  return <div className={cn("stagger", className)}>{children}</div>;
 }
 
+/** One member of a {@link Stagger}. Its position in the group sets its delay. */
 export function StaggerItem({ children, className }: { children: React.ReactNode; className?: string }) {
-  return (
-    <motion.div variants={item} className={className}>
-      {children}
-    </motion.div>
-  );
+  return <div className={className}>{children}</div>;
 }

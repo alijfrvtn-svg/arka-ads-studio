@@ -136,6 +136,22 @@ export function HeroShowcase({
   const timer = useRef(0);
   const count = slides.length;
 
+  /**
+   * Whether the client has taken over.
+   *
+   * framer-motion writes `initial` into the *server-rendered HTML*, so an
+   * entrance that starts at `opacity: 0` ships the hero invisible and leaves it
+   * that way until the bundle has downloaded, parsed and hydrated. This is the
+   * top of the homepage — the first thing anyone sees and the LCP — and on a
+   * slow link it was a white screen for as long as that took.
+   *
+   * So the first render has no entrance: the deck and the heading are drawn
+   * where they belong, in the HTML, with no script needed to reveal them. Every
+   * slide after it animates exactly as before, because by then this is true.
+   */
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
   useEffect(() => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
     const sync = () => setReduced(mq.matches);
@@ -290,7 +306,7 @@ export function HeroShowcase({
                   // just its neighbours, so nothing overlaps it.
                   style={{ zIndex: focused ? cards.length + 1 : g.z }}
                   // Up from below, through a full turn, into the fan.
-                  initial={{ opacity: 0, x: g.x, y: 260, rotate: g.rotate - 360, scale: 0.82 }}
+                  initial={mounted ? { opacity: 0, x: g.x, y: 260, rotate: g.rotate - 360, scale: 0.82 } : false}
                   animate={
                     leaving
                       ? // …and out through the top.
@@ -356,7 +372,7 @@ export function HeroShowcase({
 
           <motion.div
             key={index}
-            initial={{ opacity: 0, y: 14 }}
+            initial={mounted ? { opacity: 0, y: 14 } : false}
             animate={leaving ? { opacity: 0, y: -10 } : { opacity: 1, y: 0 }}
             transition={
               reduced

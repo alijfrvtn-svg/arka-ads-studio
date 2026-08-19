@@ -141,6 +141,17 @@ export function IndustryShowcase({ industries, locale = "fa" }: { industries: In
   const reduced = useReducedMotion();
   const c = COPY[locale] ?? COPY.fa;
   const [active, setActive] = useState(0);
+
+  /**
+   * Whether the client has taken over.
+   *
+   * framer-motion writes `initial` into the server-rendered HTML, so an
+   * entrance that begins at `opacity: 0` ships these invisible and leaves them
+   * that way until the bundle hydrates. The first render is drawn in place;
+   * everything after it animates exactly as before.
+   */
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   /**
    * The frame the stage is crossfading FROM.
    *
@@ -308,7 +319,7 @@ export function IndustryShowcase({ industries, locale = "fa" }: { industries: In
         <motion.div
           key={cur.id}
           className="absolute inset-0"
-          initial={reduced ? false : { opacity: 0, scale: 1.04 }}
+          initial={reduced || !mounted ? false : { opacity: 0, scale: 1.04 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
         >

@@ -2067,3 +2067,73 @@ h3 {
   font-size: 0.9em;
 }
 
+/* ————— Reveal —————
+   ------------------------------------------------------------
+   Content is visible. The animation is laid over it, never in front of it.
+
+   This used to be framer-motion's `whileInView`, which writes `opacity: 0`
+   into the *server-rendered HTML* and only clears it once the bundle has
+   downloaded, parsed, hydrated, and an IntersectionObserver has fired. On the
+   homepage that was 98 elements — the whole page — invisible until JavaScript
+   said otherwise. On a fast link nobody notices. On a link where a 76KB image
+   has been measured stalling eleven seconds, the visitor gets a white screen,
+   then chunks of the page appearing as they scroll, which reads exactly like
+   the site reloading under them. And if the bundle never arrives at all, the
+   page is blank forever.
+
+   So the reveal is CSS now, driven by the scroll position rather than by a
+   script. Browsers that support scroll-driven animations run it on the
+   compositor with no JavaScript involved; browsers that do not simply show the
+   content. Neither can leave anything invisible.
+
+   Two details carry that guarantee:
+
+   `animation-fill-mode: none` — outside the active range the element keeps its
+   normal style, which is opacity 1. A fill of `both` would hold the `from`
+   frame whenever the timeline could not resolve, which is the failure this
+   exists to remove. The range only covers the element entering the scrollport,
+   and before that it is off-screen anyway, so nothing is observably skipped.
+
+   `view()` rather than a named timeline — the range resolves against whatever
+   scrollport actually contains the element, so a reveal inside one of the
+   horizontal card rails behaves the same as one in the page. */
+.reveal,
+.stagger > * {
+  opacity: 1;
+}
+
+@keyframes reveal-in {
+  from {
+    opacity: 0;
+    transform: translateY(var(--rv-y, 26px));
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .reveal,
+    .stagger > * {
+      animation-name: reveal-in;
+      animation-timing-function: linear;
+      animation-fill-mode: none;
+      animation-timeline: view();
+      animation-range: entry 0% entry calc(70% + var(--rv-delay, 0%));
+    }
+
+    /* The stagger, without a variant tree: each child finishes a little later
+       than the one before it, so the group arrives as a run rather than at
+       once. Past the eighth the offset stops growing — a longer list would
+       otherwise have its tail still fading in well after it was read. */
+    .stagger > *:nth-child(2) { --rv-delay: 6%; }
+    .stagger > *:nth-child(3) { --rv-delay: 12%; }
+    .stagger > *:nth-child(4) { --rv-delay: 18%; }
+    .stagger > *:nth-child(5) { --rv-delay: 24%; }
+    .stagger > *:nth-child(6) { --rv-delay: 30%; }
+    .stagger > *:nth-child(7) { --rv-delay: 36%; }
+    .stagger > *:nth-child(n + 8) { --rv-delay: 42%; }
+  }
+}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ProjectCard } from "./ProjectCard";
 import { cn } from "@/lib/utils";
@@ -41,6 +41,20 @@ export function WorkFilter({
 }) {
   const ALL = "همه";
   const [cat, setCat] = useState(ALL);
+
+  /**
+   * Whether the client has taken over.
+   *
+   * framer-motion writes `initial` into the server-rendered HTML, so a grid
+   * whose entrance starts at `opacity: 0` ships invisible and stays that way
+   * until the bundle hydrates. This grid *is* the page's content, so on a slow
+   * link the visitor got an empty page rather than a page that had not
+   * animated yet. The first render is drawn in place; filtering — which
+   * already requires a click, so the script is plainly running — animates
+   * exactly as before.
+   */
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   const [status, setStatus] = useState<"ALL" | "DONE" | "IN_PROGRESS">("ALL");
   // Only offer a chip that would actually match something.
   const cats = [ALL, ...categories.filter((c) => projects.some((p) => p.category === c.slug)).map((c) => c.slug)];
@@ -135,7 +149,7 @@ export function WorkFilter({
               <motion.div
                 key={p.id}
                 layout
-                initial={{ opacity: 0, scale: 0.96 }}
+                initial={mounted ? { opacity: 0, scale: 0.96 } : false}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.96 }}
                 transition={{ duration: 0.35 }}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { Clock } from "lucide-react";
@@ -45,6 +45,20 @@ export function JournalFilter({
   const cats = [ALL, ...known, ...orphans];
   const labels = new Map(categories.map((c) => [c.slug, c]));
   const [cat, setCat] = useState(ALL);
+
+  /**
+   * Whether the client has taken over.
+   *
+   * framer-motion writes `initial` into the server-rendered HTML, so a grid
+   * whose entrance starts at `opacity: 0` ships invisible and stays that way
+   * until the bundle hydrates. This grid *is* the page's content, so on a slow
+   * link the visitor got an empty page rather than a page that had not
+   * animated yet. The first render is drawn in place; filtering — which
+   * already requires a click, so the script is plainly running — animates
+   * exactly as before.
+   */
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   const list = cat === ALL ? posts : posts.filter((p) => p.category === cat);
 
   return (
@@ -75,7 +89,7 @@ export function JournalFilter({
               <motion.article
                 key={p.id}
                 layout
-                initial={{ opacity: 0, y: 16 }}
+                initial={mounted ? { opacity: 0, y: 16 } : false}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.35 }}
