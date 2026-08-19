@@ -4,13 +4,13 @@ import { AboutHero } from "@/components/about/AboutHero";
 import { Section, Container, SectionHeading, Eyebrow } from "@/components/ui/Section";
 import { Reveal } from "@/components/fx/Reveal";
 import { StatsBar } from "@/components/home/StatsBar";
-import { FinalCTA } from "@/components/home/FinalCTA";
 import { VideoPlayer } from "@/components/work/VideoPlayer";
 import { SocialIcon } from "@/components/layout/SocialIcon";
-import { getStats, getTeam, getAboutPage, getHomePage, getContactPage } from "@/lib/queries";
+import { getStats, getTeam, getAboutPage } from "@/lib/queries";
 import { buildMetadata } from "@/lib/seo";
 import { tr, ui } from "@/lib/i18n";
-import { parseArr } from "@/lib/utils";
+import { parseArr, labelOn, localeDigits, cn } from "@/lib/utils";
+import { INDUSTRY_PAINT } from "@/lib/constants";
 import { getLocale } from "@/lib/get-locale";
 import { HighlightedTitle } from "@/components/ui/HighlightedTitle";
 import type { Social } from "@/types";
@@ -25,13 +25,7 @@ const ICONS: Record<string, LucideIcon> = { Target, Gem, Zap, Sparkles };
 
 export default async function AboutPage() {
   const locale = await getLocale();
-  const [team, stats, a, home, contact] = await Promise.all([
-    getTeam(),
-    getStats(),
-    getAboutPage(locale),
-    getHomePage(locale),
-    getContactPage(locale),
-  ]);
+  const [team, stats, a] = await Promise.all([getTeam(), getStats(), getAboutPage(locale)]);
   const statData = stats.map((s) => ({ label: tr(locale, s.label, s.labelEn, s.labelAr), value: s.value, suffix: s.suffix }));
 
   return (
@@ -75,17 +69,41 @@ export default async function AboutPage() {
       <Section>
         <Container>
           <SectionHeading align="center" eyebrow={a.valuesEyebrow} title={a.valuesHeading} className="mx-auto mb-16 max-w-2xl" />
+          {/* The same poster the departments use on the homepage — 4:5, icon
+              chip in the corner, copy at the foot — but filled with colour
+              instead of a photograph, since a value has no picture of its own.
+              Four values, four colours, one each. */}
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {a.values.map((v, i) => {
               const I = ICONS[v.icon] ?? Sparkles;
+              const colour = INDUSTRY_PAINT[i % INDUSTRY_PAINT.length];
+              // Computed per hex, never paired by hand — see labelOn(). The
+              // floor across these four is 5.70:1 (white on the violet).
+              const label = labelOn(colour);
+              const onDark = label === "#ffffff";
               return (
-                <Reveal key={v.title} delay={i * 0.08}>
-                  <div className="h-full rounded-[1.5rem] border border-card-border bg-surface p-7 transition-all duration-700 [transition-timing-function:var(--ease-apple)] hover:-translate-y-1.5 hover:border-foreground/25 hover:shadow-[0_1px_2px_rgba(0,0,0,0.04),0_28px_60px_-32px_rgba(0,0,0,0.35)]">
-                    <div className="liquid-clear mb-5 grid h-12 w-12 place-items-center rounded-[13px] text-foreground">
+                <Reveal key={v.title} delay={i * 0.08} className="h-full">
+                  <div
+                    className="ind-row group flex aspect-[4/5] flex-col justify-end overflow-hidden rounded-[1.75rem] p-7 transition-all duration-700 [transition-timing-function:var(--ease-apple)] hover:-translate-y-1.5 hover:shadow-[0_1px_2px_rgba(0,0,0,0.1),0_36px_70px_-30px_rgba(0,0,0,0.5)]"
+                    style={{ background: colour, color: label }}
+                  >
+                    {/* The cast-glass shell, as on every other coloured surface
+                        here. `.ind-row` is what gives it something to size to. */}
+                    <span className="crystal" aria-hidden />
+                    <span
+                      className={cn(
+                        "absolute right-6 top-6 grid h-12 w-12 place-items-center rounded-[15px] border",
+                        onDark ? "border-white/35 bg-white/15" : "border-black/20 bg-black/[0.07]",
+                      )}
+                    >
                       <I className="h-5 w-5" />
-                    </div>
-                    <h3 className="font-display text-lg font-bold tracking-tight text-foreground">{v.title}</h3>
-                    <p className="mt-2 text-sm leading-relaxed text-foreground-muted">{v.desc}</p>
+                    </span>
+                    <h3 className="font-display text-[1.35rem] font-bold leading-snug tracking-tight">{v.title}</h3>
+                    {/* 0.85 is the measured floor: below it the description
+                        drops under 4.5:1 on the violet. */}
+                    <p className="mt-2.5 text-sm leading-relaxed" style={{ opacity: 0.85 }}>
+                      {v.desc}
+                    </p>
                   </div>
                 </Reveal>
               );
@@ -141,7 +159,7 @@ export default async function AboutPage() {
                   <span className="absolute -right-[41px] top-1 grid h-5 w-5 place-items-center rounded-full border-2 border-foreground bg-background">
                     <span className="h-2 w-2 rounded-full bg-foreground" />
                   </span>
-                  <span className="font-display text-2xl font-extrabold text-gradient">{t.year}</span>
+                  <span className="font-display text-2xl font-extrabold text-gradient ltr-nums">{localeDigits(locale, t.year)}</span>
                   <h3 className="mt-1.5 font-display text-lg font-bold tracking-tight text-foreground">{t.title}</h3>
                   <p className="mt-1 text-foreground-muted">{t.desc}</p>
                 </div>
@@ -173,7 +191,6 @@ export default async function AboutPage() {
         </Container>
       </Section>
 
-      <FinalCTA content={home} phone={contact.phone} phoneDisplay={contact.phoneDisplay} />
     </>
   );
 }
