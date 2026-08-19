@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowUpLeft } from "lucide-react";
-import { PageHero } from "@/components/ui/PageHero";
+import { ServicesHero } from "@/components/services/ServicesHero";
 import { Section, Container } from "@/components/ui/Section";
 import { Reveal } from "@/components/fx/Reveal";
 import { ServiceArc } from "@/components/services/ServiceArc";
@@ -52,11 +52,12 @@ export default async function ServicesPage() {
   const c = COPY[locale];
   return (
     <>
-      <PageHero
+      <ServicesHero
         eyebrow={ui(locale).navServices}
         breadcrumb={[{ label: ui(locale).navHome, href: "/" }, { label: ui(locale).navServices }]}
         title={<>{c.title} <span className="text-gradient">{c.highlight}</span></>}
         description={c.description}
+        locale={locale}
       />
       <Section>
         <div className="space-y-24">
@@ -70,7 +71,7 @@ export default async function ServicesPage() {
             const label = labelOn(colour);
             const onDark = label === "#ffffff";
             return (
-              <div key={dept.key} className="container-x">
+              <div key={dept.key} id={`dept-${dept.key}`} className="container-x scroll-mt-28">
                 {/* A full-width bar rather than a floating title: it spans the
                     same container as the card row below, so the two line up
                     instead of the heading hanging in the margin. `color` is set
