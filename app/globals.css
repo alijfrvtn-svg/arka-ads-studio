@@ -1105,6 +1105,31 @@ body {
 
 /* Grain. One tiled square of fractal noise at low opacity — static, so it
    costs a single paint and nothing per frame, unlike an animated grain. */
+/* Neither of these is drawn on a phone.
+   ------------------------------------------------------------
+   Both rules existed once and were deleted by accident — a range replacement
+   while swapping the painted canvas for gradients took them with it — which is
+   why the industries list kept going white on the way back up long after
+   everything else had stopped. Measured on the live site with them missing:
+   five `.ind-orbit` layers, 497x1676 each, every one running an infinite
+   rotation, holding 34 blurred circles between them. A blur is re-rasterised
+   as its layer transforms, so that is five full-height buffers being redrawn
+   forever behind decoration nobody is looking at.
+
+   Grain is the same shape of cost: a full-screen overlay-blended layer the
+   whole hero has to composite through, worth nothing at 0.13 on a 6in panel. */
+@media (max-width: 1023px) {
+  .ind-orbits {
+    display: none;
+  }
+}
+
+@media (max-width: 767px) {
+  .film-grain {
+    display: none;
+  }
+}
+
 .film-grain {
   position: absolute;
   inset: 0;

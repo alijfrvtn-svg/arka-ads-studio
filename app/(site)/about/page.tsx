@@ -104,7 +104,19 @@ export default async function AboutPage() {
                         crystal — so a chip placed directly on the card had its
                         `absolute` overridden and dropped into the flex column
                         on top of the title. */}
-                    <div className="relative flex h-full flex-col justify-end p-7">
+                    {/* `pt-20` below sm, and it is load-bearing.
+                        ------------------------------------------------------
+                        `h-full` needs a parent with a definite height, and once
+                        the card started sizing to its content there was none —
+                        so this box resolved to 141px inside a 208px card, sat
+                        at the top, and `justify-end` had no free space left to
+                        push anything down with. The chip runs 24px to 72px from
+                        the top; the title was landing at 28. Measured overlap
+                        was 30px vertically and 44 across.
+
+                        From sm the card is 4:5 again, the height is definite,
+                        and the original padding is correct. */}
+                    <div className="relative flex h-full flex-col justify-end p-7 pt-20 sm:pt-7">
                       <span
                         className={cn(
                           "absolute right-6 top-6 grid h-12 w-12 place-items-center rounded-[15px] border",
