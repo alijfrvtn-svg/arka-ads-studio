@@ -190,11 +190,12 @@ export function ParticleWave({ className }: { className?: string }) {
         const spread = 1.05 + 0.32 * d;
         const size = 1.7 + 2.7 * d;
         // Reaches 1 at the front row: the nearest dots are the full hex on
-        // white rather than a tint of it, and depth comes off the far rows
-        // fading rather than off the near ones being held back. The 1.25
-        // exponent is what carries weight into the back — at 1.6 the far rows
-        // were almost gone and the surface only read in its last third.
-        const rowAlpha = 0.13 + 0.87 * Math.pow(d, 1.25);
+        // white rather than a tint of it. The floor and the exponent are what
+        // carry weight into the back — at 0.13 and 1.6 the far rows were almost
+        // gone, and even at 0.13 and 1.25 the whole surface still read as a
+        // wash rather than as colour. Depth comes off the row spacing and the
+        // dot size as much as off the fade.
+        const rowAlpha = 0.3 + 0.7 * Math.pow(d, 1.15);
 
         for (let ci = 0; ci < cols; ci++) {
           const u = ci / (cols - 1);
@@ -235,7 +236,7 @@ export function ParticleWave({ className }: { className?: string }) {
           // never actually reached the hex: measured at 216/255, a tint of the
           // colour rather than the colour. The last term is the compression in
           // the well, where the material gets denser.
-          const a = rowAlpha * (0.8 + 0.2 * (0.5 - wave * 0.5)) * (1 + 0.4 * squash);
+          const a = rowAlpha * (0.88 + 0.12 * (0.5 - wave * 0.5)) * (1 + 0.4 * squash);
           const band = Math.min(BANDS - 1, Math.max(0, Math.round(a * (BANDS - 1))));
           buckets[band].push(x, y, size * (1 + 0.5 * squash));
         }

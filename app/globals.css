@@ -676,7 +676,11 @@ body {
    Masking the canvas rather than lowering the dots' alpha keeps the colour at
    full strength where it is actually seen. */
 .about-wave {
-  mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.28) 18%, #000 46%, #000 100%);
+  /* Reaches full strength at 42% rather than 46%, and is already at 0.45 by
+     15%. The fade is only there to thin the field the headline sits on; it was
+     also dimming the body of the surface, which is the part that is supposed
+     to be the colour. */
+  mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.45) 15%, #000 42%, #000 100%);
 }
 
 /* ————— a painted section that arrives and leaves —————
