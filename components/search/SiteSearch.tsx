@@ -114,7 +114,11 @@ export function SiteSearch() {
                 />
               )}
 
-              <div className={cn("border-t border-card-border px-4 py-2 text-[11px] text-foreground-faint")}>
+              {/* Advice about arrow keys and Enter, shown where those exist.
+                  On a phone it was a line of 11px type explaining a keyboard
+                  the reader does not have, eating the bottom of a panel that
+                  is already competing with the on-screen one. */}
+              <div className={cn("hidden border-t border-card-border px-4 py-2 text-[11px] text-foreground-faint lg:block")}>
                 برای جابه‌جایی از کلیدهای ↑ ↓ و برای باز کردن از Enter استفاده کنید.
               </div>
             </motion.div>

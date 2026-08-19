@@ -99,8 +99,18 @@ export function IndustryHero({
         }}
       >
         <Reveal>
-          <nav className="mb-4 text-xs text-foreground-muted">
-            <Link href="/" className="transition-colors hover:text-foreground">{ui(locale).navHome}</Link> ‹ <Link href="/industries" className="transition-colors hover:text-foreground">{ui(locale).navIndustries}</Link>
+          {/* The one breadcrumb on the site that was still bare inline text:
+              21x18 and 29x18 links, against the 44px-tall ones every other
+              page uses. The negative margin cancels the padding so the row
+              still starts flush with the heading under it. */}
+          <nav className="-mx-2 mb-4 flex flex-wrap items-center text-xs text-foreground-muted">
+            <Link href="/" className="inline-flex min-h-11 items-center px-2 transition-colors hover:text-foreground">
+              {ui(locale).navHome}
+            </Link>
+            <span aria-hidden>‹</span>
+            <Link href="/industries" className="inline-flex min-h-11 items-center px-2 transition-colors hover:text-foreground">
+              {ui(locale).navIndustries}
+            </Link>
           </nav>
         </Reveal>
         <Reveal delay={0.05}>

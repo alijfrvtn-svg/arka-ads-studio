@@ -48,7 +48,10 @@ export function SearchResults({
   }
 
   return (
-    <ul role="listbox" className="max-h-[min(60vh,26rem)] overflow-y-auto overscroll-contain py-1">
+    // svh, not vh: on a phone `vh` is the *large* viewport — the one you get
+    // with the address bar hidden — so a list sized in it is taller than the
+    // screen actually showing it for as long as the bar is still down.
+    <ul role="listbox" className="max-h-[min(60svh,26rem)] overflow-y-auto overscroll-contain py-1">
       {hits.map((h, i) => {
         const Icon = ICONS[h.type];
         return (
@@ -77,7 +80,7 @@ export function SearchResults({
                   <span className="block truncate text-xs text-foreground-muted">{h.subtitle}</span>
                 )}
               </span>
-              <span className="shrink-0 rounded-md border border-card-border px-2 py-0.5 text-[10px] text-foreground-faint">
+              <span className="shrink-0 rounded-md border border-card-border px-2 py-0.5 text-[0.7rem] text-foreground-faint lg:text-[10px]">
                 {h.badge || LABELS[h.type]}
               </span>
             </Link>

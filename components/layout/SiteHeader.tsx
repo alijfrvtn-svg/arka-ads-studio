@@ -59,6 +59,23 @@ export function SiteHeader({
     setMega(null);
   }, [pathname]);
 
+  /**
+   * Hold the page still while the drawer is over it.
+   *
+   * Without this the sheet is a pane of blurred glass with the homepage
+   * sliding about underneath it — a drag that starts on the menu and misses a
+   * link scrolls the page it is covering, and closing the drawer drops the
+   * reader somewhere they never chose to go.
+   */
+  useEffect(() => {
+    if (!open) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [open]);
+
   const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
 
   /**
@@ -140,6 +157,8 @@ export function SiteHeader({
             <button
               onClick={() => setOpen((o) => !o)}
               aria-label="منو"
+              aria-expanded={open}
+              aria-controls="mobile-nav"
               className="liquid liquid-clear grid h-11 w-11 place-items-center rounded-full text-foreground lg:hidden"
             >
               {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -225,9 +244,28 @@ export function SiteHeader({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 top-[72px] z-40 bg-background/90 backdrop-blur-2xl lg:hidden"
+            id="mobile-nav"
+            /* ── Two numbers and one word that were all wrong ──────────────
+               `top-[72px]` was a guess, and the bar is not 72px tall: the
+               header is py-5 around an h-16 row unscrolled, so it ends at
+               104px, and the drawer's first link was sitting 32px up behind
+               it. It condenses to 76px on scroll, so the offset has to follow
+               the same flag the bar does rather than split the difference.
+
+               And the sheet could not scroll. Its eight rows come to 663px,
+               which fits an 812px phone held upright and nothing else: on a
+               667px screen the last link is cut off, and turned sideways
+               there are 303px of panel holding 663px of menu with no way to
+               reach the bottom 360px of it — including the only call to
+               action in the whole sheet. overscroll-contain keeps that scroll
+               from handing off to the locked page behind it once it ends. */
+            className={cn(
+              "fixed inset-x-0 bottom-0 z-40 overflow-y-auto overscroll-contain bg-background/90 backdrop-blur-2xl lg:hidden",
+              scrolled ? "top-[76px]" : "top-[104px]",
+            )}
           >
-            <nav className="container-x flex flex-col gap-1 py-8">
+            {/* pb-16 clears the home indicator on a gesture-bar phone. */}
+            <nav className="container-x flex flex-col gap-1 pb-16 pt-8">
               {NAV.map((item, i) => (
                 <motion.div
                   key={item.href}
