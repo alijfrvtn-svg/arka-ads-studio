@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import { PageHero } from "@/components/ui/PageHero";
+import { JournalHero } from "@/components/journal/JournalHero";
 import { JournalFilter } from "@/components/journal/JournalFilter";
 import { db } from "@/lib/db";
 import { buildMetadata } from "@/lib/seo";
 import { getLocale } from "@/lib/get-locale";
-import { ui } from "@/lib/i18n";
+import { tr, ui } from "@/lib/i18n";
 import type { Locale } from "@/types";
 import { getCategories } from "@/lib/queries";
 
@@ -46,16 +46,48 @@ export default async function JournalPage() {
   ]);
   const c = COPY[locale];
 
+  // The cover is the featured post, or the newest one if nothing is flagged.
+  // It comes out of the grid below, so the page never shows it twice.
+  const featured = posts.find((p) => p.featured) ?? posts[0] ?? null;
+  const rest = featured ? posts.filter((p) => p.id !== featured.id) : posts;
+
+  // The taxonomy table has no POST rows, so the journal's categories are the
+  // distinct strings the posts carry — the same list JournalFilter falls back
+  // to. Order of first appearance, so a chip colour cannot move when a post is
+  // added.
+  const catOrder = Array.from(new Set(posts.map((p) => p.category)));
+
+  // Both ends of the promise, read off the posts rather than written in.
+  const minutes = posts.map((p) => p.readingMinutes).filter((m) => m > 0);
+  const minMinutes = minutes.length ? Math.min(...minutes) : 0;
+  const maxMinutes = minutes.length ? Math.max(...minutes) : 0;
+
   return (
     <>
-      <PageHero
+      <JournalHero
         eyebrow={ui(locale).navJournal}
         breadcrumb={[{ label: ui(locale).navHome, href: "/" }, { label: ui(locale).navJournal }]}
         title={<>{c.title} <span className="text-gradient">{c.highlight}</span></>}
         description={c.description}
+        post={
+          featured
+            ? {
+                slug: featured.slug,
+                title: tr(locale, featured.title, featured.titleEn, featured.titleAr),
+                excerpt: tr(locale, featured.excerpt, featured.excerptEn, featured.excerptAr),
+                cover: featured.cover,
+                category: tr(locale, featured.category, featured.categoryEn, featured.categoryAr),
+                readingMinutes: featured.readingMinutes,
+              }
+            : null
+        }
+        categoryIndex={featured ? Math.max(0, catOrder.indexOf(featured.category)) : 0}
+        minMinutes={minMinutes}
+        maxMinutes={maxMinutes}
+        locale={locale}
       />
       <section className="pb-24">
-        <JournalFilter posts={posts} categories={categories} locale={locale} />
+        <JournalFilter posts={rest} categories={categories} locale={locale} />
       </section>
     </>
   );
