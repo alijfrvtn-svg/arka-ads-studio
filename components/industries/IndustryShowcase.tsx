@@ -7,7 +7,8 @@ import { ArrowUpLeft } from "lucide-react";
 import { Icon } from "@/components/ui/Icon";
 import { EmbedFrame } from "@/components/media/EmbedFrame";
 import { getEmbedUrl } from "@/lib/embed";
-import { cn } from "@/lib/utils";
+import { cn, labelOn } from "@/lib/utils";
+import { INDUSTRY_PAINT, INDUSTRY_PAINT_ORDER } from "@/lib/constants";
 import { tr } from "@/lib/i18n";
 import type { Locale } from "@/types";
 
@@ -198,12 +199,21 @@ export function IndustryShowcase({ industries, locale = "fa" }: { industries: In
   return (
     <div className="grid gap-8 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)] lg:gap-10">
       {/* ── the list ── first in source, so in RTL it takes the reading side ── */}
-      <div className="overflow-hidden rounded-[1.75rem] border border-card-border bg-surface lg:self-start">
-        <div className="divide-y divide-card-border">
+      <div className="overflow-hidden rounded-[1.75rem] border border-card-border lg:self-start">
+        <div>
           {industries.map((ind, i) => {
             const isActive = i === active;
             const title = tr(locale, ind.title, ind.titleEn, ind.titleAr);
             const excerpt = tr(locale, ind.excerpt, ind.excerptEn ?? null, ind.excerptAr ?? null);
+            // Same four colours and the same order as the homepage rows: three
+            // rows per colour, no colour ever touching itself. The order table
+            // is twelve long and so is this list, so it lands exactly.
+            const colour = INDUSTRY_PAINT[INDUSTRY_PAINT_ORDER[i % INDUSTRY_PAINT_ORDER.length]];
+            // Computed per hex, never paired by hand — see labelOn(). Floor
+            // across the four is 5.70:1 (white on the violet), widest 10.96:1
+            // (ink on the gold).
+            const label = labelOn(colour);
+            const onDark = label === "#ffffff";
             return (
               <Link
                 key={ind.id}
@@ -215,11 +225,14 @@ export function IndustryShowcase({ industries, locale = "fa" }: { industries: In
                 // should drive the stage exactly as the pointer does.
                 onMouseEnter={() => pick(i)}
                 onFocus={() => pick(i)}
-                className={cn(
-                  "group block px-5 py-5 transition-colors duration-500 [transition-timing-function:var(--ease-apple)] md:px-7",
-                  isActive ? "bg-card-hover" : "hover:bg-card-hover",
-                )}
+                className="ind-row group block px-5 py-5 md:px-7"
+                style={{ background: colour, color: label }}
               >
+                {/* The cast-glass shell, as on the homepage: a diagonal facet, a
+                    sheen off the top edge and a bevelled rim, all white and
+                    black at low alpha so it works on any of the four without
+                    being tuned per hex. */}
+                <span className="crystal" aria-hidden />
                 {/* The card's own media, on the layout that has no stage. */}
                 <div className="relative mb-4 aspect-[16/10] overflow-hidden rounded-[1.25rem] lg:hidden">
                   <Media ind={ind} play={!reduced && i === visible} />
@@ -231,28 +244,28 @@ export function IndustryShowcase({ industries, locale = "fa" }: { industries: In
                     <span
                       className={cn(
                         "grid h-11 w-11 shrink-0 place-items-center rounded-[12px] border transition-all duration-500 [transition-timing-function:var(--ease-apple)]",
-                        isActive
-                          ? "border-transparent bg-foreground text-background"
-                          : "border-card-border text-foreground-faint",
+                        onDark ? "border-white/35 bg-white/15" : "border-black/20 bg-black/[0.07]",
+                        isActive && (onDark ? "border-white/60 bg-white/30" : "border-black/35 bg-black/[0.16]"),
                       )}
+                      style={{ color: label }}
                     >
                       <Icon name={ind.icon} className="h-5 w-5" />
                     </span>
                     <span className="min-w-0">
                       <span
-                        className={cn(
-                          "block truncate font-display text-xl font-bold transition-colors duration-500 md:text-2xl",
-                          isActive ? "text-foreground" : "text-foreground-muted",
-                        )}
+                        className="block truncate font-display text-xl font-bold tracking-tight md:text-2xl"
+                        style={{ color: label }}
                       >
                         {title}
                       </span>
                       {locale === "fa" && ind.titleEn && (
                         <span
-                          className={cn(
-                            "block truncate text-[0.6rem] uppercase tracking-[0.22em] transition-opacity duration-500",
-                            isActive ? "text-foreground-faint opacity-100" : "opacity-0",
-                          )}
+                          className="mt-0.5 block truncate text-[0.6rem] uppercase tracking-[0.22em] transition-opacity duration-500"
+                          // 0.85 is the floor, not a taste: at 0.6 the label
+                          // lands at 3.01:1 on the violet and 3.26 on the blue.
+                          // Measured across the four, 0.85 is where the worst
+                          // (violet) reaches 4.55 and all of them clear AA.
+                          style={{ color: label, opacity: isActive ? 1 : 0.85 }}
                         >
                           {ind.titleEn}
                         </span>
@@ -262,15 +275,18 @@ export function IndustryShowcase({ industries, locale = "fa" }: { industries: In
                   <ArrowUpLeft
                     className={cn(
                       "h-5 w-5 shrink-0 transition-all duration-500 [transition-timing-function:var(--ease-apple)]",
-                      isActive ? "translate-x-0 text-foreground opacity-100" : "translate-x-2 opacity-0",
+                      isActive ? "translate-x-0 opacity-100" : "translate-x-2 opacity-0",
                     )}
+                    style={{ color: label }}
                     aria-hidden
                   />
                 </div>
 
                 {/* Read out on every layout; drawn only where the stage is not
                     already showing it. */}
-                <p className="mt-3 text-sm leading-relaxed text-foreground-muted lg:sr-only">{excerpt}</p>
+                <p className="mt-3 text-sm leading-relaxed lg:sr-only" style={{ color: label, opacity: 0.85 }}>
+                  {excerpt}
+                </p>
               </Link>
             );
           })}

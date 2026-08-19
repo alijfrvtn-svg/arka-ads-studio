@@ -226,7 +226,11 @@ export function IndustriesAccordion({
                           {locale === "fa" && ind.titleEn && (
                             <span
                               className="mt-0.5 block text-[0.6rem] uppercase tracking-[0.25em]"
-                              style={{ color: label, opacity: 0.72 }}
+                              // 0.85, not lower: this micro-line is 0.6rem, so
+                              // it needs 4.5:1, and at 0.72 it sits at 3.65 on
+                              // the violet. 0.85 puts the worst of the four at
+                              // 4.55. Same floor as the /industries list.
+                              style={{ color: label, opacity: 0.85 }}
                             >
                               {ind.titleEn}
                             </span>
