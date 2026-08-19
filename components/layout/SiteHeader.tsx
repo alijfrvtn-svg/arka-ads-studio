@@ -61,8 +61,19 @@ export function SiteHeader({
 
   const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
 
+  /**
+   * Routes that open on a full-bleed film running under the header.
+   *
+   * Unscrolled the bar has no glass, so ink type would sit straight on the
+   * footage — readable over a lit sky and invisible the moment the reel cuts
+   * to black. The attribute inverts the header's tokens for exactly as long
+   * as the bar is bare; see header[data-over-media] in globals.css.
+   */
+  const overMedia = pathname === "/work" && !scrolled;
+
   return (
     <header
+      data-over-media={overMedia || undefined}
       className={cn(
         "fixed inset-x-0 top-0 z-50 transition-all duration-700 [transition-timing-function:var(--ease-apple)]",
         scrolled ? "py-2.5" : "py-5",

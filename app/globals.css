@@ -908,6 +908,105 @@ body {
 }
 
 /* ============================================================
+   Film hero — /work (components/work/WorkCinematicHero.tsx)
+   ------------------------------------------------------------
+   A full-bleed reel running under the header, carrying white type at the foot
+   of the frame.
+
+   The scrims are sized from the footage rather than by eye. Sampled across
+   fourteen frames of the encoded file, the brightest 5% of pixels reach
+   L=0.75 in the top strip and L=0.61 in the bottom one — and from nine
+   seconds in the frame is pure black. So one overlay has to hold white type
+   over a lit sky and over nothing at all, and the bright end is what sets it:
+
+     top    0.80 black  ->  1.05 / (0.20 x 0.75 + 0.05)  =  5.2:1
+     bottom 0.88 black  ->  1.05 / (0.12 x 0.61 + 0.05)  =  8.6:1
+
+   The top band is there for the header, which carries no glass of its own
+   until it condenses on scroll — see header[data-over-media] below.
+   ============================================================ */
+.film-hero-top {
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  height: 240px;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.8) 0%,
+    rgba(0, 0, 0, 0.55) 38%,
+    rgba(0, 0, 0, 0.2) 72%,
+    transparent 100%
+  );
+}
+
+.film-hero-bottom {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: 66%;
+  pointer-events: none;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.94) 0%,
+    rgba(0, 0, 0, 0.88) 16%,
+    rgba(0, 0, 0, 0.62) 36%,
+    rgba(0, 0, 0, 0.26) 60%,
+    transparent 100%
+  );
+}
+
+/* Corners pulled down so the frame reads as a projected image rather than a
+   video element pinned to the edges of the viewport. */
+.film-hero-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(122% 100% at 50% 44%, transparent 40%, rgba(0, 0, 0, 0.5) 100%);
+}
+
+/* Grain. One tiled square of fractal noise at low opacity — static, so it
+   costs a single paint and nothing per frame, unlike an animated grain. */
+.film-grain {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.13;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+}
+
+/* ————— the header over a film hero —————
+   Unscrolled the bar has no glass at all: it is ink type sitting directly on
+   whatever is behind it, which on /work is a lit desert sky one second and
+   pure black the next. Inverting the tokens on this one scope flips the
+   wordmark, the links and anything added to the header later in one place —
+   the same move .ink-surface makes for the footer, rather than restyling each
+   child.
+
+   It lasts only while the bar is bare. Once it condenses into glass on scroll
+   it is a surface of its own again and goes back to ink.
+
+   Measured against the 0.80 top band over the brightest 5% of the reel, which
+   is where these have to hold: white 5.25:1, the muted tone 4.74:1, the faint
+   one 4.62:1. The muted tone started at 0.86 and came in at 4.38 — under the
+   line — which is why the two translucent steps sit this close to white here
+   and nowhere else. Over the black stretch of the reel all three are past
+   18:1. */
+header[data-over-media] {
+  --foreground: #ffffff;
+  --foreground-muted: rgba(255, 255, 255, 0.92);
+  --foreground-faint: rgba(255, 255, 255, 0.9);
+  /* The tokens alone do not reach the wordmark. It is a mask painted with
+     `currentColor`, and `color` is inherited from body — which read the
+     page-level --foreground, not this one — so the mark stayed ink while
+     everything around it turned white. Feeding the local token into `color`
+     here is what carries the inversion into currentColor. */
+  color: var(--foreground);
+}
+
+/* ============================================================
    Ink surface — black glass
    ------------------------------------------------------------
    Shared by the footer and the stats band. Both are slabs of smoked black
