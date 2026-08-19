@@ -223,7 +223,20 @@ export function WorkCinematicHero({ locale = "fa" }: { locale?: Locale }) {
       className="relative isolate min-h-[100svh] w-full overflow-hidden bg-[#050505]"
     >
       {/* The film. Wrapped so the parallax rides the wrapper and leaves the
-          element itself free for object-fit. */}
+          element itself free for object-fit.
+
+          `contain` below sm, `cover` from there up.
+          ------------------------------------------------------------
+          The reel is 960x528 — a 1.82 landscape frame. The hero on a phone is
+          375x812, a 0.46 portrait box, and covering one with the other crops
+          away everything it cannot fit: measured, 25% of the frame's width
+          survived. Three quarters of every shot was off the sides, which is
+          why it read as out of frame rather than as a wide shot.
+
+          Contained, the whole frame is there, sitting in the upper part of the
+          hero with the title in the dark below it — which is what a letterbox
+          is for. If it should run edge to edge on a phone instead, the fix is
+          a 9:16 export of the same footage, not a different fit. */}
       <motion.div
         className="absolute inset-0 will-change-transform"
         style={reduced || !parallax ? undefined : { y, scale }}
@@ -231,7 +244,7 @@ export function WorkCinematicHero({ locale = "fa" }: { locale?: Locale }) {
         <video
           ref={videoRef}
           poster="/video/work-hero-poster.webp"
-          className="h-full w-full object-cover"
+          className="h-full w-full object-contain object-[50%_38%] sm:object-cover sm:object-center"
           playsInline
           loop
           muted

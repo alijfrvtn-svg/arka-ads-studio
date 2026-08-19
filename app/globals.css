@@ -965,6 +965,30 @@ body {
 
    Its host must be positioned. `.ind-row` handles that; anything else using
    this needs its own `relative`, or the shell sizes itself to the page. */
+/* The sheen is desktop-only.
+   ------------------------------------------------------------
+   Each crystal is a `mix-blend-mode: soft-light` layer inside its own
+   `isolation: isolate` context, which means the browser has to keep the row's
+   backdrop as a separate composited buffer to blend against. Twelve rows on
+   the homepage industries list is twelve of those, down 1700px of page — the
+   same kind of layer as the painted canvas, discarded first when iOS Safari
+   wants memory and slow to rebuild, which is why that one section kept going
+   white on the way back up after everything else had stopped.
+
+   The rows keep their colour; they lose a diagonal gloss nobody would miss at
+   this size. */
+@media (max-width: 1023px) {
+  .crystal {
+    display: none;
+  }
+
+  /* Nothing left to isolate — and the containing block it was here to provide
+     is still `position: relative` on the row itself. */
+  .ind-row {
+    isolation: auto;
+  }
+}
+
 .crystal {
   position: absolute;
   inset: 0;

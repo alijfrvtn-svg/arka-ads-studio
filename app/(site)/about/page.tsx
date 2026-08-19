@@ -138,9 +138,11 @@ export default async function AboutPage() {
               return (
                 <Reveal key={m.id} delay={i * 0.06}>
                   <div className="group relative overflow-hidden rounded-[1.5rem] border border-card-border">
-                    <div className="relative aspect-[4/3] sm:aspect-[4/5]">
+                    <div className="relative aspect-[4/5]">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={m.avatar || ""} alt={m.name} className="h-full w-full object-cover transition-all duration-700 [transition-timing-function:var(--ease-apple)] group-hover:scale-[1.03]" />
+                      <img src={m.avatar || ""} alt={m.name} // `object-top`: these are portraits, and a centre crop takes the head
+                        // off before it takes anything else.
+                        className="h-full w-full object-cover object-top transition-all duration-700 [transition-timing-function:var(--ease-apple)] group-hover:scale-[1.03]" />
                       {/* Near-opaque under the name, clear above it — team photos vary too
                           much to trust a thin scrim. */}
                       <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(0,0,0,0.92)_0%,rgba(0,0,0,0.86)_30%,rgba(0,0,0,0.34)_60%,rgba(0,0,0,0)_100%)]" />

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ArrowUpLeft, ChevronLeft, ChevronRight } from "lucide-react";
 import { Icon } from "@/components/ui/Icon";
 import { SERVICE_CARD_IMAGE } from "@/lib/constants";
+import { useMediaQuery, DESKTOP } from "@/lib/use-media";
 import { ARC_SMALL_VARIANTS, smallVariant } from "@/lib/marquee-variants";
 import { cn, localeNumber } from "@/lib/utils";
 import { tr, ui } from "@/lib/i18n";
@@ -65,6 +66,10 @@ export function ServiceArc({
 }) {
   const scroller = useRef<HTMLDivElement>(null);
   const frame = useRef(0);
+  /** Whether the row is drawn on a cylinder. A ref, because `paint` reads it
+   *  from inside a rAF and must not be rebuilt when it changes. */
+  const curved = useRef(false);
+  const wide = useMediaQuery(DESKTOP);
 
   /**
    * Read every card, then write every card.
@@ -77,6 +82,25 @@ export function ServiceArc({
   const paint = useCallback(() => {
     const el = scroller.current;
     if (!el) return;
+
+    /**
+     * A phone gets a plain slider.
+     *
+     * The curve is a per-frame rewrite of rotateY, translateZ, translateY and
+     * scale on every card — and because it moves a card *visually* while its
+     * snap position is worked out from layout, a card snapped to the centre
+     * still came to rest off-centre and half out of frame. Clearing the
+     * transforms is what puts it back in the middle, so this is the same fix
+     * for both complaints.
+     */
+    if (!curved.current) {
+      for (const card of el.querySelectorAll<HTMLElement>("[data-arc-card]")) {
+        card.style.transform = "";
+        card.style.opacity = "";
+        card.style.zIndex = "";
+      }
+      return;
+    }
     const cards = Array.from(el.querySelectorAll<HTMLElement>("[data-arc-card]"));
     const box = el.getBoundingClientRect();
     const mid = box.left + box.width / 2;
@@ -103,6 +127,11 @@ export function ServiceArc({
       card.style.zIndex = String(Math.max(1, 100 - Math.round(a * 80)));
     });
   }, []);
+
+  useEffect(() => {
+    curved.current = wide;
+    paint();
+  }, [wide, paint]);
 
   useEffect(() => {
     const el = scroller.current;
