@@ -119,6 +119,24 @@ export const SITE_PAINT = [
 export const INDUSTRY_PAINT = ["#FF6B5B", "#2B56D6", "#FFB902", "#7C3AED"] as const;
 
 /**
+ * The same four, darkened just enough to be set as type on white.
+ *
+ * INDUSTRY_PAINT is built to be a background, and two of them cannot carry
+ * text on white at all: the coral is 2.80:1 and the gold 1.72:1. These are the
+ * same hues scaled toward black until each clears 3.5:1 — comfortably past the
+ * 3:1 that large bold text needs, with headroom.
+ *
+ *   coral   #FF6B5B -> #E25F51   3.51:1   (89% of the original)
+ *   blue    #2B56D6 -> unchanged 6.17:1
+ *   gold    #FFB902 -> #B18101   3.50:1   (70%)
+ *   violet  #7C3AED -> unchanged 5.70:1
+ *
+ * Only for large, bold type — a headline. Body copy still needs 4.5:1 and
+ * should stay ink.
+ */
+export const TEXT_PAINT = ["#E25F51", "#2B56D6", "#B18101", "#7C3AED"] as const;
+
+/**
  * Which colour each of the twelve rows gets.
  *
  * Three rows per colour, and no colour ever touches itself — the brief. A plain

@@ -7,7 +7,8 @@ import { db } from "@/lib/db";
 import { Container } from "@/components/ui/Section";
 import { StickyTOC } from "@/components/journal/StickyTOC";
 import { buildMetadata, articleJsonLd } from "@/lib/seo";
-import { slugify, localeDate, localeNumber } from "@/lib/utils";
+import { slugify, localeDate, localeNumber, labelOn, paintSeed } from "@/lib/utils";
+import { INDUSTRY_PAINT, TEXT_PAINT } from "@/lib/constants";
 import { tr, trArr, ui } from "@/lib/i18n";
 import { getLocale } from "@/lib/get-locale";
 import type { Locale } from "@/types";
@@ -64,6 +65,24 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
     orderBy: { publishedAt: "desc" },
   });
   const tags = trArr<string>(locale, p.tags, p.tagsEn, p.tagsAr);
+
+  /**
+   * A colour per tag: the pure four here, because a pill is a filled shape and
+   * its label colour is computed per hex.
+   *
+   * The colour comes from the tag itself rather than from its position, so a
+   * tag keeps the same one across every article it appears on and a new tag is
+   * coloured the moment it is written — nothing to record anywhere. The second
+   * step is the site's own rule everywhere else colour is placed: no colour
+   * ever touches itself, so a run that would repeat is nudged to the next one.
+   */
+  const tagColours = tags.reduce<{ tag: string; colour: string }[]>((acc, tag) => {
+    let idx = paintSeed(tag) % INDUSTRY_PAINT.length;
+    const prev = acc[acc.length - 1]?.colour;
+    if (prev && INDUSTRY_PAINT[idx] === prev) idx = (idx + 1) % INDUSTRY_PAINT.length;
+    acc.push({ tag, colour: INDUSTRY_PAINT[idx] });
+    return acc;
+  }, []);
   const c = COPY[locale];
 
   return (
@@ -77,7 +96,17 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
             <Link href="/" className="transition-colors hover:text-foreground">{ui(locale).navHome}</Link> ‹ <Link href="/journal" className="transition-colors hover:text-foreground">{ui(locale).navJournal}</Link>
           </nav>
           <span className="eyebrow">{category}</span>
-          <h1 className="mt-5 font-display text-4xl font-extrabold leading-[1.06] tracking-[-0.03em] text-foreground balance md:text-5xl">{title}</h1>
+          {/* The headline takes one of the four, picked from the slug so the
+              article keeps the same colour on every visit and a new article
+              gets one the moment it is written. TEXT_PAINT rather than
+              INDUSTRY_PAINT: two of the raw four cannot be set as type on
+              white at all. */}
+          <h1
+            className="mt-5 font-display text-4xl font-extrabold leading-[1.06] tracking-[-0.03em] balance md:text-5xl"
+            style={{ color: TEXT_PAINT[paintSeed(p.slug) % TEXT_PAINT.length] }}
+          >
+            {title}
+          </h1>
           <p className="mt-6 text-lg leading-relaxed text-foreground-muted">{excerpt}</p>
           <div className="mt-6 flex flex-wrap items-center gap-4 text-sm text-foreground-muted">
             {p.author && (
@@ -121,7 +150,15 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
 
         {tags.length > 0 && (
           <div className="mt-10 flex flex-wrap gap-2 border-t border-card-border pt-8">
-            {tags.map((t) => <span key={t} className="liquid-clear rounded-full px-4 py-1.5 text-sm text-foreground-muted">{t}</span>)}
+            {tagColours.map(({ tag, colour }) => (
+              <span
+                key={tag}
+                className="rounded-full px-4 py-1.5 text-sm font-medium"
+                style={{ background: colour, color: labelOn(colour) }}
+              >
+                {tag}
+              </span>
+            ))}
           </div>
         )}
       </Container>
