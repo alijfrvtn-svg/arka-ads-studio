@@ -90,7 +90,7 @@ export function SiteHeader({
             scrolled ? "glass glass-strong liquid-refract h-14" : "h-16 border border-transparent",
           )}
         >
-          <Link href="/" aria-label="آرکا" className="shrink-0">
+          <Link href="/" aria-label="آرکا" className="flex h-11 shrink-0 items-center">
             <Logo className={scrolled ? "h-6" : "h-7"} />
           </Link>
 

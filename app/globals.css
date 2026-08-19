@@ -427,6 +427,33 @@ body {
   text-transform: uppercase;
   color: var(--accent);
 }
+
+/* 12.5px on a phone; the desktop size above is untouched.
+   ------------------------------------------------------------
+   The eyebrow is nearly always Persian, and Persian at 11.2px with 0.3em
+   between the letters is not small type — it is unreadable type. The script
+   has no capitals to fall back on, its distinguishing marks are dots the size
+   of a stem, and tracking that wide pulls a joined word apart into shapes that
+   no longer read as one. It is the smallest text on the site and it sits above
+   every section heading on every page, so it is worth the 1.3px.
+
+   Written as a max-width override rather than as a mobile base with a
+   min-width override, which is the direction this file usually goes. Lightning
+   CSS folded the min-width version straight back into the base rule and threw
+   the phone values away — the same silent-merge behaviour that has bitten this
+   stylesheet before. Phrased this way the base rule is the desktop one and
+   stands alone, so the worst a dropped block can do is leave things exactly as
+   they were.
+
+   The cut is at lg, not at md: a tablet is held at arm's length like a laptop
+   is, so 11.2px of spaced-out Persian is no easier to read there than on a
+   phone. Only a desktop, where the design was signed off, keeps it. */
+@media (max-width: 1023px) {
+  .eyebrow {
+    font-size: 0.78rem;
+    letter-spacing: 0.22em;
+  }
+}
 .eyebrow::before {
   content: "";
   width: 1.75rem;
@@ -669,6 +696,53 @@ body {
    Legibility is handled per text block instead, by `.paint-plate` below. */
 .paint-canvas {
   overflow: hidden;
+}
+
+/* Below lg the painting keeps its colour but loses its torn edges.
+   ------------------------------------------------------------
+   The tearing is feTurbulence at four octaves driving feDisplacementMap at
+   scale 150 over a canvas the width of the page — by a distance the most
+   expensive thing the site asks a GPU to rasterise, and it is asked of the
+   devices with the least to give.
+
+   Not `filter: none`, which would leave four hard-edged ellipses sitting on
+   the washes and look like a mistake. A plain CSS blur in its place keeps the
+   masses soft and keeps their colour where it was, so the band still reads as
+   paint — just paint that was poured rather than thrown. A CSS `filter` beats
+   the SVG presentation attribute, which is what lets this be a media query
+   rather than a second component.
+
+   The flecks lose their filter outright: they are 6-15px circles, and at that
+   size a torn edge was never visible anyway. */
+@media (max-width: 1023px) {
+  .paint-canvas svg g[filter*="splat"] {
+    filter: blur(11px);
+  }
+
+  .paint-canvas svg g[filter*="fleck"] {
+    filter: none;
+  }
+}
+
+/* Grain is a full-screen overlay-blended layer, so the entire hero — video
+   included — has to composite through it every frame. At 0.13 over a 6in
+   screen it is below the noise floor of the panel it is drawn on. Phones
+   only: on a tablet the hero is large enough for it to still do its job. */
+@media (max-width: 767px) {
+  .film-grain {
+    display: none;
+  }
+}
+
+/* The orbiting circles behind the industry rows are decorative, and they are
+   the worst possible shape for a phone: thirty-odd elements each carrying a
+   14-36px blur, all of them inside an element that animates forever. Blur is
+   re-rasterised as the layer transforms, so this is per-frame work for
+   something nobody is looking at. */
+@media (max-width: 1023px) {
+  .ind-orbits {
+    display: none;
+  }
 }
 
 /* The live wave on the About hero fades in over its own top third, so the
@@ -1782,16 +1856,33 @@ h3 {
    white page and back to white over ink — one element, always visible, no
    colour involved.
    ============================================================ */
+/* Hidden by default, shown only where there is a pointer to follow.
+   ------------------------------------------------------------
+   The script already refused to run without `(hover: hover) and
+   (pointer: fine)` — but it returned before doing anything, which left both
+   elements sitting at top-left with nothing to move them. On every phone that
+   was a 6px dot and a 38px ring pinned to the corner of the screen, inverted
+   by the difference blend. Gating the CSS on the same query is what actually
+   removes them, and it takes two composited difference-blend layers off every
+   touch device with them. */
 .cursor-dot,
 .cursor-ring {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 9999;
-  pointer-events: none;
-  border-radius: 50%;
-  mix-blend-mode: difference;
-  will-change: transform;
+  display: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .cursor-dot,
+  .cursor-ring {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 9999;
+    pointer-events: none;
+    border-radius: 50%;
+    mix-blend-mode: difference;
+    will-change: transform;
+  }
 }
 .cursor-dot {
   width: 6px;

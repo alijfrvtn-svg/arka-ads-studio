@@ -99,7 +99,7 @@ export function ProjectCard({
             {tags.map((t) => (
               <span
                 key={t}
-                className="rounded-full border border-white/20 bg-white/10 px-2.5 py-0.5 text-[11px] text-white/75 backdrop-blur-sm"
+                className="rounded-full border border-white/20 bg-white/10 px-2.5 py-0.5 text-[0.72rem] lg:text-[11px] text-white/75 backdrop-blur-sm"
               >
                 {t}
               </span>

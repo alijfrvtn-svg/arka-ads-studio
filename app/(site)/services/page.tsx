@@ -94,7 +94,7 @@ export default async function ServicesPage() {
                       <div>
                         <h2 className="font-display text-2xl font-bold tracking-tight">{tr(locale, dept.title, dept.titleEn, dept.titleAr)}</h2>
                         {locale === "fa" && (
-                          <p className="text-[0.65rem] uppercase tracking-[0.25em] opacity-75">{dept.titleEn}</p>
+                          <p className="text-[0.72rem] uppercase tracking-[0.16em] opacity-75 lg:text-[0.65rem] lg:tracking-[0.25em]">{dept.titleEn}</p>
                         )}
                       </div>
                     </div>

@@ -260,7 +260,7 @@ export function IndustryShowcase({ industries, locale = "fa" }: { industries: In
                       </span>
                       {locale === "fa" && ind.titleEn && (
                         <span
-                          className="mt-0.5 block truncate text-[0.6rem] uppercase tracking-[0.22em] transition-opacity duration-500"
+                          className="mt-0.5 block truncate text-[0.7rem] uppercase tracking-[0.12em] transition-opacity duration-500 lg:text-[0.6rem] lg:tracking-[0.22em]"
                           // 0.85 is the floor, not a taste: at 0.6 the label
                           // lands at 3.01:1 on the violet and 3.26 on the blue.
                           // Measured across the four, 0.85 is where the worst
@@ -331,7 +331,7 @@ export function IndustryShowcase({ industries, locale = "fa" }: { industries: In
             transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
           >
               {locale === "fa" && cur.titleEn && (
-                <span className="text-[0.65rem] font-semibold uppercase tracking-[0.28em] text-white/70">
+                <span className="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-white/70 lg:text-[0.65rem] lg:tracking-[0.28em]">
                   {cur.titleEn}
                 </span>
               )}

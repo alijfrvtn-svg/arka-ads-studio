@@ -2,8 +2,17 @@
 
 import { useRef } from "react";
 import { motion, useMotionValue, useSpring } from "framer-motion";
+import { useMediaQuery, FINE_POINTER } from "@/lib/use-media";
 
-/** Element that leans toward the cursor — cinematic magnetic hover. */
+/**
+ * Element that leans toward the cursor — cinematic magnetic hover.
+ *
+ * Inert without a cursor to lean toward, and that has to be said out loud
+ * rather than left to `onMouseMove` never firing: a tap on a touchscreen
+ * synthesises a mousemove at the point of contact before it sends the click,
+ * so the button would jump out from under the finger that was pressing it and
+ * stay there — there is no pointerleave coming to put it back.
+ */
 export function Magnetic({
   children,
   strength = 0.35,
@@ -13,6 +22,7 @@ export function Magnetic({
   strength?: number;
   className?: string;
 }) {
+  const fine = useMediaQuery(FINE_POINTER);
   const ref = useRef<HTMLDivElement>(null);
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -34,8 +44,8 @@ export function Magnetic({
   return (
     <motion.div
       ref={ref}
-      onMouseMove={onMove}
-      onMouseLeave={reset}
+      onMouseMove={fine ? onMove : undefined}
+      onMouseLeave={fine ? reset : undefined}
       style={{ x: sx, y: sy }}
       className={className}
     >

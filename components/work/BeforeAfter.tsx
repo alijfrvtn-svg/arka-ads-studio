@@ -21,9 +21,12 @@ export function BeforeAfter({ before, after, locale = "fa" }: { before: string; 
   return (
     <div
       ref={ref}
-      className="relative aspect-[16/10] w-full select-none overflow-hidden rounded-2xl border border-card-border"
+      className="relative aspect-[16/10] w-full touch-pan-y select-none overflow-hidden rounded-2xl border border-card-border"
       onMouseMove={(e) => e.buttons === 1 && onMove(e.clientX)}
-      onTouchMove={(e) => onMove(e.touches[0].clientX)}
+      onTouchMove={(e) => {
+        const t = e.touches[0];
+        if (t) onMove(t.clientX);
+      }}
       onClick={(e) => onMove(e.clientX)}
     >
       {/* after (full) */}

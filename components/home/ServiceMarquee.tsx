@@ -133,7 +133,7 @@ function MarqueeCardFace({ card, duplicate }: { card: MarqueeCard; duplicate: bo
       className="h-full w-full object-cover"
     />
   ) : (
-    <span className="grid h-full w-full place-items-center bg-surface-2 px-3 text-center text-[11px] font-medium leading-snug text-foreground-muted">
+    <span className="grid h-full w-full place-items-center bg-surface-2 px-3 text-center text-[0.72rem] lg:text-[11px] font-medium leading-snug text-foreground-muted">
       {card.title}
     </span>
   );

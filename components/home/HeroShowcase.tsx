@@ -398,7 +398,7 @@ export function HeroShowcase({
               onClick={() => step(i)}
               aria-label={`${t.go}: ${s.title}`}
               aria-current={i === index}
-              className="grid h-11 w-8 place-items-center"
+              className="grid h-11 w-11 shrink-0 place-items-center"
             >
               <span
                 className={cn(
@@ -460,7 +460,7 @@ function ShowcaseCardFace({
            land. */
         <span className="flex h-full w-full flex-col items-center justify-center gap-2 bg-surface-2 px-3 text-center">
           <ImageIcon className="h-5 w-5 text-foreground-faint" aria-hidden />
-          <span className="text-[11px] font-medium leading-snug text-foreground-muted">{card.title}</span>
+          <span className="text-[0.72rem] lg:text-[11px] font-medium leading-snug text-foreground-muted">{card.title}</span>
         </span>
       )}
     </Link>

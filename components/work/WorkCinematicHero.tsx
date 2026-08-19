@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
+import { useMediaQuery, DESKTOP } from "@/lib/use-media";
 import { ChevronLeft, Play, Volume2, VolumeX } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Locale } from "@/types";
@@ -103,6 +104,13 @@ export function WorkCinematicHero({ locale = "fa" }: { locale?: Locale }) {
   // The frame drifts and closes in a little as the page scrolls off it. Scroll
   // linked rather than timed, so it tracks the reader instead of running on its
   // own clock.
+  //
+  // Desktop only. On a phone the address bar collapses on the first flick of
+  // scrolling, the viewport grows by ~60px mid-gesture, and every scroll-linked
+  // value re-resolves against a stage that just changed height — the video
+  // lurches at exactly the moment the reader is looking straight at it. There
+  // is no way to smooth that away, so the phone gets a still frame instead.
+  const parallax = useMediaQuery(DESKTOP);
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start start", "end start"] });
   const y = useTransform(scrollYProgress, [0, 1], ["0%", "12%"]);
   const scale = useTransform(scrollYProgress, [0, 1], [1, 1.09]);
@@ -207,7 +215,7 @@ export function WorkCinematicHero({ locale = "fa" }: { locale?: Locale }) {
           element itself free for object-fit. */}
       <motion.div
         className="absolute inset-0 will-change-transform"
-        style={reduced ? undefined : { y, scale }}
+        style={reduced || !parallax ? undefined : { y, scale }}
       >
         <video
           ref={videoRef}
@@ -257,7 +265,7 @@ export function WorkCinematicHero({ locale = "fa" }: { locale?: Locale }) {
             animate={reduced ? undefined : { opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
           >
-            <span className="text-[0.7rem] font-semibold uppercase tracking-[0.28em] text-white/65">
+            <span className="text-[0.78rem] font-semibold uppercase tracking-[0.18em] text-white/65 lg:text-[0.7rem] lg:tracking-[0.28em]">
               {c.eyebrow}
             </span>
             <h1 className="mt-5 max-w-4xl font-display text-4xl font-extrabold leading-[1.06] tracking-[-0.03em] text-white/80 balance sm:text-5xl md:text-6xl lg:text-7xl">
@@ -322,7 +330,7 @@ export function WorkCinematicHero({ locale = "fa" }: { locale?: Locale }) {
         <div className="pointer-events-none absolute bottom-7 left-0 right-0 hidden justify-center md:flex">
           <motion.span
             aria-hidden
-            className="flex flex-col items-center gap-2 text-[0.65rem] uppercase tracking-[0.22em] text-white/70"
+            className="flex flex-col items-center gap-2 text-[0.72rem] uppercase tracking-[0.14em] text-white/70 lg:text-[0.65rem] lg:tracking-[0.22em]"
             animate={reduced ? undefined : { y: [0, 7, 0] }}
             transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
           >

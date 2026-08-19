@@ -174,7 +174,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={r.cover} alt="" className="h-20 w-28 shrink-0 rounded-xl object-cover transition-all duration-700" />
                   <div>
-                    <span className="text-[0.65rem] uppercase tracking-[0.2em] text-foreground-faint">{tr(locale, r.category, r.categoryEn, r.categoryAr)}</span>
+                    <span className="text-[0.72rem] uppercase tracking-[0.12em] text-foreground-faint lg:text-[0.65rem] lg:tracking-[0.2em]">{tr(locale, r.category, r.categoryEn, r.categoryAr)}</span>
                     <h3 className="mt-1.5 font-display font-bold leading-snug tracking-tight text-foreground">{tr(locale, r.title, r.titleEn, r.titleAr)}</h3>
                   </div>
                 </Link>

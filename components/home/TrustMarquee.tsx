@@ -11,7 +11,7 @@ export function TrustMarquee({
   const row = clients.length ? clients : [{ name: "برند" }];
   return (
     <div className="seam-top seam-bottom py-10">
-      <p className="container-x mb-8 text-center text-[0.7rem] uppercase tracking-[0.3em] text-foreground-faint">
+      <p className="container-x mb-8 text-center text-[0.78rem] uppercase tracking-[0.18em] text-foreground-faint lg:text-[0.7rem] lg:tracking-[0.3em]">
         {caption}
       </p>
       <Marquee speed={38}>

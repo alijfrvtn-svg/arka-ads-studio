@@ -96,7 +96,15 @@ export function JournalDeck({
 
   return (
     <div>
-      <div className="relative aspect-[16/10] max-h-[58svh] w-full md:aspect-[16/9]">
+      {/* Portrait on a phone, landscape from sm up.
+          ------------------------------------------------------------
+          16/10 is a shape that only works once the card is wide. At 320px it
+          left a 272x170 plate holding a category chip, a reading-time pill, a
+          three-line Persian headline and a 46px button — the headline started
+          30px above the top of the card and ran straight through the chips.
+          A cover is portrait anyway, so below sm it becomes one and the content
+          gets the 360px it actually needs. */}
+      <div className="relative aspect-[3/4] max-h-[62svh] w-full sm:aspect-[16/10] md:aspect-[16/9]">
         {posts.map((p, k) => {
           const depth = (k - i + n) % n;
           const isFront = depth === 0;
@@ -207,7 +215,7 @@ export function JournalDeck({
               onClick={() => setI(k)}
               aria-label={`${postLabel} ${localeDigits(locale, k + 1)}`}
               aria-current={active}
-              className="grid h-11 w-8 place-items-center"
+              className="grid h-11 w-11 shrink-0 place-items-center"
             >
               <span
                 className="block h-1.5 rounded-full transition-all duration-500 [transition-timing-function:var(--ease-apple)]"

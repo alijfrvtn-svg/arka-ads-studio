@@ -263,7 +263,7 @@ export default async function CaseStudy({ params }: { params: Promise<{ slug: st
           <img src={next.cover} alt="" className="absolute inset-0 h-full w-full object-cover opacity-30 transition-transform duration-[900ms] [transition-timing-function:var(--ease-apple)] group-hover:scale-[1.04]" />
           <div className="absolute inset-0 bg-background/75" />
           <Container className="relative py-32 text-center">
-            <p className="text-[0.7rem] uppercase tracking-[0.3em] text-foreground-faint">{ui(locale).nextProject}</p>
+            <p className="text-[0.78rem] uppercase tracking-[0.18em] text-foreground-faint lg:text-[0.7rem] lg:tracking-[0.3em]">{ui(locale).nextProject}</p>
             <h2 className="mx-auto mt-4 max-w-3xl font-display text-3xl font-extrabold tracking-[-0.03em] text-foreground md:text-5xl">{tr(locale, next.title, next.titleEn, next.titleAr)}</h2>
             <span className="liquid liquid-raised mt-10 inline-flex items-center gap-2 rounded-full px-8 py-4 font-semibold">
               <span className="inline-flex items-center gap-2">

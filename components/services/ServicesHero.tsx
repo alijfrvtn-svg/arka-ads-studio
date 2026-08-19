@@ -150,7 +150,7 @@ export function ServicesHero({
                       {tr(locale, dept.title, dept.titleEn, dept.titleAr)}
                     </span>
                     {locale === "fa" && (
-                      <span className="mt-1 block truncate text-[0.65rem] uppercase tracking-[0.24em] opacity-85">
+                      <span className="mt-1 block truncate text-[0.72rem] uppercase tracking-[0.14em] opacity-85 lg:text-[0.65rem] lg:tracking-[0.24em]">
                         {dept.titleEn}
                       </span>
                     )}
@@ -196,7 +196,7 @@ export function ServicesHero({
         <motion.span
           aria-hidden
           style={{ opacity: hintOpacity }}
-          className="pointer-events-none sticky bottom-6 z-10 mx-auto block w-fit rounded-full bg-foreground/85 px-4 py-2 text-[0.7rem] font-medium text-background backdrop-blur"
+          className="pointer-events-none sticky bottom-6 z-10 mx-auto block w-fit rounded-full bg-foreground/85 px-4 py-2 text-[0.78rem] font-medium text-background backdrop-blur lg:text-[0.7rem]"
         >
           {c.hint}
         </motion.span>

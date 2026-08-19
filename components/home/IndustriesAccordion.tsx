@@ -87,7 +87,7 @@ function Orbits() {
   const r = rand(9271);
   let angle = 0;
   return (
-    <div className="pointer-events-none absolute -inset-x-[26%] -inset-y-[10%] z-0" aria-hidden>
+    <div className="ind-orbits pointer-events-none absolute -inset-x-[26%] -inset-y-[10%] z-0" aria-hidden>
       {groups.map((g, gi) => (
         <div
           key={gi}
@@ -225,7 +225,7 @@ export function IndustriesAccordion({
                           </span>
                           {locale === "fa" && ind.titleEn && (
                             <span
-                              className="mt-0.5 block text-[0.6rem] uppercase tracking-[0.25em]"
+                              className="mt-0.5 block text-[0.7rem] uppercase tracking-[0.14em] lg:text-[0.6rem] lg:tracking-[0.25em]"
                               // 0.85, not lower: this micro-line is 0.6rem, so
                               // it needs 4.5:1, and at 0.72 it sits at 3.65 on
                               // the violet. 0.85 puts the worst of the four at

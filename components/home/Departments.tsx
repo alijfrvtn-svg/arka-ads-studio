@@ -102,7 +102,7 @@ export function Departments({
                     {locale === "fa" && d.titleEn && (
                       <p
                         className={cn(
-                          "mt-1.5 text-[0.65rem] uppercase tracking-[0.25em]",
+                          "mt-1.5 text-[0.72rem] uppercase tracking-[0.18em] lg:text-[0.65rem] lg:tracking-[0.25em]",
                           poster ? "text-white/65" : "text-foreground-faint",
                         )}
                       >

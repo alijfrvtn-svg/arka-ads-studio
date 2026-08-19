@@ -94,9 +94,24 @@ export function ParticleWave({ className }: { className?: string }) {
     let running = true;
     let w = 0;
     let h = 0;
-    // Capped at 2: past that the dot count quadruples for a difference nobody
-    // can see on a field of 1px marks.
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+    /**
+     * Whether this device has a pointer that could press into the surface.
+     *
+     * Not a width query: a touch laptop is wide and still has no hover, and a
+     * stylus tablet is narrow and does. The dent is meaningless without a
+     * pointer that hovers, so it is bound to the capability rather than to a
+     * breakpoint.
+     */
+    const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+
+    /**
+     * Phones pay twice for pixel ratio — once in the dots they have to place
+     * and once in the fill they have to push — and they have the least to
+     * spend. 1.5 is indistinguishable from 2 on a field of 2px marks.
+     */
+    const small = window.matchMedia("(max-width: 1023px)").matches;
+    const dpr = Math.min(window.devicePixelRatio || 1, small ? 1.5 : 2);
 
     const resize = () => {
       const r = canvas.getBoundingClientRect();
@@ -179,9 +194,13 @@ export function ParticleWave({ className }: { className?: string }) {
       // between dots where it was.
       const cols = Math.max(MIN_COLS, Math.min(COLS, Math.round(w / 6.7)));
 
-      for (let ri = 0; ri < ROWS; ri++) {
+      // Fewer rows on a phone as well as fewer columns: the surface reads by
+      // its spacing, and at this width the back rows overlap anyway.
+      const rows = small ? 26 : ROWS;
+
+      for (let ri = 0; ri < rows; ri++) {
         // 0 far, 1 near.
-        const d = ri / (ROWS - 1);
+        const d = ri / (rows - 1);
         // Rows widen as they come forward, which is the whole of the
         // perspective — no matrix, no z divide. It starts above 1 so even the
         // farthest row is wider than the canvas: at 0.72 the back of the
@@ -265,7 +284,7 @@ export function ParticleWave({ className }: { className?: string }) {
     // Setting canvas.width wipes the surface, so a resize has to be followed
     // by a draw immediately. Waiting for the next frame leaves it blank while
     // the loop is paused off-screen, or while rAF is throttled.
-    if (!reduced) {
+    if (!reduced && finePointer) {
       window.addEventListener("pointermove", onMove, { passive: true });
       window.addEventListener("pointerdown", onMove, { passive: true });
       document.addEventListener("pointerleave", onOut);

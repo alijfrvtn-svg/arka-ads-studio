@@ -88,7 +88,12 @@ export function Testimonials({ items, content, locale = "fa" }: { items: T[]; co
   const longest = items.reduce((a, b) => (b.quote.length > a.quote.length ? b : a), items[0]);
 
   return (
-    <Section id="testimonials">
+    // The fan overhangs its container by ~25px a side, which is by design: on
+    // desktop the gutter absorbs it. On a phone the gutter is 24px, so the
+    // outermost card poked 1px past the viewport and gave the whole document a
+    // horizontal scroll. `clip` rather than `hidden` — hidden would make this
+    // section a scroll container and take the sticky header's context with it.
+    <Section id="testimonials" className="overflow-x-clip">
       <Container>
         <SectionHeading
           align="center"
@@ -216,7 +221,7 @@ export function Testimonials({ items, content, locale = "fa" }: { items: T[]; co
                   onClick={() => setI(k)}
                   aria-label={`${REVIEW_WORD[locale]} ${localeDigits(locale, k + 1)}`}
                   aria-current={k === i}
-                  className="grid h-11 w-8 place-items-center"
+                  className="grid h-11 w-11 shrink-0 place-items-center"
                 >
                   <span
                     className={`block h-1.5 rounded-full transition-all duration-500 [transition-timing-function:var(--ease-apple)] ${k === i ? "w-7 bg-foreground" : "w-1.5 bg-foreground/20"}`}
