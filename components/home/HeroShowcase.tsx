@@ -7,6 +7,7 @@ import { ArrowUpLeft, ChevronLeft, ChevronRight, ImageIcon } from "lucide-react"
 import { Typewriter } from "@/components/fx/Typewriter";
 import { Magnetic } from "@/components/fx/Magnetic";
 import { cn } from "@/lib/utils";
+import { MARQUEE_SMALL_VARIANTS, smallVariant } from "@/lib/marquee-variants";
 import type { Locale } from "@/types";
 
 export interface ShowcaseCard {
@@ -430,6 +431,10 @@ function ShowcaseCardFace({
   focused?: boolean;
   compact?: boolean;
 }) {
+  // Only the static artwork has a smaller sibling; a Media Library upload
+  // or a remote cover is served exactly as before.
+  const small = card.image && MARQUEE_SMALL_VARIANTS.has(card.image) ? smallVariant(card.image) : null;
+
   return (
     <Link
       href={`/services/${card.slug}`}
@@ -449,6 +454,21 @@ function ShowcaseCardFace({
         // eslint-disable-next-line @next/next/no-img-element
         <img
           src={card.image}
+          // These are the only eager images on the homepage, so they are the
+          // ones competing with the LCP — and they were the full 720px file
+          // for a card that is never wider than 160px. `sizes` is the card's
+          // own clamp, so the browser resolves the same number the layout
+          // does: a 2x screen takes the 420px sibling at 31KB, a 3x screen
+          // still needs more than 420 and keeps the original. Seven cards, so
+          // this is ~440KB off the critical path on most devices.
+          srcSet={small ? `${small} 420w, ${card.image} 720w` : undefined}
+          sizes={
+            small
+              ? compact
+                ? "(max-width: 1023px) 144px, clamp(144px, 17vw, 200px)"
+                : "(max-width: 1023px) 176px, clamp(176px, 22vw, 256px)"
+              : undefined
+          }
           alt={card.title}
           loading="eager"
           decoding="async"
