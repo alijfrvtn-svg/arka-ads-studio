@@ -706,31 +706,34 @@ body {
   overflow: hidden;
 }
 
-/* Below lg the painting keeps its colour but loses its torn edges.
+/* Which of the two compositions is on show.
    ------------------------------------------------------------
-   The tearing is feTurbulence at four octaves driving feDisplacementMap at
-   scale 150 over a canvas the width of the page — by a distance the most
-   expensive thing the site asks a GPU to rasterise, and it is asked of the
-   devices with the least to give.
+   The wide one is the section's shape on a desktop; below lg the section is a
+   tall column and a landscape painting cropped to fit it is not a painting any
+   more — measured, 9% of its width survived. The portrait composition takes
+   over there. Both live in the DOM; only one is ever rasterised. */
+.paint-portrait {
+  display: none;
+}
 
-   Not `filter: none`, which would leave four hard-edged ellipses sitting on
-   the washes and look like a mistake. A plain CSS blur in its place keeps the
-   masses soft and keeps their colour where it was, so the band still reads as
-   paint — just paint that was poured rather than thrown. A CSS `filter` beats
-   the SVG presentation attribute, which is what lets this be a media query
-   rather than a second component.
-
-   The flecks lose their filter outright: they are 6-15px circles, and at that
-   size a torn edge was never visible anyway. */
 @media (max-width: 1023px) {
-  .paint-canvas svg g[filter*="splat"] {
-    filter: blur(11px);
+  .paint-landscape {
+    display: none;
   }
 
-  .paint-canvas svg g[filter*="fleck"] {
-    filter: none;
+  .paint-portrait {
+    display: block;
   }
 }
+
+/* The portrait canvas carries its own cost control rather than having one
+   imposed here. It used to be this: below lg the wide painting's displacement
+   filters were replaced with a flat CSS blur, because feTurbulence at four
+   octaves across a full-width canvas is the most expensive thing the site
+   rasterises. That rule is gone because the canvas it was written for is no
+   longer drawn at these widths — the portrait one is, and it is built cheap:
+   two octaves instead of four, over a box a quarter the width. Overriding it
+   here would only flatten artwork that is already within budget. */
 
 /* Grain is a full-screen overlay-blended layer, so the entire hero — video
    included — has to composite through it every frame. At 0.13 over a 6in
