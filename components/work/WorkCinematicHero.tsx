@@ -279,7 +279,7 @@ export function WorkCinematicHero({ locale = "fa" }: { locale?: Locale }) {
             <span className="text-[0.78rem] font-semibold uppercase tracking-[0.18em] text-white/65 lg:text-[0.7rem] lg:tracking-[0.28em]">
               {c.eyebrow}
             </span>
-            <h1 className="mt-5 max-w-4xl font-display text-4xl font-extrabold leading-[1.06] tracking-[-0.03em] text-white/80 balance sm:text-5xl md:text-6xl lg:text-7xl">
+            <h1 className="mt-5 max-w-4xl font-display text-3xl font-extrabold leading-[1.06] tracking-[-0.03em] text-white/80 balance sm:text-5xl md:text-6xl lg:text-7xl">
               {c.title} <span className="text-white">{c.highlight}</span>
             </h1>
             <p className="mt-6 max-w-xl text-base leading-relaxed text-white/75 md:text-lg">

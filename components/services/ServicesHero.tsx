@@ -145,12 +145,18 @@ export function ServicesHero({
                   >
                     <Icon name={dept.icon} className="h-6 w-6" />
                   </span>
+                  {/* `truncate` only from lg. The band is 183px wide on a
+                      phone and these names are longer than that — "برندینگ و
+                      طراحی گرافیک" wants 230px, "مارکتینگ و استراتژی محتوا"
+                      wants 250 — so every department was arriving with its own
+                      name cut off mid-word behind an ellipsis. It is the label
+                      of the whole slide; it wraps instead. */}
                   <span className="min-w-0">
-                    <span className="block truncate font-display text-2xl font-extrabold tracking-tight md:text-4xl">
+                    <span className="block font-display text-xl font-extrabold leading-snug tracking-tight md:text-4xl lg:truncate">
                       {tr(locale, dept.title, dept.titleEn, dept.titleAr)}
                     </span>
                     {locale === "fa" && (
-                      <span className="mt-1 block truncate text-[0.72rem] uppercase tracking-[0.14em] opacity-85 lg:text-[0.65rem] lg:tracking-[0.24em]">
+                      <span className="mt-1 block text-[0.72rem] uppercase leading-snug tracking-[0.14em] opacity-85 lg:truncate lg:text-[0.65rem] lg:tracking-[0.24em]">
                         {dept.titleEn}
                       </span>
                     )}
