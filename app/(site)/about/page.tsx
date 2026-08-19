@@ -84,26 +84,35 @@ export default async function AboutPage() {
               return (
                 <Reveal key={v.title} delay={i * 0.08} className="h-full">
                   <div
-                    className="ind-row group flex aspect-[4/5] flex-col justify-end overflow-hidden rounded-[1.75rem] p-7 transition-all duration-700 [transition-timing-function:var(--ease-apple)] hover:-translate-y-1.5 hover:shadow-[0_1px_2px_rgba(0,0,0,0.1),0_36px_70px_-30px_rgba(0,0,0,0.5)]"
+                    className="ind-row group aspect-[4/5] overflow-hidden rounded-[1.75rem] transition-all duration-700 [transition-timing-function:var(--ease-apple)] hover:-translate-y-1.5 hover:shadow-[0_1px_2px_rgba(0,0,0,0.1),0_36px_70px_-30px_rgba(0,0,0,0.5)]"
                     style={{ background: colour, color: label }}
                   >
                     {/* The cast-glass shell, as on every other coloured surface
                         here. `.ind-row` is what gives it something to size to. */}
                     <span className="crystal" aria-hidden />
-                    <span
-                      className={cn(
-                        "absolute right-6 top-6 grid h-12 w-12 place-items-center rounded-[15px] border",
-                        onDark ? "border-white/35 bg-white/15" : "border-black/20 bg-black/[0.07]",
-                      )}
-                    >
-                      <I className="h-5 w-5" />
-                    </span>
-                    <h3 className="font-display text-[1.35rem] font-bold leading-snug tracking-tight">{v.title}</h3>
-                    {/* 0.85 is the measured floor: below it the description
-                        drops under 4.5:1 on the violet. */}
-                    <p className="mt-2.5 text-sm leading-relaxed" style={{ opacity: 0.85 }}>
-                      {v.desc}
-                    </p>
+                    {/* One wrapper holds everything, and the chip is positioned
+                        against it rather than against the card. `.ind-row`
+                        forces `position: relative` on each of its own direct
+                        children — that is the rule that lifts content above the
+                        crystal — so a chip placed directly on the card had its
+                        `absolute` overridden and dropped into the flex column
+                        on top of the title. */}
+                    <div className="relative flex h-full flex-col justify-end p-7">
+                      <span
+                        className={cn(
+                          "absolute right-6 top-6 grid h-12 w-12 place-items-center rounded-[15px] border",
+                          onDark ? "border-white/35 bg-white/15" : "border-black/20 bg-black/[0.07]",
+                        )}
+                      >
+                        <I className="h-5 w-5" />
+                      </span>
+                      <h3 className="font-display text-[1.35rem] font-bold leading-snug tracking-tight">{v.title}</h3>
+                      {/* 0.85 is the measured floor: below it the description
+                          drops under 4.5:1 on the violet. */}
+                      <p className="mt-2.5 text-sm leading-relaxed" style={{ opacity: 0.85 }}>
+                        {v.desc}
+                      </p>
+                    </div>
                   </div>
                 </Reveal>
               );
