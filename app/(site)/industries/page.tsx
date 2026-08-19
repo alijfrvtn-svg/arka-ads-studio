@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { PageHero } from "@/components/ui/PageHero";
+import { IndustriesHero } from "@/components/industries/IndustriesHero";
 import { Section, Container } from "@/components/ui/Section";
 import { IndustryShowcase } from "@/components/industries/IndustryShowcase";
 import { getIndustries } from "@/lib/queries";
@@ -45,11 +45,13 @@ export default async function IndustriesPage() {
   const c = COPY[locale];
   return (
     <>
-      <PageHero
+      <IndustriesHero
         eyebrow={ui(locale).navIndustries}
         breadcrumb={[{ label: ui(locale).navHome, href: "/" }, { label: ui(locale).navIndustries }]}
         title={<>{c.title} <span className="text-gradient">{c.highlight}</span></>}
         description={c.description}
+        count={industries.length}
+        locale={locale}
       />
       <Section>
         <Container>
