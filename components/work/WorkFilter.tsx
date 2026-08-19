@@ -65,8 +65,15 @@ export function WorkFilter({
           and pushed 16px past the right edge, giving the whole page a
           horizontal scroll. The glass spans edge to edge on its own, and the
           `container-x` inside is what lines the chips up with the grid
-          below. */}
-      <div className="glass glass-strong sticky top-[72px] z-20 mb-12 rounded-none border-x-0 py-3.5">
+          below.
+
+          `border-x-0!` needs the important: .glass sets `border: 1px` in
+          globals.css, which is hand-written and therefore sorts after the
+          utilities at equal specificity, so the plain utility lost and the two
+          side hairlines survived. They cost 1px of the bar's content box on
+          each side, which pushed the chip row a pixel off the grid at any
+          width narrow enough that container-x is not centred. */}
+      <div className="glass glass-strong sticky top-[72px] z-20 mb-12 rounded-none border-x-0! py-3.5">
         <div className="container-x flex gap-2 overflow-x-auto">
           {cats.map((c) => (
             <button
