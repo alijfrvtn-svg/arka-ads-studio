@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowUpLeft } from "lucide-react";
 import { Reveal } from "@/components/fx/Reveal";
 import { cn } from "@/lib/utils";
+import { MARQUEE_SMALL_VARIANTS, smallVariant } from "@/lib/marquee-variants";
 
 export interface MarqueeCard {
   slug: string;
@@ -28,9 +29,19 @@ export interface MarqueeCard {
  * Cost
  * ----
  * 28 cards x 2 copies x 2 rows would be 112 <img> elements on every page. The
- * rows are split — 14 cards each — so it is 56, and each card is ~90KB of webp
- * at 720px. They are `loading="lazy"` and the band is below the fold on every
- * page, so nothing here competes with the LCP.
+ * rows are split — 14 cards each — so it is 56, and they are `loading="lazy"`
+ * below the fold on every page, so nothing here competes with the LCP.
+ *
+ * They used to be ~94KB each. The file behind a card is its service's `cover`,
+ * which the homepage hero deck and the service page hero also read and render
+ * at 233px — so it is 720px wide, and this band was downloading all of that to
+ * fill a tile 102px across on a phone and 139px on a desktop. Over 28 cards
+ * that is 2.6MB of a 1MB page budget, on a link where an 80KB image has been
+ * measured stalling eleven seconds.
+ *
+ * Each one now has a 420px sibling and the srcset offers both: enough for the
+ * largest tile here on a 3x screen, and every other use of `cover` still gets
+ * the original untouched. 2.6MB -> 0.8MB, 94KB -> 29KB a card.
  */
 export function ServiceMarquee({
   cards,
@@ -123,10 +134,20 @@ function MarqueeRow({ cards, direction }: { cards: MarqueeCard[]; direction: "lt
 }
 
 function MarqueeCardFace({ card, duplicate }: { card: MarqueeCard; duplicate: boolean }) {
+  // Only the static artwork has a small sibling. A cover uploaded to the Media
+  // Library, or pasted from a remote host, is served exactly as it was before —
+  // the manifest is the guard, since a derived filename that does not exist
+  // would be a 404 inside a srcset, and browsers do not fall back from those.
+  const small = card.image && MARQUEE_SMALL_VARIANTS.has(card.image) ? smallVariant(card.image) : null;
+
   const inner = card.image ? (
     // eslint-disable-next-line @next/next/no-img-element
     <img
       src={card.image}
+      // Widths, not densities: the tile is a different size on a phone than on
+      // a desktop, so the browser needs both numbers to choose properly.
+      srcSet={small ? `${small} 420w, ${card.image} 720w` : undefined}
+      sizes={small ? "(max-width: 1023px) 112px, 140px" : undefined}
       alt={duplicate ? "" : card.title}
       loading="lazy"
       decoding="async"

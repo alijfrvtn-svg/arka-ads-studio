@@ -15,3 +15,45 @@
     Referrer-Policy = "strict-origin-when-cross-origin"
     Permissions-Policy = "camera=(), microphone=(), geolocation=()"
     Strict-Transport-Security = "max-age=63072000; includeSubDomains; preload"
+
+# ── Static artwork and video ────────────────────────────────────────────────
+# Netlify's default for anything under public/ is
+# `public, max-age=0, must-revalidate`, which means the browser asks the edge
+# about every file on every page view. The closing marquee lives in the site
+# layout and carries 28 images, so that default was costing 28 conditional
+# round trips on *every* navigation — on a link where an 80KB image has been
+# measured stalling eleven seconds, that is most of the page's time budget
+# spent asking about files that had not changed.
+#
+# A day of hard caching with a week of stale-while-revalidate: a repeat visit
+# inside a day makes no request at all, and after that the stale copy is shown
+# instantly while a fresh one is fetched behind it. Not `immutable`, and not a
+# year — these filenames are stable rather than content-hashed, so replaced
+# artwork has to be able to propagate. It does, within a day.
+#
+# Next's own hashed output under /_next/static already gets
+# `max-age=31536000, immutable` from the plugin and is untouched here.
+[[headers]]
+  for = "/services/*"
+  [headers.values]
+    Cache-Control = "public, max-age=86400, stale-while-revalidate=604800"
+
+[[headers]]
+  for = "/service-cards/*"
+  [headers.values]
+    Cache-Control = "public, max-age=86400, stale-while-revalidate=604800"
+
+[[headers]]
+  for = "/departments/*"
+  [headers.values]
+    Cache-Control = "public, max-age=86400, stale-while-revalidate=604800"
+
+[[headers]]
+  for = "/brand/*"
+  [headers.values]
+    Cache-Control = "public, max-age=86400, stale-while-revalidate=604800"
+
+[[headers]]
+  for = "/video/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800, stale-while-revalidate=604800"

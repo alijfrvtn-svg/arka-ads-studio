@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ArrowUpLeft, ChevronLeft, ChevronRight } from "lucide-react";
 import { Icon } from "@/components/ui/Icon";
 import { SERVICE_CARD_IMAGE } from "@/lib/constants";
+import { ARC_SMALL_VARIANTS, smallVariant } from "@/lib/marquee-variants";
 import { cn, localeNumber } from "@/lib/utils";
 import { tr, ui } from "@/lib/i18n";
 import type { Locale } from "@/types";
@@ -139,6 +140,7 @@ export function ServiceArc({
         {services.map((s) => {
           // The arc's own artwork, not `cover` — see SERVICE_CARD_IMAGE.
           const art = SERVICE_CARD_IMAGE[s.slug] ?? s.cover;
+          const artSmall = art && ARC_SMALL_VARIANTS.has(art) ? smallVariant(art) : null;
           return (
           <Link
             key={s.id}
@@ -151,6 +153,14 @@ export function ServiceArc({
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={art}
+                  // The card is a fixed 268px, 290px from sm up, so `sizes` is
+                  // simply those two numbers — and 600 is exactly twice the
+                  // larger one. A 2x screen takes the small file and matches
+                  // pixel for pixel; a 3x screen still picks the 900px
+                  // original. Artwork uploaded to the Media Library has no
+                  // sibling and is served exactly as before.
+                  srcSet={artSmall ? `${artSmall} 600w, ${art} 900w` : undefined}
+                  sizes={artSmall ? "(max-width: 639px) 268px, 290px" : undefined}
                   alt=""
                   loading="lazy"
                   className="absolute inset-0 h-full w-full object-cover"
