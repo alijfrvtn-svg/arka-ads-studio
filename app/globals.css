@@ -671,6 +671,33 @@ body {
   overflow: hidden;
 }
 
+/* ————— a painted section that arrives and leaves —————
+   The homepage band butts against white on both edges on purpose: it is one
+   long stretch of colour and the hard line reads as the edge of a canvas.
+
+   A painted section dropped between two others cannot do that. On the industry
+   pages it landed straight under the hero photograph, so a photograph ended and
+   full-strength paint began on one horizontal line with no air between them.
+
+   Fading the canvas — not the section — is what keeps the whitespace rule: the
+   section still carries its full 176px of padding, and now that padding is
+   actually white, with the colour coming up through it instead of starting at
+   its edge. The band is the divider, and it divides by dissolving.
+
+   The stops are proportional so the fade scales with the section rather than
+   eating a fixed slice of a short one. */
+.paint-canvas-soft {
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(0, 0, 0, 0.35) 7%,
+    #000 17%,
+    #000 84%,
+    rgba(0, 0, 0, 0.35) 94%,
+    transparent 100%
+  );
+}
+
 /* ————— local clearing —————
    A heavily blurred white radial sitting directly behind one block of text.
    Blurred and edgeless, so it reads as a lighter passage in the painting rather

@@ -45,7 +45,9 @@ export function IndustryHero({
 
   return (
     <section
-      className="relative flex min-h-[70vh] items-end overflow-hidden pb-16 pt-40"
+      // pb-28 rather than pb-16: what follows is a painted band, and the
+      // photograph needs to have finished before it starts.
+      className="relative flex min-h-[70vh] items-end overflow-hidden pb-28 pt-40 md:pb-32"
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
     >

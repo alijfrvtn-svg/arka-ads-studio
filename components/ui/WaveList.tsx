@@ -164,7 +164,7 @@ export function WaveList({
       {/* The same painting as the homepage process section. Legibility is not
           handled by keeping paint away from the text but by the local clearing
           each text block carries — see `.paint-plate` in globals.css. */}
-      <div className="paint-canvas absolute inset-0" aria-hidden>
+      <div className="paint-canvas paint-canvas-soft absolute inset-0" aria-hidden>
         <PaintCanvas />
       </div>
 
