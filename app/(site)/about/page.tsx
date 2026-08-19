@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Sparkles, Target, Gem, Zap, type LucideIcon } from "lucide-react";
-import { PageHero } from "@/components/ui/PageHero";
+import { AboutHero } from "@/components/about/AboutHero";
 import { Section, Container, SectionHeading, Eyebrow } from "@/components/ui/Section";
 import { Reveal } from "@/components/fx/Reveal";
 import { StatsBar } from "@/components/home/StatsBar";
@@ -36,7 +36,7 @@ export default async function AboutPage() {
 
   return (
     <>
-      <PageHero
+      <AboutHero
         eyebrow={a.heroEyebrow}
         breadcrumb={[{ label: ui(locale).navHome, href: "/" }, { label: ui(locale).navAbout }]}
         title={<HighlightedTitle title={a.heroTitle} highlight={a.heroTitleHighlight} />}

@@ -671,6 +671,14 @@ body {
   overflow: hidden;
 }
 
+/* The live wave on the About hero fades in over its own top third, so the
+   headline sits on a thinning field rather than on the body of the surface.
+   Masking the canvas rather than lowering the dots' alpha keeps the colour at
+   full strength where it is actually seen. */
+.about-wave {
+  mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.28) 18%, #000 46%, #000 100%);
+}
+
 /* ————— a painted section that arrives and leaves —————
    The homepage band butts against white on both edges on purpose: it is one
    long stretch of colour and the hard line reads as the edge of a canvas.
