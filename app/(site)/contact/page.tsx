@@ -1,11 +1,16 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { Mail, MapPin, Phone, Clock } from "lucide-react";
-import { PageHero } from "@/components/ui/PageHero";
+import { WaveHero } from "@/components/ui/WaveHero";
 import { Section, Container } from "@/components/ui/Section";
 import { Reveal } from "@/components/fx/Reveal";
 import { ContactForm } from "@/components/contact/ContactForm";
 import { SocialIcon } from "@/components/layout/SocialIcon";
+import { INDUSTRY_PAINT, DEPARTMENT_DESC_GRADIENT } from "@/lib/constants";
+import { labelOn } from "@/lib/utils";
+
+/** The teal of the four supplied pairs. */
+const SOCIAL_GRADIENT = DEPARTMENT_DESC_GRADIENT.DIGITAL;
 import { getContactPage } from "@/lib/queries";
 import { buildMetadata } from "@/lib/seo";
 import { getLocale } from "@/lib/get-locale";
@@ -27,7 +32,7 @@ export default async function ContactPage() {
 
   return (
     <>
-      <PageHero
+      <WaveHero
         eyebrow={c.heroEyebrow}
         breadcrumb={[{ label: ui(locale).navHome, href: "/" }, { label: ui(locale).navContact }]}
         title={<HighlightedTitle title={c.heroTitle} highlight={c.heroTitleHighlight} />}
@@ -48,33 +53,19 @@ export default async function ContactPage() {
                   <ContactForm serviceOptions={c.serviceOptions} budgetOptions={c.budgetOptions} locale={locale} />
                 </Suspense>
               </div>
-            </Reveal>
 
-            <Reveal delay={0.1}>
-              <div className="space-y-6">
-                <div className="space-y-4">
-                  <ContactRow icon={MapPin} label={ui(locale).contactRowOffice} value={c.address} />
-                  <ContactRow icon={Phone} label={ui(locale).contactRowPhone} value={c.phoneDisplay} href={`tel:${c.phone}`} ltr />
-                  <ContactRow icon={Mail} label={ui(locale).contactRowEmail} value={c.email} href={`mailto:${c.email}`} ltr />
-                  <ContactRow icon={Clock} label={ui(locale).contactRowHours} value={c.officeHours} />
-                </div>
-
-                {/* The map is interface, not imagery, so it stays achromatic.
-                    Greyscale rather than the old invert(), which existed only
-                    to fake dark tiles for the dark theme. */}
-                <div className="relative overflow-hidden rounded-[1.5rem] border border-card-border">
-                  <iframe
-                    title={ui(locale).mapTitle}
-                    src={`https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${c.mapLat}%2C${c.mapLng}`}
-                    className="h-64 w-full"
-                    style={{ filter: "grayscale(1) contrast(1.04)" }}
-                    loading="lazy"
-                  />
-                  <div className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-black/5" />
-                </div>
-
-                <div className="rounded-[1.5rem] border border-card-border bg-surface-2 p-7">
-                  <p className="mb-4 text-sm font-semibold text-foreground">{ui(locale).footerFollowUs}</p>
+              {/* Under the form, which is where someone lands once they have
+                  decided not to fill it in. The teal of the four supplied
+                  pairs: the one that is neither the near-black of the footer
+                  nor the light violet, which would put white icons at 4.90:1.
+                  Here white sits at 8.70:1 against the lighter stop. */}
+              <div
+                className="relative isolate mt-6 overflow-hidden rounded-[1.5rem] p-7"
+                style={{ background: `linear-gradient(150deg, ${SOCIAL_GRADIENT[0]} 0%, ${SOCIAL_GRADIENT[1]} 100%)` }}
+              >
+                <span className="crystal" aria-hidden />
+                <div className="relative flex flex-wrap items-center justify-between gap-4">
+                  <p className="text-sm font-semibold text-white">{ui(locale).footerFollowUs}</p>
                   <div className="flex gap-2">
                     {c.socials.map((s) => (
                       <a
@@ -83,12 +74,40 @@ export default async function ContactPage() {
                         target="_blank"
                         rel="noreferrer"
                         aria-label={s.label}
-                        className="liquid liquid-clear grid h-11 w-11 place-items-center rounded-full text-foreground-muted hover:text-foreground"
+                        className="grid h-11 w-11 place-items-center rounded-full border border-white/25 bg-white/10 text-white transition-colors duration-500 hover:bg-white/20"
                       >
                         <SocialIcon platform={s.platform} className="h-[18px] w-[18px]" />
                       </a>
                     ))}
                   </div>
+                </div>
+              </div>
+            </Reveal>
+
+            <Reveal delay={0.1}>
+              <div className="space-y-6">
+                {/* One of the four per row, in order — the same four that
+                    carry every other coloured surface on the site. */}
+                <div className="space-y-4">
+                  <ContactRow colour={INDUSTRY_PAINT[0]} icon={MapPin} label={ui(locale).contactRowOffice} value={c.address} />
+                  <ContactRow colour={INDUSTRY_PAINT[1]} icon={Phone} label={ui(locale).contactRowPhone} value={c.phoneDisplay} href={`tel:${c.phone}`} ltr />
+                  <ContactRow colour={INDUSTRY_PAINT[2]} icon={Mail} label={ui(locale).contactRowEmail} value={c.email} href={`mailto:${c.email}`} ltr />
+                  <ContactRow colour={INDUSTRY_PAINT[3]} icon={Clock} label={ui(locale).contactRowHours} value={c.officeHours} />
+                </div>
+
+                {/* The tiles keep their own colour now — parks green, water
+                    blue, roads picked out — which is what makes a map legible
+                    as a map rather than as a grey texture. It was greyscaled to
+                    match the achromatic pass; that no longer holds now the page
+                    carries colour of its own. */}
+                <div className="relative overflow-hidden rounded-[1.5rem] border border-card-border">
+                  <iframe
+                    title={ui(locale).mapTitle}
+                    src={`https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${c.mapLat}%2C${c.mapLng}`}
+                    className="h-64 w-full"
+                    loading="lazy"
+                  />
+                  <div className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-black/5" />
                 </div>
               </div>
             </Reveal>
@@ -99,15 +118,44 @@ export default async function ContactPage() {
   );
 }
 
-function ContactRow({ icon: Icon, label, value, href, ltr }: { icon: any; label: string; value: string; href?: string; ltr?: boolean }) {
+function ContactRow({
+  icon: Icon,
+  label,
+  value,
+  href,
+  ltr,
+  colour,
+}: {
+  icon: any;
+  label: string;
+  value: string;
+  href?: string;
+  ltr?: boolean;
+  colour: string;
+}) {
+  // Computed per hex, never paired by hand: these four span a coral and a gold
+  // that want ink and a blue and a violet that want white. Floor across the set
+  // is 5.70:1 for the value and 4.55:1 for the label at 0.8.
+  const ink = labelOn(colour);
+  const onDark = ink === "#ffffff";
   const inner = (
-    <div className="flex items-start gap-4 rounded-[1.25rem] border border-card-border bg-surface-2 p-6 transition-all duration-500 [transition-timing-function:var(--ease-apple)] hover:border-foreground/25 hover:bg-background hover:shadow-[0_1px_2px_rgba(0,0,0,0.04),0_18px_40px_-24px_rgba(0,0,0,0.3)]">
-      <span className="liquid-clear grid h-11 w-11 shrink-0 place-items-center rounded-[12px] text-foreground">
+    <div
+      className="ind-row flex items-start gap-4 overflow-hidden rounded-[1.25rem] p-6 transition-all duration-500 [transition-timing-function:var(--ease-apple)] hover:-translate-y-0.5 hover:shadow-[0_1px_2px_rgba(0,0,0,0.06),0_20px_44px_-24px_rgba(0,0,0,0.45)]"
+      style={{ background: colour, color: ink }}
+    >
+      <span className="crystal" aria-hidden />
+      <span
+        className={`grid h-11 w-11 shrink-0 place-items-center rounded-[12px] border ${
+          onDark ? "border-white/35 bg-white/15" : "border-black/20 bg-black/[0.07]"
+        }`}
+      >
         <Icon className="h-5 w-5" />
       </span>
-      <div>
-        <p className="text-xs text-foreground-faint">{label}</p>
-        <p className={`mt-0.5 font-medium text-foreground ${ltr ? "ltr-nums" : ""}`}>{value}</p>
+      <div className="min-w-0">
+        <p className="text-xs" style={{ opacity: 0.8 }}>
+          {label}
+        </p>
+        <p className={`mt-0.5 font-semibold ${ltr ? "ltr-nums" : ""}`}>{value}</p>
       </div>
     </div>
   );

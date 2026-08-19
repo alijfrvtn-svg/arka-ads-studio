@@ -2,10 +2,14 @@ import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 import { Container, Eyebrow } from "@/components/ui/Section";
 import { Reveal } from "@/components/fx/Reveal";
-import { ParticleWave } from "./ParticleWave";
+import { ParticleWave } from "@/components/about/ParticleWave";
 
 /**
- * The About hero, over a live background.
+ * A page hero over the live particle wave.
+ *
+ * Written for About and now shared with Contact, which asked for the same
+ * thing — so it moved here rather than being copied. Nothing in it was ever
+ * about the About page; it is copy over a drawn surface.
  *
  * The wave is a drawn surface rather than a video — see ParticleWave. It runs
  * low and wide in the frame; the copy sits above it and stops where it begins,
@@ -13,7 +17,7 @@ import { ParticleWave } from "./ParticleWave";
  * to survive. The page stays white paper that happens to be moving at the foot
  * of the hero.
  */
-export function AboutHero({
+export function WaveHero({
   eyebrow,
   title,
   description,
