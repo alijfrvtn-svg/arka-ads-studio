@@ -416,8 +416,17 @@ body {
   padding-inline: 1.5rem;
 }
 
+/* The floor, not the slope, is what a phone feels.
+   ------------------------------------------------------------
+   `11vw` only reaches the old 5.5rem minimum at about an 800px viewport, so
+   below that the minimum was doing all the work and every section carried a
+   desktop-sized 88px above and below it — 176px of nothing between any two of
+   them, on a homepage that is thirteen screens tall. Dropping the floor to
+   3.25rem gives a phone 52px and leaves everything from 800px up exactly where
+   it was, because the vw term takes over before the new floor is ever
+   reached. */
 .section {
-  padding-block: clamp(5.5rem, 11vw, 11rem);
+  padding-block: clamp(3.25rem, 11vw, 11rem);
 }
 
 /* Swiss editorial eyebrow — now grey uppercase micro-type instead of a
