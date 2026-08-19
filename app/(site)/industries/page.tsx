@@ -12,19 +12,19 @@ const COPY: Record<Locale, { title: string; highlight: string; description: stri
   fa: {
     title: "تخصص در",
     highlight: "هر صنعت",
-    description: "نشانگر را روی هر صنعت ببرید و رویکرد اختصاصی ما را کشف کنید.",
+    description: "دوازده صنعت، هرکدام با زبان و مخاطب خودش. یکی را انتخاب کنید تا ببینید چطور به آن نگاه می‌کنیم.",
     metaDescription: "راهکارهای خلاق و دیجیتال اختصاصی آرکا برای ۱۲ صنعت؛ از پزشکی و خودرو تا فشن و فین‌تک.",
   },
   en: {
     title: "Expertise in",
     highlight: "every industry",
-    description: "Hover over an industry to discover our dedicated approach.",
+    description: "Twelve industries, each with its own language and audience. Pick one and see how we read it.",
     metaDescription: "ARKA's creative and digital solutions across 12 industries — from medical and automotive to fashion and fintech.",
   },
   ar: {
     title: "خبرة في",
     highlight: "كل صناعة",
-    description: "مرّر المؤشر فوق أي صناعة لاكتشاف نهجنا المخصص لها.",
+    description: "اثنتا عشرة صناعة، لكل منها لغتها وجمهورها. اختر واحدة وشاهد كيف ننظر إليها.",
     metaDescription: "حلول آركا الإبداعية والرقمية المخصصة لـ 12 صناعة؛ من الطب والسيارات إلى الموضة والتكنولوجيا المالية.",
   },
 };
