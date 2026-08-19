@@ -44,6 +44,23 @@ const COLS = 150;
 const ROWS = 34;
 const MIN_COLS = 68;
 
+/**
+ * The dent under the pointer.
+ *
+ * RADIUS is how wide the well is, as a share of the shorter side; DEPTH how far
+ * the surface gives, as a share of the canvas height. The dot also thickens and
+ * darkens inside it, because material that is compressed gets denser — that is
+ * what reads as pressing into something soft rather than as a hole cut in it.
+ *
+ * FOLLOW and RELAX are how fast the well tracks the pointer and how fast it
+ * fills back in. Both deliberately slow: instant would make it a cursor sprite,
+ * and the lag is the whole difference between a surface and a decal.
+ */
+const DENT_RADIUS = 0.34;
+const DENT_DEPTH = 0.16;
+const DENT_FOLLOW = 0.14;
+const DENT_RELAX = 0.07;
+
 /** Alpha is quantised into this many bands so the whole grid draws with a
  *  handful of fillStyle changes instead of one per dot. */
 const BANDS = 14;
@@ -93,6 +110,31 @@ export function ParticleWave({ className }: { className?: string }) {
 
     const start = performance.now();
 
+    // Where the well is, where it is heading, and how far in it is pressed.
+    // In canvas-local px; all of it stays at rest until the pointer arrives.
+    const ptr = { x: 0, y: 0, tx: 0, ty: 0, press: 0, want: 0 };
+
+    const onMove = (e: PointerEvent) => {
+      const r = canvas.getBoundingClientRect();
+      const x = e.clientX - r.left;
+      const y = e.clientY - r.top;
+      ptr.tx = x;
+      ptr.ty = y;
+      // A margin, so the well starts forming as the pointer approaches the
+      // surface rather than snapping into existence at its edge.
+      const m = 80;
+      ptr.want = x >= -m && x <= r.width + m && y >= -m && y <= r.height + m ? 1 : 0;
+      // First contact: put the well where the pointer is instead of sliding it
+      // across the whole surface from the top-left corner.
+      if (ptr.press < 0.001) {
+        ptr.x = x;
+        ptr.y = y;
+      }
+    };
+    const onOut = () => {
+      ptr.want = 0;
+    };
+
     const draw = (now: number) => {
       const t = (now - start) / 1000;
 
@@ -104,6 +146,18 @@ export function ParticleWave({ className }: { className?: string }) {
       const raw = into <= HOLD - BLEND ? 0 : (into - (HOLD - BLEND)) / BLEND;
       const k = raw * raw * (3 - 2 * raw); // smoothstep, so neither end snaps
       const [r, g, b] = mix(RGB[i], RGB[(i + 1) % RGB.length], k);
+
+      // The well eases toward the pointer and relaxes back more slowly than it
+      // forms, which is how something soft behaves.
+      ptr.x += (ptr.tx - ptr.x) * DENT_FOLLOW;
+      ptr.y += (ptr.ty - ptr.y) * DENT_FOLLOW;
+      ptr.press += (ptr.want - ptr.press) * (ptr.want > ptr.press ? DENT_FOLLOW : DENT_RELAX);
+
+      const dentR = Math.max(90, Math.min(w, h) * DENT_RADIUS);
+      const dent2R2 = 2 * dentR * dentR;
+      const dentCut = (dentR * 3) * (dentR * 3);
+      const dentY = h * DENT_DEPTH;
+      const pressing = ptr.press > 0.004;
 
       ctx.clearRect(0, 0, w, h);
 
@@ -125,12 +179,13 @@ export function ParticleWave({ className }: { className?: string }) {
         // Rows spread apart as they come forward, which is the whole of the
         // perspective — no matrix, no z divide.
         const spread = 0.72 + 0.4 * d;
-        const size = 1 + 2.1 * d;
-        // Reaches 1 at the front row. The brief was high contrast and colours
-        // that are not washed out, so the nearest dots are the full hex on
-        // white rather than a tint of it — depth comes off the far rows fading
-        // away, not off the near ones being held back.
-        const rowAlpha = 0.05 + 0.95 * Math.pow(d, 1.6);
+        const size = 1.7 + 2.7 * d;
+        // Reaches 1 at the front row: the nearest dots are the full hex on
+        // white rather than a tint of it, and depth comes off the far rows
+        // fading rather than off the near ones being held back. The 1.25
+        // exponent is what carries weight into the back — at 1.6 the far rows
+        // were almost gone and the surface only read in its last third.
+        const rowAlpha = 0.13 + 0.87 * Math.pow(d, 1.25);
 
         for (let ci = 0; ci < cols; ci++) {
           const u = ci / (cols - 1);
@@ -142,19 +197,38 @@ export function ParticleWave({ className }: { className?: string }) {
             Math.sin(u * 11.3 + t * 0.19 - d * 3.0) * 0.15;
 
           const x = (u - 0.5) * w * spread + w * 0.5;
-          const y = baseY + (d - 0.5) * bandH + wave * amp * (0.35 + 0.65 * d);
+          let y = baseY + (d - 0.5) * bandH + wave * amp * (0.35 + 0.65 * d);
+
+          let squash = 0;
+          if (pressing) {
+            const dx = x - ptr.x;
+            const dy = y - ptr.y;
+            const q = dx * dx + dy * dy;
+            // Past three radii the gaussian is under 0.0001 — not worth an
+            // exp() call on every one of five thousand dots.
+            if (q < dentCut) {
+              // Tapered against the bottom edge. The nearest rows already sit
+              // within a few px of it, so an untapered well would push them out
+              // of frame and read as dots vanishing rather than as a surface
+              // giving way. Physically it is the same thing: the sheet is
+              // pinned at the edge and cannot dip there.
+              const room = Math.min(1, (h - y) / (h * 0.3));
+              squash = Math.exp(-q / dent2R2) * ptr.press * Math.max(0, room);
+              y += dentY * squash;
+            }
+          }
 
           if (x < -8 || x > w + 8 || y < -8 || y > h + 8) continue;
 
-          // The crest catches the light: dots near the top of their own swing
-          // are brighter, which is what makes it a surface rather than a fog.
-          // The crest only ever takes a fifth off the top. Three sines rarely
-          // align, so a wider swing here meant the nearest dots never actually
-          // reached the hex — measured at 216/255 before this, which is a tint
-          // of the colour rather than the colour.
-          const a = rowAlpha * (0.8 + 0.2 * (0.5 - wave * 0.5));
+          // The crest catches the light, which is what makes this a surface
+          // rather than a fog — but it only ever takes a fifth off the top.
+          // Three sines rarely align, so a wider swing meant the nearest dots
+          // never actually reached the hex: measured at 216/255, a tint of the
+          // colour rather than the colour. The last term is the compression in
+          // the well, where the material gets denser.
+          const a = rowAlpha * (0.8 + 0.2 * (0.5 - wave * 0.5)) * (1 + 0.4 * squash);
           const band = Math.min(BANDS - 1, Math.max(0, Math.round(a * (BANDS - 1))));
-          buckets[band].push(x, y, size);
+          buckets[band].push(x, y, size * (1 + 0.5 * squash));
         }
       }
 
@@ -181,6 +255,12 @@ export function ParticleWave({ className }: { className?: string }) {
     // Setting canvas.width wipes the surface, so a resize has to be followed
     // by a draw immediately. Waiting for the next frame leaves it blank while
     // the loop is paused off-screen, or while rAF is throttled.
+    if (!reduced) {
+      window.addEventListener("pointermove", onMove, { passive: true });
+      window.addEventListener("pointerdown", onMove, { passive: true });
+      document.addEventListener("pointerleave", onOut);
+    }
+
     const ro = new ResizeObserver(() => {
       resize();
       draw(performance.now());
@@ -207,6 +287,9 @@ export function ParticleWave({ className }: { className?: string }) {
     return () => {
       running = false;
       cancelAnimationFrame(raf);
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerdown", onMove);
+      document.removeEventListener("pointerleave", onOut);
       ro.disconnect();
       io.disconnect();
     };
