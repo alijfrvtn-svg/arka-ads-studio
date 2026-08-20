@@ -28,6 +28,56 @@ export function MediaLibrary({ items }: { items: Item[] }) {
   const [error, setError] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
+  /**
+   * A name a human can read, from a URL that was not written for humans.
+   *
+   * The old version was `url.split("/").pop()`, which on a signed CDN link
+   * returns the entire query string — the library filled up with entries
+   * called things like "…9pwpnhrKfeQ&oe=6A8890E8". The path is what carries
+   * the name; the query carries the signature.
+   */
+  const nameFromUrl = (raw: string): string => {
+    try {
+      const u = new URL(raw);
+      const base = decodeURIComponent(u.pathname.split("/").filter(Boolean).pop() ?? "");
+      if (base && base.length <= 60) return base;
+      // A path segment that is itself an opaque token is no better than the
+      // query was — fall back to something that at least says where it is from.
+      return `${u.hostname.replace(/^www\./, "")} — ${base.slice(0, 24) || "video"}`;
+    } catch {
+      return raw.split("/").pop() || "file";
+    }
+  };
+
+  /**
+   * Whether a URL carries an expiry, i.e. whether it will stop working.
+   *
+   * Facebook and Instagram CDN links sign with `oe`, a hex unix timestamp
+   * usually a day out; S3 uses `Expires` or `X-Amz-Expires`; Google Cloud uses
+   * `X-Goog-Expires`. Saving one of these into the media library looks fine
+   * today and leaves a hole in the site tomorrow, with nothing to explain it —
+   * which is exactly what happened, so it is worth catching at the point of
+   * paste rather than discovering later.
+   */
+  const expiryOf = (raw: string): Date | null => {
+    try {
+      const q = new URL(raw).searchParams;
+      const oe = q.get("oe");
+      if (oe && /^[0-9a-f]+$/i.test(oe)) return new Date(parseInt(oe, 16) * 1000);
+      for (const k of ["Expires", "X-Amz-Expires", "X-Goog-Expires", "expires"]) {
+        const v = q.get(k);
+        if (v && /^\d+$/.test(v)) {
+          const n = Number(v);
+          // A small number is a lifetime in seconds, a large one is an instant.
+          return new Date((n < 1e6 ? Date.now() / 1000 + n : n) * 1000);
+        }
+      }
+      return null;
+    } catch {
+      return null;
+    }
+  };
+
   const add = (url: string, name: string, type: string) =>
     start(async () => {
       const fd = new FormData();
@@ -108,8 +158,17 @@ export function MediaLibrary({ items }: { items: Item[] }) {
             onClick={() => {
               if (!url.trim()) return;
               const trimmed = url.trim();
+              const expires = expiryOf(trimmed);
+              if (expires) {
+                const when = expires.toLocaleDateString("fa-IR", { month: "long", day: "numeric" });
+                setError(
+                  `این لینک موقتی است و حدود ${when} از کار می‌افتد. لینک‌های امضاشدهٔ اینستاگرام، فیسبوک و فضای ابری برای ذخیره در سایت مناسب نیستند — فایل را دانلود و آپلود کنید، یا لینک صفحهٔ ویدیو را بگذارید نه لینک مستقیم فایل را.`,
+                );
+                return;
+              }
+              setError(null);
               const isVideo = /\.(mp4|webm|mov)(\?|$)/i.test(trimmed) || isEmbedUrl(trimmed);
-              add(trimmed, trimmed.split("/").pop() || "file", isVideo ? "VIDEO" : "IMAGE");
+              add(trimmed, nameFromUrl(trimmed), isVideo ? "VIDEO" : "IMAGE");
               setUrl("");
             }}
             className="h-10 rounded-xl bg-primary px-4 text-sm font-semibold text-primary-foreground"
@@ -153,7 +212,17 @@ export function MediaLibrary({ items }: { items: Item[] }) {
                   <Film className="h-8 w-8 opacity-70" />
                 </div>
               ) : m.type === "VIDEO" ? (
-                <video src={m.url} muted className="h-full w-full object-cover" />
+                /* `#t=0.1` asks for a frame a tenth of a second in. Without it a
+                   video with no poster paints as an empty grey box, which is
+                   indistinguishable from a broken link — and that is exactly how
+                   a linked video was showing up in the library. */
+                <video
+                  src={`${m.url}#t=0.1`}
+                  muted
+                  playsInline
+                  preload="metadata"
+                  className="h-full w-full object-cover"
+                />
               ) : (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={m.url} alt={m.name} className="h-full w-full object-cover" />
