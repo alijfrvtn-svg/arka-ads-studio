@@ -58,7 +58,7 @@ export default async function HomePage() {
   return (
     <>
       <HeroShowcase slides={showcase} locale={locale} />
-      <TrustMarquee clients={clients.map((c) => ({ name: tr(locale, c.name, c.nameEn, c.nameEn) }))} caption={content.trustCaption} />
+      <TrustMarquee clients={clients.map((c) => ({ name: tr(locale, c.name, c.nameEn, c.nameEn), logo: c.logo }))} caption={content.trustCaption} />
       <Departments content={content} departments={departments} locale={locale} />
       <FeaturedWork projects={projects} content={content} locale={locale} />
       {/* One canvas across both: painted separately they met on a hard seam. */}

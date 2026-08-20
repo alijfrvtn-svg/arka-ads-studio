@@ -121,7 +121,16 @@ export default async function CaseStudy({ params }: { params: Promise<{ slug: st
             <Meta icon={Users2} label={t.metaClient} value={p.client ? tr(locale, p.client.name, p.client.nameEn, p.client.nameEn) : "—"} />
             <Meta icon={Calendar} label={t.metaYear} value={localeDigits(locale, p.year)} />
             <Meta icon={MapPin} label={t.metaLocation} value={location || "—"} />
-            <Meta icon={Tag} label={t.footerServices} value={p.services.map((s) => tr(locale, s.title, s.titleEn, s.titleAr)).join(locale === "fa" ? "، " : ", ") || "—"} />
+            {/* No services linked means the row has nothing to say, and an em dash
+                is not an answer — it is the absence of one taking up a column.
+                Set them on the project under «ارتباطات و برچسب‌ها». */}
+            {p.services.length > 0 && (
+              <Meta
+                icon={Tag}
+                label={t.footerServices}
+                value={p.services.map((s) => tr(locale, s.title, s.titleEn, s.titleAr)).join(locale === "fa" ? "، " : ", ")}
+              />
+            )}
           </div>
         </Container>
       </div>
@@ -218,11 +227,33 @@ export default async function CaseStudy({ params }: { params: Promise<{ slug: st
       {gallery.length > 0 && (
         <Section>
           <Container>
-            <div className="columns-1 gap-4 sm:columns-2 lg:columns-3 [&>*]:mb-4">
+            {/* A grid, not masonry.
+                ------------------------------------------------------------
+                This was `columns-*`, which is CSS multi-column: it fills one
+                column top to bottom before starting the next, and every cell
+                keeps its own natural height. With product shots of differing
+                proportions that produces a ragged wall — rows that do not line
+                up, columns that end at different heights, and a reading order
+                that goes down rather than across.
+
+                A grid with one shared ratio fixes all of it at once: every cell
+                is the same box, rows align, and the order matches the way the
+                page is read. `object-contain` on a white ground rather than
+                `cover`, because these are products photographed on white — a
+                cover crop would cut the very thing the photograph is of. */}
+            <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
               {gallery.map((g, i) => (
-                <Reveal key={i} delay={(i % 3) * 0.06} className="break-inside-avoid">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={g} alt="" className="w-full rounded-2xl border border-card-border" />
+                <Reveal key={i} delay={(i % 3) * 0.06}>
+                  <div className="aspect-square overflow-hidden rounded-2xl border border-card-border bg-white">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={g}
+                      alt=""
+                      loading="lazy"
+                      decoding="async"
+                      className="h-full w-full object-contain transition-transform duration-700 [transition-timing-function:var(--ease-apple)] hover:scale-[1.03]"
+                    />
+                  </div>
                 </Reveal>
               ))}
             </div>
