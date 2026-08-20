@@ -1223,3 +1223,120 @@ export async function deleteTeamMember(id: string) {
   revalidateSite("/admin/team", "/about");
   return { ok: true };
 }
+
+// ============================================================
+// APPEARANCE — the site's visual identity
+// ============================================================
+// Stored in its own Setting row rather than merged into "site", because that
+// blob is already shared by three forms and this one is a different shape
+// entirely. Read-modify-write all the same, so a form that only submits the
+// colours cannot wipe the plan multipliers.
+export async function saveAppearance(fd: FormData) {
+  await requirePermission("settings.manage");
+
+  const { APPEARANCE_KEY } = await import("./appearance");
+  const row = await db.setting.findUnique({ where: { key: APPEARANCE_KEY } });
+  const existing = parseObj<Record<string, unknown>>(row?.value, {});
+
+  /** Read the repeated `name` inputs back into an array, dropping blanks. */
+  const list = (name: string) => fd.getAll(name).map((v) => String(v).trim()).filter(Boolean);
+  /** Read `name.KEY` pairs back into an object. */
+  const record = (prefix: string) => {
+    const out: Record<string, string> = {};
+    for (const [k, v] of fd.entries()) {
+      if (!k.startsWith(prefix + ".")) continue;
+      const s = String(v).trim();
+      if (s) out[k.slice(prefix.length + 1)] = s;
+    }
+    return out;
+  };
+  const numbers = (prefix: string) => {
+    const out: Record<string, number> = {};
+    for (const [k, n] of Object.entries(record(prefix))) {
+      const v = Number(n.replace(/[^\d.]/g, ""));
+      if (Number.isFinite(v)) out[k] = v;
+    }
+    return out;
+  };
+  /** `gradient.DESIGN.0` / `.1` back into the two-stop pairs. */
+  const gradients = () => {
+    const out: Record<string, [string, string]> = {};
+    for (const [k, v] of Object.entries(record("gradient"))) {
+      const [dept, idx] = k.split(".");
+      if (!dept || (idx !== "0" && idx !== "1")) continue;
+      const pair = out[dept] ?? ["", ""];
+      pair[idx === "0" ? 0 : 1] = v;
+      out[dept] = pair;
+    }
+    // A pair with one empty stop is worse than no pair at all — it would paint
+    // a gradient into transparent. Drop those and let the default stand.
+    return Object.fromEntries(Object.entries(out).filter(([, p]) => p[0] && p[1]));
+  };
+
+  const patch: Record<string, unknown> = {
+    sitePaint: list("sitePaint"),
+    industryPaint: list("industryPaint"),
+    textPaint: list("textPaint"),
+    departmentPaint: record("departmentPaint"),
+    departmentPoster: record("departmentPoster"),
+    departmentGradient: gradients(),
+    departmentPriceFrom: numbers("departmentPriceFrom"),
+    planMultiplier: numbers("planMultiplier"),
+  };
+  // Only overwrite what this submission actually carried.
+  for (const k of Object.keys(patch)) {
+    const v = patch[k];
+    const empty = Array.isArray(v) ? v.length === 0 : !v || Object.keys(v as object).length === 0;
+    if (empty) delete patch[k];
+  }
+
+  const value = { ...existing, ...patch };
+  await db.setting.upsert({
+    where: { key: APPEARANCE_KEY },
+    create: { key: APPEARANCE_KEY, value: J(value) },
+    update: { value: J(value) },
+  });
+
+  revalidateSite("/admin/appearance", "/");
+  redirect("/admin/appearance");
+}
+
+// ============================================================
+// SITE COPY — the interface strings
+// ============================================================
+// Only what differs from the shipped dictionary is stored. A field typed back
+// to its default, or emptied, drops out of the row entirely rather than being
+// saved as an override equal to the default — otherwise the row grows to hold
+// all 270 strings and a later change to a default would be silently pinned to
+// the old wording.
+export async function saveSiteCopy(fd: FormData) {
+  await requirePermission("settings.manage");
+
+  const { COPY_KEY, copyDefaults } = await import("./site-copy");
+  const defaults = new Map(copyDefaults().map((d) => [d.key, d]));
+
+  const out: Record<string, Record<string, string>> = {};
+  for (const [field, raw] of fd.entries()) {
+    // Fields are named `copy.<key>.<locale>`.
+    const m = /^copy\.(.+)\.(fa|en|ar)$/.exec(field);
+    if (!m) continue;
+    const [, key, locale] = m;
+    const def = defaults.get(key);
+    if (!def) continue;
+
+    const value = String(raw).trim();
+    if (!value || value === (def as Record<string, string>)[locale]) continue;
+
+    out[key] ??= {};
+    out[key][locale] = value;
+  }
+
+  await db.setting.upsert({
+    where: { key: COPY_KEY },
+    create: { key: COPY_KEY, value: J(out) },
+    update: { value: J(out) },
+  });
+
+  revalidateSite("/admin/copy", "/");
+  redirect("/admin/copy");
+}

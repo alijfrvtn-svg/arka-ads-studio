@@ -1,0 +1,379 @@
+/* ============================================================
+   The panel's design system — Liquid Glass, the iOS 26 language
+   ------------------------------------------------------------
+   Scoped to `[data-ios]`, which the shell puts on its own root. Nothing here
+   can reach the public site, and the legacy CMS tokens in globals.css are
+   overridden rather than removed, so any page not yet converted still renders.
+
+   Three things carry the look, and they are the three Apple actually ships:
+
+   1. **Material, not colour.** A surface is a translucent layer that blurs and
+      saturates what is behind it, edged with a hairline that is brighter along
+      the top and darker along the bottom. That specular edge is what separates
+      glass from a translucent box — without it you get frosted plastic.
+
+   2. **Grouped inset lists.** Content lives in rounded groups floating on a
+      recessed background, with separators that start at the text rather than
+      at the edge of the card. A row is 44pt tall because that is a thumb.
+
+   3. **One type scale.** Seventeen is body. Everything else is a step from it,
+      and weight rather than size carries emphasis.
+
+   Persian throughout: the panel is RTL, so every inset, separator offset and
+   knob travel is written logically rather than as left/right.
+   ============================================================ */
+
+[data-ios] {
+  /* ————— system palette, light ————— */
+  --ios-blue: #007aff;
+  --ios-green: #34c759;
+  --ios-red: #ff3b30;
+  --ios-orange: #ff9500;
+  --ios-yellow: #ffcc00;
+  --ios-purple: #af52de;
+  --ios-pink: #ff2d55;
+  --ios-teal: #30b0c7;
+
+  /* Backgrounds: the recessed ground, and the cards that float on it. */
+  --ios-grouped: #f2f2f7;
+  --ios-card: #ffffff;
+  --ios-card-2: #f9f9fb;
+  --ios-elevated: #ffffff;
+
+  /* Label hierarchy — the four levels, as opacities of ink. */
+  --ios-label: #000000;
+  --ios-label-2: rgba(60, 60, 67, 0.6);
+  --ios-label-3: rgba(60, 60, 67, 0.3);
+  --ios-label-4: rgba(60, 60, 67, 0.18);
+  --ios-separator: rgba(60, 60, 67, 0.29);
+  --ios-fill: rgba(120, 120, 128, 0.12);
+  --ios-fill-2: rgba(120, 120, 128, 0.16);
+
+  /* The glass itself. */
+  --ios-glass: rgba(255, 255, 255, 0.72);
+  --ios-glass-thin: rgba(255, 255, 255, 0.55);
+  --ios-glass-border: rgba(255, 255, 255, 0.7);
+  --ios-glass-top: rgba(255, 255, 255, 0.9);
+  --ios-glass-bottom: rgba(0, 0, 0, 0.06);
+  --ios-glass-shadow: 0 8px 32px -8px rgba(0, 0, 0, 0.16);
+
+  /* Geometry. 44 is a thumb; the radii run smallest to largest. */
+  --ios-row: 44px;
+  --ios-r-sm: 8px;
+  --ios-r: 10px;
+  --ios-r-card: 16px;
+  --ios-r-sheet: 22px;
+  --ios-gutter: 16px;
+
+  color: var(--ios-label);
+  background: var(--ios-grouped);
+  font-synthesis-weight: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+[data-ios].dark,
+.dark [data-ios] {
+  --ios-blue: #0a84ff;
+  --ios-green: #30d158;
+  --ios-red: #ff453a;
+  --ios-orange: #ff9f0a;
+  --ios-yellow: #ffd60a;
+  --ios-purple: #bf5af2;
+  --ios-pink: #ff375f;
+  --ios-teal: #40cbe0;
+
+  --ios-grouped: #000000;
+  --ios-card: #1c1c1e;
+  --ios-card-2: #2c2c2e;
+  --ios-elevated: #2c2c2e;
+
+  --ios-label: #ffffff;
+  --ios-label-2: rgba(235, 235, 245, 0.6);
+  --ios-label-3: rgba(235, 235, 245, 0.3);
+  --ios-label-4: rgba(235, 235, 245, 0.18);
+  --ios-separator: rgba(84, 84, 88, 0.65);
+  --ios-fill: rgba(120, 120, 128, 0.24);
+  --ios-fill-2: rgba(120, 120, 128, 0.32);
+
+  --ios-glass: rgba(30, 30, 32, 0.72);
+  --ios-glass-thin: rgba(30, 30, 32, 0.55);
+  --ios-glass-border: rgba(255, 255, 255, 0.12);
+  --ios-glass-top: rgba(255, 255, 255, 0.16);
+  --ios-glass-bottom: rgba(0, 0, 0, 0.4);
+  --ios-glass-shadow: 0 8px 32px -8px rgba(0, 0, 0, 0.6);
+
+  color-scheme: dark;
+}
+
+/* ————— type scale —————
+   The system sizes, in the site's Persian face. Weight carries emphasis, which
+   is why almost nothing here changes size to mean "important". */
+.ios-large-title { font-size: 2.125rem; line-height: 1.18; font-weight: 800; letter-spacing: -0.022em; }
+.ios-title-1     { font-size: 1.75rem;  line-height: 1.21; font-weight: 800; letter-spacing: -0.02em; }
+.ios-title-2     { font-size: 1.375rem; line-height: 1.27; font-weight: 700; letter-spacing: -0.016em; }
+.ios-title-3     { font-size: 1.25rem;  line-height: 1.3;  font-weight: 700; letter-spacing: -0.012em; }
+.ios-headline    { font-size: 1.0625rem; line-height: 1.29; font-weight: 700; }
+.ios-body        { font-size: 1.0625rem; line-height: 1.41; font-weight: 400; }
+.ios-callout     { font-size: 1rem;      line-height: 1.31; font-weight: 400; }
+.ios-subhead     { font-size: 0.9375rem; line-height: 1.33; font-weight: 400; }
+.ios-footnote    { font-size: 0.8125rem; line-height: 1.38; font-weight: 400; }
+.ios-caption     { font-size: 0.75rem;   line-height: 1.33; font-weight: 400; }
+
+/* ————— the material —————
+   One standard property only. Writing the -webkit- prefix by hand makes
+   Lightning CSS drop both declarations and ship a flat box; it adds the prefix
+   itself where the build targets need it. */
+.ios-glass {
+  background: var(--ios-glass);
+  backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid var(--ios-glass-border);
+  box-shadow:
+    inset 0 1px 0 var(--ios-glass-top),
+    inset 0 -1px 0 var(--ios-glass-bottom),
+    var(--ios-glass-shadow);
+}
+
+.ios-glass-thin {
+  background: var(--ios-glass-thin);
+  backdrop-filter: blur(16px) saturate(160%);
+  border: 1px solid var(--ios-glass-border);
+  box-shadow: inset 0 1px 0 var(--ios-glass-top);
+}
+
+/* ————— grouped inset list —————
+   The card floats; the rows inside it are flush. The separator is inset to
+   where the label starts, never to the edge of the card — that inset is the
+   most recognisable thing about one of these lists, and it is set with logical
+   properties because this panel is right-to-left. */
+.ios-group {
+  background: var(--ios-card);
+  border-radius: var(--ios-r-card);
+  overflow: hidden;
+}
+
+.ios-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: var(--ios-row);
+  padding: 0.6875rem var(--ios-gutter);
+  position: relative;
+  width: 100%;
+  text-align: start;
+}
+
+.ios-row + .ios-row::before {
+  content: "";
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline: var(--ios-gutter) 0;
+  height: 1px;
+  background: var(--ios-separator);
+}
+
+/* A row that leads with an icon lines its separator up with the label
+   instead, so the rule starts where the words do. */
+.ios-row-icon + .ios-row-icon::before {
+  inset-inline-start: calc(var(--ios-gutter) * 2 + 29px);
+}
+
+a.ios-row,
+button.ios-row {
+  transition: background-color 0.15s ease;
+}
+
+a.ios-row:active,
+button.ios-row:active {
+  background: var(--ios-fill);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  a.ios-row:hover,
+  button.ios-row:hover {
+    background: var(--ios-fill);
+  }
+}
+
+/* The group's caption sits in the gutter above the card, not inside it. */
+.ios-group-header {
+  padding: 0 calc(var(--ios-gutter) + 0.25rem) 0.4375rem;
+  color: var(--ios-label-2);
+  font-size: 0.8125rem;
+  letter-spacing: 0.01em;
+}
+
+.ios-group-footer {
+  padding: 0.4375rem calc(var(--ios-gutter) + 0.25rem) 0;
+  color: var(--ios-label-2);
+  font-size: 0.8125rem;
+  line-height: 1.38;
+}
+
+/* ————— controls ————— */
+.ios-switch {
+  position: relative;
+  inline-size: 51px;
+  block-size: 31px;
+  border-radius: 999px;
+  background: var(--ios-fill-2);
+  transition: background-color 0.22s cubic-bezier(0.32, 0.72, 0, 1);
+  flex: none;
+}
+
+/* Driven by the checkbox rather than by a data attribute: that way a switch
+   works the same whether React is controlling it or a plain form is. */
+.ios-switch-input:checked + .ios-switch {
+  background: var(--ios-green);
+}
+
+.ios-switch::after {
+  content: "";
+  position: absolute;
+  inset-block-start: 2px;
+  inset-inline-start: 2px;
+  inline-size: 27px;
+  block-size: 27px;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15), 0 1px 1px rgba(0, 0, 0, 0.16);
+  transition: translate 0.22s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+/* The knob travels toward the end of the track, whichever side that is. */
+.ios-switch-input:checked + .ios-switch::after {
+  translate: 20px 0;
+}
+
+[dir="rtl"] .ios-switch-input:checked + .ios-switch::after {
+  translate: -20px 0;
+}
+
+.ios-segmented {
+  display: inline-flex;
+  padding: 2px;
+  gap: 2px;
+  border-radius: 9px;
+  background: var(--ios-fill);
+}
+
+.ios-segment {
+  padding: 0.375rem 0.875rem;
+  border-radius: 7px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--ios-label);
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ios-segment[data-on="true"] {
+  background: var(--ios-card);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12), 0 1px 1px rgba(0, 0, 0, 0.04);
+}
+
+.ios-field {
+  inline-size: 100%;
+  background: transparent;
+  border: 0;
+  outline: 0;
+  color: var(--ios-label);
+  font-size: 1.0625rem;
+  text-align: start;
+}
+
+.ios-field::placeholder {
+  color: var(--ios-label-3);
+}
+
+/* A search field is a filled pill, not a bordered box. */
+.ios-search {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4375rem 0.625rem;
+  border-radius: var(--ios-r);
+  background: var(--ios-fill);
+  color: var(--ios-label-2);
+}
+
+.ios-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  min-height: var(--ios-row);
+  padding: 0 1.125rem;
+  border-radius: var(--ios-r);
+  font-size: 1.0625rem;
+  font-weight: 600;
+  transition: opacity 0.15s ease, background-color 0.15s ease;
+}
+
+.ios-btn:active {
+  opacity: 0.6;
+}
+
+.ios-btn-filled { background: var(--ios-blue); color: #fff; }
+.ios-btn-tinted { background: color-mix(in srgb, var(--ios-blue) 14%, transparent); color: var(--ios-blue); }
+.ios-btn-plain  { color: var(--ios-blue); }
+.ios-btn-destructive { background: color-mix(in srgb, var(--ios-red) 14%, transparent); color: var(--ios-red); }
+
+/* ————— chrome ————— */
+.ios-nav-bar {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 30;
+  background: var(--ios-glass);
+  backdrop-filter: blur(24px) saturate(180%);
+  border-block-end: 1px solid var(--ios-separator);
+}
+
+.ios-sidebar {
+  background: var(--ios-glass-thin);
+  backdrop-filter: blur(30px) saturate(180%);
+  border-inline-end: 1px solid var(--ios-separator);
+}
+
+.ios-tabbar {
+  position: fixed;
+  inset-block-end: 0;
+  inset-inline: 0;
+  z-index: 40;
+  background: var(--ios-glass);
+  backdrop-filter: blur(24px) saturate(180%);
+  border-block-start: 1px solid var(--ios-separator);
+  padding-block-end: env(safe-area-inset-bottom);
+}
+
+.ios-sheet {
+  border-start-start-radius: var(--ios-r-sheet);
+  border-start-end-radius: var(--ios-r-sheet);
+  background: var(--ios-elevated);
+  box-shadow: 0 -8px 40px -8px rgba(0, 0, 0, 0.3);
+}
+
+/* The grabber at the top of a sheet. */
+.ios-grabber {
+  inline-size: 36px;
+  block-size: 5px;
+  border-radius: 999px;
+  background: var(--ios-label-3);
+  margin: 0.375rem auto;
+}
+
+/* ————— badges ————— */
+.ios-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.125rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-ios] * {
+    transition-duration: 0.01ms !important;
+  }
+}

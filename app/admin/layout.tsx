@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import "./ios.css";
 import { getSessionUser } from "@/lib/auth";
 import { effectivePermissions } from "@/lib/rbac";
 import { AdminShell } from "@/components/admin/AdminShell";
