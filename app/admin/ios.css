@@ -35,7 +35,7 @@
   --ios-teal: #30b0c7;
 
   /* Backgrounds: the recessed ground, and the cards that float on it. */
-  --ios-grouped: #f2f2f7;
+  --ios-grouped: #eceef4;
   --ios-card: #ffffff;
   --ios-card-2: #f9f9fb;
   --ios-elevated: #ffffff;
@@ -50,12 +50,36 @@
   --ios-fill-2: rgba(120, 120, 128, 0.16);
 
   /* The glass itself. */
-  --ios-glass: rgba(255, 255, 255, 0.72);
-  --ios-glass-thin: rgba(255, 255, 255, 0.55);
-  --ios-glass-border: rgba(255, 255, 255, 0.7);
-  --ios-glass-top: rgba(255, 255, 255, 0.9);
-  --ios-glass-bottom: rgba(0, 0, 0, 0.06);
-  --ios-glass-shadow: 0 8px 32px -8px rgba(0, 0, 0, 0.16);
+  --ios-glass: rgba(255, 255, 255, 0.62);
+  --ios-glass-thin: rgba(255, 255, 255, 0.45);
+  --ios-glass-border: rgba(255, 255, 255, 0.85);
+  --ios-glass-top: rgba(255, 255, 255, 0.95);
+  --ios-glass-bottom: rgba(0, 0, 0, 0.04);
+
+  /* ————— soft UI —————
+     Two lights, one shape. A raised surface is lit from the top inline-start
+     and shadowed from the bottom inline-end; a recessed one is the same pair
+     inverted and moved inside. Everything on this panel is one of those two
+     states, which is what makes it read as moulded rather than as boxes.
+
+     The shadow is warm-grey rather than black: pure black over a tinted ground
+     reads as dirt, and this ground is tinted. */
+  --neo-lift: rgba(255, 255, 255, 0.95);
+  --neo-cast: rgba(148, 155, 178, 0.42);
+  --neo-cast-soft: rgba(148, 155, 178, 0.26);
+
+  --neo-raised:
+    -6px -6px 16px var(--neo-lift),
+    7px 7px 20px var(--neo-cast-soft);
+  --neo-raised-lg:
+    -9px -9px 24px var(--neo-lift),
+    11px 11px 32px var(--neo-cast-soft);
+  --neo-inset:
+    inset 3px 3px 7px var(--neo-cast),
+    inset -3px -3px 7px var(--neo-lift);
+  --neo-pressed:
+    inset 5px 5px 11px var(--neo-cast),
+    inset -5px -5px 11px var(--neo-lift);
 
   /* Geometry. 44 is a thumb; the radii run smallest to largest. */
   --ios-row: 44px;
@@ -66,43 +90,84 @@
   --ios-gutter: 16px;
 
   color: var(--ios-label);
-  background: var(--ios-grouped);
+  /* Not a flat grey. Glass over a single colour is just a lighter rectangle —
+     it needs something behind it that varies for the blur to have any work to
+     do. Three very faint washes in the brand hues, fixed so they stay put
+     while the panel scrolls over them. */
+  background:
+    radial-gradient(58% 44% at 12% 0%, rgba(255, 107, 91, 0.09) 0%, rgba(255, 107, 91, 0) 100%),
+    radial-gradient(52% 40% at 92% 18%, rgba(43, 86, 214, 0.09) 0%, rgba(43, 86, 214, 0) 100%),
+    radial-gradient(60% 46% at 50% 100%, rgba(124, 58, 237, 0.07) 0%, rgba(124, 58, 237, 0) 100%),
+    var(--ios-grouped);
+  background-attachment: fixed;
   font-synthesis-weight: none;
   -webkit-font-smoothing: antialiased;
 }
 
-[data-ios].dark,
-.dark [data-ios] {
-  --ios-blue: #0a84ff;
-  --ios-green: #30d158;
-  --ios-red: #ff453a;
-  --ios-orange: #ff9f0a;
-  --ios-yellow: #ffd60a;
-  --ios-purple: #bf5af2;
-  --ios-pink: #ff375f;
-  --ios-teal: #40cbe0;
+/* Light, whatever the document says.
+   ------------------------------------------------------------
+   The pre-paint script puts `.dark` on <html> for CMS routes, which is what
+   the old navy panel wanted. This one is soft-UI glass: the whole effect is
+   two light sources — a highlight from one corner and a shadow from the other
+   — and on a dark ground there is no highlight to give, so the shapes go flat
+   and the translucency has nothing to be translucent against. The dark
+   override is deliberately absent rather than restyled. */
 
-  --ios-grouped: #000000;
-  --ios-card: #1c1c1e;
-  --ios-card-2: #2c2c2e;
-  --ios-elevated: #2c2c2e;
+/* ————— the legacy tokens, remapped —————
+   ------------------------------------------------------------
+   Twenty-odd components under /admin that are not being rewritten this pass —
+   the charts, the boards, the media library, the editors — are written against
+   the old CMS tokens: `bg-surface`, `text-foreground`, `border-card-border`.
+   Those tokens are still defined in globals.css with the navy values, and the
+   pre-paint script still puts `.dark` on the document for CMS routes.
 
-  --ios-label: #ffffff;
-  --ios-label-2: rgba(235, 235, 245, 0.6);
-  --ios-label-3: rgba(235, 235, 245, 0.3);
-  --ios-label-4: rgba(235, 235, 245, 0.18);
-  --ios-separator: rgba(84, 84, 88, 0.65);
-  --ios-fill: rgba(120, 120, 128, 0.24);
-  --ios-fill-2: rgba(120, 120, 128, 0.32);
+   Rather than touch twenty files, the tokens themselves are redefined inside
+   this scope. Everything written against them lands on the light glass
+   automatically and keeps working; anything converted properly later simply
+   stops depending on it. The public site is untouched — `[data-ios]` exists
+   only on the panel shell.
 
-  --ios-glass: rgba(30, 30, 32, 0.72);
-  --ios-glass-thin: rgba(30, 30, 32, 0.55);
-  --ios-glass-border: rgba(255, 255, 255, 0.12);
-  --ios-glass-top: rgba(255, 255, 255, 0.16);
-  --ios-glass-bottom: rgba(0, 0, 0, 0.4);
-  --ios-glass-shadow: 0 8px 32px -8px rgba(0, 0, 0, 0.6);
+   `--surface` is deliberately translucent white rather than a solid: it is
+   what most of those components use for their card, and this is how they pick
+   up the glass without being edited. */
+[data-ios] {
+  --background: transparent;
+  --background-2: transparent;
+  --surface: rgba(255, 255, 255, 0.62);
+  --surface-2: rgba(255, 255, 255, 0.45);
+  --surface-3: rgba(255, 255, 255, 0.34);
+  --card: rgba(255, 255, 255, 0.62);
+  --card-border: rgba(255, 255, 255, 0.85);
+  --card-hover: rgba(255, 255, 255, 0.78);
+  --foreground: var(--ios-label);
+  --foreground-muted: var(--ios-label-2);
+  --foreground-faint: var(--ios-label-3);
+  --primary: var(--ios-blue);
+  --primary-foreground: #ffffff;
+  --accent: var(--ios-blue);
+  --accent-bright: var(--ios-blue);
+  --accent-soft: var(--ios-teal);
+  --ring: var(--ios-blue);
+  --hairline: var(--ios-separator);
+  --grid-line: rgba(120, 130, 160, 0.08);
+  --glass-bg: rgba(255, 255, 255, 0.62);
+  --glass-bg-strong: rgba(255, 255, 255, 0.78);
+  --glass-border: var(--ios-glass-border);
+  --glass-highlight: var(--ios-glass-top);
+  --glass-shade: rgba(0, 0, 0, 0.04);
+  --glass-shadow: var(--neo-raised);
+  --selection-bg: var(--ios-blue);
+  --selection-fg: #ffffff;
+  color-scheme: light;
+}
 
-  color-scheme: dark;
+/* Anything still carrying a legacy rounded border gets the moulded edge
+   instead, so an unconverted card does not sit on the glass looking drawn on
+   rather than lifted off it. */
+[data-ios] .rounded-2xl.border,
+[data-ios] .rounded-xl.border {
+  box-shadow: inset 0 1px 0 var(--ios-glass-top), var(--neo-raised);
+  backdrop-filter: blur(20px) saturate(175%);
 }
 
 /* ————— type scale —————
@@ -127,17 +192,14 @@
   background: var(--ios-glass);
   backdrop-filter: blur(24px) saturate(180%);
   border: 1px solid var(--ios-glass-border);
-  box-shadow:
-    inset 0 1px 0 var(--ios-glass-top),
-    inset 0 -1px 0 var(--ios-glass-bottom),
-    var(--ios-glass-shadow);
+  box-shadow: inset 0 1px 0 var(--ios-glass-top), var(--neo-raised);
 }
 
 .ios-glass-thin {
   background: var(--ios-glass-thin);
-  backdrop-filter: blur(16px) saturate(160%);
+  backdrop-filter: blur(18px) saturate(170%);
   border: 1px solid var(--ios-glass-border);
-  box-shadow: inset 0 1px 0 var(--ios-glass-top);
+  box-shadow: inset 0 1px 0 var(--ios-glass-top), var(--neo-raised);
 }
 
 /* ————— grouped inset list —————
@@ -145,10 +207,24 @@
    where the label starts, never to the edge of the card — that inset is the
    most recognisable thing about one of these lists, and it is set with logical
    properties because this panel is right-to-left. */
+/* The card is the shape the whole panel is made of: translucent, blurred, and
+   lifted off the ground by the two lights rather than outlined by a border.
+   `overflow: hidden` stays so the rows clip to the corner radius. */
 .ios-group {
-  background: var(--ios-card);
+  background: var(--ios-glass);
+  backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid var(--ios-glass-border);
   border-radius: var(--ios-r-card);
+  box-shadow: inset 0 1px 0 var(--ios-glass-top), var(--neo-raised);
   overflow: hidden;
+}
+
+/* A group that carries something already opaque — a chart, a photograph — does
+   not need to be translucent as well, and blurring behind an opaque child is
+   work with nothing to show for it. */
+.ios-group-solid {
+  background: var(--ios-card);
+  backdrop-filter: none;
 }
 
 .ios-row {
@@ -168,7 +244,15 @@
   inset-block-start: 0;
   inset-inline: var(--ios-gutter) 0;
   height: 1px;
-  background: var(--ios-separator);
+  /* Fades at both ends. A hard rule edge-to-edge reads as a crack in a surface
+     that is meant to be moulded from one piece. */
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    var(--ios-separator) 12%,
+    var(--ios-separator) 88%,
+    transparent 100%
+  );
 }
 
 /* A row that leads with an icon lines its separator up with the label
@@ -215,7 +299,8 @@ button.ios-row:active {
   inline-size: 51px;
   block-size: 31px;
   border-radius: 999px;
-  background: var(--ios-fill-2);
+  background: rgba(255, 255, 255, 0.3);
+  box-shadow: var(--neo-inset);
   transition: background-color 0.22s cubic-bezier(0.32, 0.72, 0, 1);
   flex: none;
 }
@@ -235,7 +320,7 @@ button.ios-row:active {
   block-size: 27px;
   border-radius: 999px;
   background: #fff;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15), 0 1px 1px rgba(0, 0, 0, 0.16);
+  box-shadow: -2px -2px 5px var(--neo-lift), 3px 3px 8px var(--neo-cast);
   transition: translate 0.22s cubic-bezier(0.32, 0.72, 0, 1);
 }
 
@@ -253,7 +338,8 @@ button.ios-row:active {
   padding: 2px;
   gap: 2px;
   border-radius: 9px;
-  background: var(--ios-fill);
+  background: rgba(255, 255, 255, 0.32);
+  box-shadow: var(--neo-inset);
 }
 
 .ios-segment {
@@ -266,8 +352,8 @@ button.ios-row:active {
 }
 
 .ios-segment[data-on="true"] {
-  background: var(--ios-card);
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12), 0 1px 1px rgba(0, 0, 0, 0.04);
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: var(--neo-raised);
 }
 
 .ios-field {
@@ -285,14 +371,23 @@ button.ios-row:active {
 }
 
 /* A search field is a filled pill, not a bordered box. */
-.ios-search {
+/* Anything you type into is pressed *into* the surface. That is the whole
+   grammar: raised means you can act on it, recessed means it receives. */
+.ios-search,
+.ios-input {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.4375rem 0.625rem;
+  padding: 0.5rem 0.75rem;
   border-radius: var(--ios-r);
-  background: var(--ios-fill);
+  background: rgba(255, 255, 255, 0.34);
+  box-shadow: var(--neo-inset);
   color: var(--ios-label-2);
+  transition: box-shadow 0.2s ease;
+}
+
+.ios-input:focus-within {
+  box-shadow: var(--neo-pressed), 0 0 0 3px color-mix(in srgb, var(--ios-blue) 22%, transparent);
 }
 
 .ios-btn {
@@ -308,29 +403,44 @@ button.ios-row:active {
   transition: opacity 0.15s ease, background-color 0.15s ease;
 }
 
+/* Pressed, not faded: the shadow moves inside so the button goes down into
+   the surface under a finger. */
 .ios-btn:active {
-  opacity: 0.6;
+  box-shadow: var(--neo-pressed);
 }
 
-.ios-btn-filled { background: var(--ios-blue); color: #fff; }
-.ios-btn-tinted { background: color-mix(in srgb, var(--ios-blue) 14%, transparent); color: var(--ios-blue); }
-.ios-btn-plain  { color: var(--ios-blue); }
-.ios-btn-destructive { background: color-mix(in srgb, var(--ios-red) 14%, transparent); color: var(--ios-red); }
+.ios-btn-filled {
+  background: var(--ios-blue);
+  color: #fff;
+  box-shadow: -3px -3px 10px var(--neo-lift), 5px 5px 16px color-mix(in srgb, var(--ios-blue) 34%, transparent);
+}
+.ios-btn-tinted {
+  background: rgba(255, 255, 255, 0.5);
+  color: var(--ios-blue);
+  box-shadow: var(--neo-raised);
+}
+.ios-btn-plain { color: var(--ios-blue); }
+.ios-btn-destructive {
+  background: rgba(255, 255, 255, 0.5);
+  color: var(--ios-red);
+  box-shadow: var(--neo-raised);
+}
 
 /* ————— chrome ————— */
 .ios-nav-bar {
   position: sticky;
   inset-block-start: 0;
   z-index: 30;
-  background: var(--ios-glass);
-  backdrop-filter: blur(24px) saturate(180%);
-  border-block-end: 1px solid var(--ios-separator);
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(28px) saturate(180%);
+  border-block-end: 1px solid var(--ios-glass-border);
+  box-shadow: 0 8px 24px -18px var(--neo-cast);
 }
 
 .ios-sidebar {
-  background: var(--ios-glass-thin);
-  backdrop-filter: blur(30px) saturate(180%);
-  border-inline-end: 1px solid var(--ios-separator);
+  background: rgba(255, 255, 255, 0.42);
+  backdrop-filter: blur(34px) saturate(180%);
+  border-inline-end: 1px solid var(--ios-glass-border);
 }
 
 .ios-tabbar {
@@ -338,9 +448,10 @@ button.ios-row:active {
   inset-block-end: 0;
   inset-inline: 0;
   z-index: 40;
-  background: var(--ios-glass);
-  backdrop-filter: blur(24px) saturate(180%);
-  border-block-start: 1px solid var(--ios-separator);
+  background: rgba(255, 255, 255, 0.62);
+  backdrop-filter: blur(28px) saturate(180%);
+  border-block-start: 1px solid var(--ios-glass-border);
+  box-shadow: 0 -10px 30px -20px var(--neo-cast);
   padding-block-end: env(safe-area-inset-bottom);
 }
 

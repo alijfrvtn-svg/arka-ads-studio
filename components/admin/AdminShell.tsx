@@ -32,7 +32,6 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { Logo } from "@/components/brand/Logo";
-import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { AdminSearch } from "./AdminSearch";
 import { NotificationBell, type NotificationItem } from "@/components/notifications/NotificationBell";
 import { IdleLogout } from "@/components/auth/IdleLogout";
@@ -237,7 +236,6 @@ export function AdminShell({
             </div>
             <div className="ms-auto flex items-center gap-1 lg:ms-0">
               <NotificationBell initial={notifications} />
-              <ThemeToggle />
               <a
                 href="/"
                 target="_blank"
