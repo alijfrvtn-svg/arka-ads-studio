@@ -4,9 +4,10 @@ import { JournalFilter } from "@/components/journal/JournalFilter";
 import { db } from "@/lib/db";
 import { buildMetadata } from "@/lib/seo";
 import { getLocale } from "@/lib/get-locale";
-import { tr, ui } from "@/lib/i18n";
+import { tr } from "@/lib/i18n";
 import type { Locale } from "@/types";
 import { getCategories } from "@/lib/queries";
+import { getUi } from "@/lib/site-copy";
 
 const COPY: Record<Locale, { title: string; highlight: string; description: string; metaDescription: string }> = {
   fa: {
@@ -31,11 +32,15 @@ const COPY: Record<Locale, { title: string; highlight: string; description: stri
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
-  return buildMetadata({ title: ui(locale).navJournal, path: "/journal", description: COPY[locale].metaDescription, locale });
+  // Interface strings, with anything edited in the panel applied. Cached per
+  // request, so every component asking for it costs one query between them.
+  const t = await getUi(locale);
+  return buildMetadata({ title: t.navJournal, path: "/journal", description: COPY[locale].metaDescription, locale });
 }
 
 export default async function JournalPage() {
   const locale = await getLocale();
+  const t = await getUi(locale);
   const [posts, categories] = await Promise.all([
     db.post.findMany({
       where: { published: true },
@@ -66,8 +71,8 @@ export default async function JournalPage() {
   return (
     <>
       <JournalHero
-        eyebrow={ui(locale).navJournal}
-        breadcrumb={[{ label: ui(locale).navHome, href: "/" }, { label: ui(locale).navJournal }]}
+        eyebrow={t.navJournal}
+        breadcrumb={[{ label: t.navHome, href: "/" }, { label: t.navJournal }]}
         title={<>{c.title} <span className="text-gradient">{c.highlight}</span></>}
         description={c.description}
         posts={top.map((p) => ({

@@ -1,8 +1,8 @@
 import { Section, Container, SectionHeading } from "@/components/ui/Section";
 import { Reveal } from "@/components/fx/Reveal";
-import { INDUSTRY_PAINT } from "@/lib/constants";
 import { labelOn, localeDigits } from "@/lib/utils";
 import type { Locale } from "@/types";
+import { getAppearance } from "@/lib/appearance";
 
 /**
  * The studio's history, read across rather than down.
@@ -45,7 +45,7 @@ interface Entry {
   desc: string;
 }
 
-export function AboutTimeline({
+export async function AboutTimeline({
   eyebrow,
   heading,
   items,
@@ -56,6 +56,9 @@ export function AboutTimeline({
   items: Entry[];
   locale?: Locale;
 }) {
+  // The live identity, edited in the panel; falls back to the shipped
+  // constants when nothing is saved. Cached per request.
+  const { industryPaint: INDUSTRY_PAINT } = await getAppearance();
   if (!items.length) return null;
 
   return (

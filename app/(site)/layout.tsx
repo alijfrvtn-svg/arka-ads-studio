@@ -12,6 +12,10 @@ import { parseObj } from "@/lib/utils";
 import { tr, ui } from "@/lib/i18n";
 import { getLocale } from "@/lib/get-locale";
 import { SITE } from "@/lib/constants";
+import { getAppearance } from "@/lib/appearance";
+import { getUi } from "@/lib/site-copy";
+import { AppearanceProvider } from "@/components/providers/Appearance";
+import { SiteCopyProvider } from "@/components/providers/SiteCopy";
 import type { FooterSettings } from "@/components/layout/SiteFooter";
 import type { Department } from "@/types";
 
@@ -38,13 +42,19 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
   // there (and stale slugs could 404) — fetch the live, published rows here
   // once and pass down instead.
   const locale = await getLocale();
-  const [services, industries, settingRow, contact, departments, marqueeCards] = await Promise.all([
+  // `appearance` and `copy` join the same batch rather than being awaited after
+  // it: both are cached for the request, so every server component below gets
+  // them for free, and both swallow their own failures and return the shipped
+  // constants — a database blip costs freshness, never colour or wording.
+  const [services, industries, settingRow, contact, departments, marqueeCards, appearance, copy] = await Promise.all([
     getServices(),
     getIndustries(),
     db.setting.findUnique({ where: { key: "site" } }),
     getContactPage(locale),
     getCategories("DEPARTMENT"),
     getMarqueeCards(locale),
+    getAppearance(),
+    getUi(locale),
   ]);
   const footer: FooterSettings = { ...FOOTER_DEFAULTS, ...parseObj<Partial<FooterSettings>>(settingRow?.value, {}) };
   const serviceLinks = services.map((s) => ({
@@ -77,11 +87,19 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
   }
 
   return (
-    <SmoothScroll>
+    // The palette also has to reach the stylesheet: the phone's painted band
+    // is a CSS gradient, and CSS cannot read the database. Emitted as custom
+    // properties here so that one surface stays in step with the other five.
+    <AppearanceProvider value={appearance}>
+      <SiteCopyProvider value={copy}>
+        <div
+          style={Object.fromEntries(appearance.sitePaint.map((c, i) => [`--paint-${i}`, c])) as React.CSSProperties}
+        >
+        <SmoothScroll>
       <CustomCursor />
       <Analytics />
       <a href="#main" className="skip-link">
-        {ui(locale).skipToContent}
+        {copy.skipToContent}
       </a>
       {staffPreview && <MaintenanceBanner />}
       <SiteHeader services={serviceLinks} industries={industryLinks} departments={departments} locale={locale} />
@@ -93,11 +111,14 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
           the layout rather than in each page so no route can forget it. */}
       <ServiceMarquee
         cards={marqueeCards}
-        heading={ui(locale).marqueeHeading}
-        body={ui(locale).marqueeBody}
-        ctaLabel={ui(locale).marqueeCta}
+        heading={copy.marqueeHeading}
+        body={copy.marqueeBody}
+        ctaLabel={copy.marqueeCta}
       />
       <SiteFooter services={serviceLinks} industries={industryLinks} locale={locale} footer={footer} contact={contact} />
-    </SmoothScroll>
+        </SmoothScroll>
+        </div>
+      </SiteCopyProvider>
+    </AppearanceProvider>
   );
 }

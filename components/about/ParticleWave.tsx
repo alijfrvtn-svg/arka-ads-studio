@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { useReducedMotion } from "framer-motion";
-import { INDUSTRY_PAINT } from "@/lib/constants";
+import { useAppearance } from "@/components/providers/Appearance";
 
 /**
  * The live background on the About hero.
@@ -28,8 +28,8 @@ import { INDUSTRY_PAINT } from "@/lib/constants";
  *     prefers-reduced-motion, which gets a single static frame instead.
  */
 
-/** The four site colours, starting on the red. */
-const CYCLE = [INDUSTRY_PAINT[0], INDUSTRY_PAINT[1], INDUSTRY_PAINT[3], INDUSTRY_PAINT[2]];
+/** The order the four are cycled in, starting on the red. */
+const CYCLE_ORDER = [0, 1, 3, 2];
 
 /** Seconds each colour holds before it has fully become the next one. */
 const HOLD = 10;
@@ -69,8 +69,6 @@ function hex(h: string): [number, number, number] {
   return [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16)) as [number, number, number];
 }
 
-const RGB = CYCLE.map(hex);
-
 /** Straight RGB interpolation, as asked. */
 function mix(a: [number, number, number], b: [number, number, number], t: number) {
   return [
@@ -81,6 +79,13 @@ function mix(a: [number, number, number], b: [number, number, number], t: number
 }
 
 export function ParticleWave({ className }: { className?: string }) {
+  // The live identity, edited in the panel. Falls back to the shipped
+  // constants when there is nothing saved — see lib/appearance.ts.
+  const { industryPaint: INDUSTRY_PAINT } = useAppearance();
+  // Derived in the body rather than at module scope: the palette is now read
+  // per request, so it cannot be baked into a constant when the file loads.
+  const CYCLE = CYCLE_ORDER.map((i) => INDUSTRY_PAINT[i]);
+  const RGB = CYCLE.map(hex);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const reduced = useReducedMotion();
 

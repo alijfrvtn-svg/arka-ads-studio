@@ -5,11 +5,11 @@ import { Section, SectionHeading } from "@/components/ui/Section";
 import { Reveal } from "@/components/fx/Reveal";
 import { Icon } from "@/components/ui/Icon";
 import { HighlightedTitle } from "@/components/ui/HighlightedTitle";
-import { DEPARTMENT_POSTER } from "@/lib/constants";
 import { tr } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import type { CategoryItem, HomeContent } from "@/lib/queries";
 import type { Locale } from "@/types";
+import { getAppearance } from "@/lib/appearance";
 
 /**
  * The four departments, as posters.
@@ -25,7 +25,7 @@ import type { Locale } from "@/types";
  * card outright — see that rule for the contrast maths. The top half is left
  * almost clear so the poster still reads as a poster.
  */
-export function Departments({
+export async function Departments({
   content,
   departments,
   locale = "fa",
@@ -35,6 +35,9 @@ export function Departments({
   departments: CategoryItem[];
   locale?: Locale;
 }) {
+  // The live identity, edited in the panel; falls back to the shipped
+  // constants when nothing is saved. Cached per request.
+  const { departmentPoster: DEPARTMENT_POSTER } = await getAppearance();
   return (
     <Section id="departments">
       {/* Wider than the site container: these are posters, not paragraphs. */}

@@ -6,10 +6,11 @@ import { IndustryHero } from "@/components/industries/IndustryHero";
 import { WaveList } from "@/components/ui/WaveList";
 import { IndustryRelated } from "@/components/industries/IndustryRelated";
 import { buildMetadata } from "@/lib/seo";
-import { tr, trArr, ui } from "@/lib/i18n";
+import { tr, trArr } from "@/lib/i18n";
 import { localeDigits } from "@/lib/utils";
 import { getLocale } from "@/lib/get-locale";
 import type { Locale } from "@/types";
+import { getUi } from "@/lib/site-copy";
 
 const COPY: Record<Locale, {
   metaTitlePrefix: string;
@@ -81,6 +82,9 @@ function samples(slug: string, offset: number, n = 3): string[] {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const locale = await getLocale();
+  // Interface strings, with anything edited in the panel applied. Cached per
+  // request, so every component asking for it costs one query between them.
+  const t = await getUi(locale);
   const ind = await db.industry.findUnique({ where: { slug } });
   if (!ind) return {};
   const title = tr(locale, ind.title, ind.titleEn, ind.titleAr);
@@ -96,6 +100,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 export default async function IndustryPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const locale = await getLocale();
+  const t = await getUi(locale);
   const ind = await db.industry.findUnique({
     where: { slug },
     include: {
@@ -127,7 +132,7 @@ export default async function IndustryPage({ params }: { params: Promise<{ slug:
               ? { lead: a }
               : { lead: a.slice(0, at + 1), rest: a.slice(at + 2) };
           })}
-          eyebrow={ui(locale).industryApproachEyebrow}
+          eyebrow={t.industryApproachEyebrow}
           heading={c.approachTitle(title)}
           locale={locale}
         />
@@ -156,7 +161,7 @@ export default async function IndustryPage({ params }: { params: Promise<{ slug:
           not, which is currently every industry, since nothing is published. */}
       <IndustryRelated
         className="bg-background-2"
-        eyebrow={ui(locale).portfolioEyebrow}
+        eyebrow={t.portfolioEyebrow}
         heading={c.portfolioTitle(title)}
         items={
           ind.projects.length

@@ -6,9 +6,11 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowUpLeft, ChevronDown } from "lucide-react";
 import { Icon } from "@/components/ui/Icon";
 import { cn, labelOn } from "@/lib/utils";
-import { INDUSTRY_PAINT, INDUSTRY_PAINT_ORDER } from "@/lib/constants";
-import { tr, ui } from "@/lib/i18n";
+import { INDUSTRY_PAINT_ORDER } from "@/lib/constants";
+import { tr } from "@/lib/i18n";
 import type { Locale } from "@/types";
+import { useAppearance } from "@/components/providers/Appearance";
+import { useUi } from "@/components/providers/SiteCopy";
 
 export interface AccordionIndustry {
   id: string;
@@ -77,6 +79,7 @@ function rand(seed: number) {
  * scroll on a narrow window.
  */
 function Orbits() {
+  const { industryPaint: INDUSTRY_PAINT } = useAppearance();
   const groups = [
     { n: 8, dur: 240, rev: false },
     { n: 7, dur: 310, rev: true },
@@ -150,12 +153,18 @@ export function IndustriesAccordion({
   eyebrow?: string;
   locale?: Locale;
 }) {
+  // Interface strings, with anything edited in the panel applied. Resolved
+  // once here because `ui(locale)` also appeared inside .map() below, and a
+  // hook called a varying number of times per render is a different bug.
+  const t = useUi();
+  // The live identity, edited in the panel. Falls back to the shipped
+  // constants when there is nothing saved — see lib/appearance.ts.
+  const { industryPaint: INDUSTRY_PAINT } = useAppearance();
   const reduced = useReducedMotion();
   const baseId = useId();
   // One at a time: two open panels in a list this long turns it back into a
   // wall of text, which is the thing the accordion is here to avoid.
   const [open, setOpen] = useState<string | null>(null);
-  const t = ui(locale);
 
   if (!industries.length) return null;
 

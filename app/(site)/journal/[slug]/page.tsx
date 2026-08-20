@@ -8,10 +8,11 @@ import { Container } from "@/components/ui/Section";
 import { StickyTOC } from "@/components/journal/StickyTOC";
 import { buildMetadata, articleJsonLd } from "@/lib/seo";
 import { slugify, localeDate, localeNumber, labelOn, paintSeed } from "@/lib/utils";
-import { INDUSTRY_PAINT, TEXT_PAINT } from "@/lib/constants";
-import { tr, trArr, ui } from "@/lib/i18n";
+import { tr, trArr } from "@/lib/i18n";
 import { getLocale } from "@/lib/get-locale";
 import type { Locale } from "@/types";
+import { getAppearance } from "@/lib/appearance";
+import { getUi } from "@/lib/site-copy";
 
 const COPY: Record<Locale, { ctaTitle: string; ctaBody: string }> = {
   fa: { ctaTitle: "پروژه‌ای دارید؟", ctaBody: "با تیم آرکا صحبت کنید." },
@@ -22,6 +23,9 @@ const COPY: Record<Locale, { ctaTitle: string; ctaBody: string }> = {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const locale = await getLocale();
+  // Interface strings, with anything edited in the panel applied. Cached per
+  // request, so every component asking for it costs one query between them.
+  const t = await getUi(locale);
   const p = await db.post.findUnique({ where: { slug } });
   if (!p) return {};
   return buildMetadata({
@@ -36,8 +40,12 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 }
 
 export default async function PostPage({ params }: { params: Promise<{ slug: string }> }) {
+  // The live identity, edited in the panel; falls back to the shipped
+  // constants when nothing is saved. Cached per request.
+  const { industryPaint: INDUSTRY_PAINT, textPaint: TEXT_PAINT } = await getAppearance();
   const { slug } = await params;
   const locale = await getLocale();
+  const t = await getUi(locale);
   const p = await db.post.findUnique({ where: { slug }, include: { author: { select: { name: true, avatar: true } } } });
   if (!p) notFound();
 
@@ -93,7 +101,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
       <header className="relative overflow-hidden pb-14 pt-40 md:pt-52">
         <Container className="relative max-w-4xl">
           <nav className="mb-5 text-xs text-foreground-muted">
-            <Link href="/" className="transition-colors hover:text-foreground">{ui(locale).navHome}</Link> ‹ <Link href="/journal" className="transition-colors hover:text-foreground">{ui(locale).navJournal}</Link>
+            <Link href="/" className="transition-colors hover:text-foreground">{t.navHome}</Link> ‹ <Link href="/journal" className="transition-colors hover:text-foreground">{t.navJournal}</Link>
           </nav>
           <span className="eyebrow">{category}</span>
           {/* The headline takes one of the four, picked from the slug so the
@@ -117,7 +125,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
               </span>
             )}
             <span className="flex items-center gap-1.5"><Calendar className="h-4 w-4" /> {localeDate(locale, p.publishedAt)}</span>
-            <span className="flex items-center gap-1.5"><Clock className="h-4 w-4" /> {localeNumber(locale, p.readingMinutes)} {ui(locale).readingMinutesSuffix}</span>
+            <span className="flex items-center gap-1.5"><Clock className="h-4 w-4" /> {localeNumber(locale, p.readingMinutes)} {t.readingMinutesSuffix}</span>
           </div>
         </Container>
       </header>
@@ -140,7 +148,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
                 <p className="mt-1 text-sm text-foreground-muted">{c.ctaBody}</p>
                 <Link href="/contact" className="liquid liquid-raised mt-5 inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl px-4 text-sm font-semibold">
                   <span className="inline-flex items-center gap-2">
-                    {ui(locale).ctaStartProject} <ArrowUpLeft className="h-4 w-4" />
+                    {t.ctaStartProject} <ArrowUpLeft className="h-4 w-4" />
                   </span>
                 </Link>
               </div>
@@ -167,7 +175,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
       {related.length > 0 && (
         <section className="seam-top bg-surface-2 py-20">
           <Container className="max-w-5xl">
-            <h2 className="mb-10 font-display text-2xl font-bold tracking-tight text-foreground">{ui(locale).relatedPosts}</h2>
+            <h2 className="mb-10 font-display text-2xl font-bold tracking-tight text-foreground">{t.relatedPosts}</h2>
             <div className="grid gap-6 sm:grid-cols-2">
               {related.map((r) => (
                 <Link key={r.id} href={`/journal/${r.slug}`} className="group flex gap-4 rounded-[1.25rem] border border-card-border bg-surface p-4 transition-all duration-500 [transition-timing-function:var(--ease-apple)] hover:-translate-y-1 hover:border-foreground/25 hover:shadow-[0_1px_2px_rgba(0,0,0,0.04),0_20px_44px_-26px_rgba(0,0,0,0.32)]">

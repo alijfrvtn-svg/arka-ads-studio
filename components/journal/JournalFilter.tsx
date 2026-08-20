@@ -5,10 +5,11 @@ import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { Clock } from "lucide-react";
 import { cn, localeDate, localeNumber, paintSeed } from "@/lib/utils";
-import { INDUSTRY_PAINT } from "@/lib/constants";
-import { tr, ui } from "@/lib/i18n";
+import { tr } from "@/lib/i18n";
 import type { CategoryItem } from "@/lib/queries";
 import type { Locale } from "@/types";
+import { useAppearance } from "@/components/providers/Appearance";
+import { useUi } from "@/components/providers/SiteCopy";
 
 interface Post {
   id: string;
@@ -29,9 +30,10 @@ interface Post {
 }
 
 /** A stable one of the four per category, so a card without a cover still
-    looks placed rather than arbitrary. */
-function colourIndex(category: string): number {
-  return paintSeed(category) % INDUSTRY_PAINT.length;
+    looks placed rather than arbitrary. Takes the count rather than the palette:
+    it needs to know how many there are, not what they look like. */
+function colourIndex(category: string, count: number): number {
+  return paintSeed(category) % count;
 }
 
 export function JournalFilter({
@@ -45,6 +47,13 @@ export function JournalFilter({
   categories: CategoryItem[];
   locale?: Locale;
 }) {
+  // Interface strings, with anything edited in the panel applied. Resolved
+  // once here because `ui(locale)` also appeared inside .map() below, and a
+  // hook called a varying number of times per render is a different bug.
+  const t = useUi();
+  // The live identity, edited in the panel. Falls back to the shipped
+  // constants when there is nothing saved — see lib/appearance.ts.
+  const { industryPaint: INDUSTRY_PAINT } = useAppearance();
   const ALL = "همه";
   const known = categories.filter((c) => posts.some((p) => p.category === c.slug)).map((c) => c.slug);
   // A post whose category was removed from the taxonomy still needs a home.
@@ -85,7 +94,7 @@ export function JournalFilter({
                   : "border border-card-border text-foreground-muted hover:border-foreground/25 hover:text-foreground",
               )}
             >
-              {c === ALL ? ui(locale).filterAll : tr(locale, labels.get(c)?.title ?? c, labels.get(c)?.titleEn, labels.get(c)?.titleAr)}
+              {c === ALL ? t.filterAll : tr(locale, labels.get(c)?.title ?? c, labels.get(c)?.titleEn, labels.get(c)?.titleAr)}
             </button>
           ))}
         </div>
@@ -110,7 +119,7 @@ export function JournalFilter({
                     // the cover does not. Two of the published covers are dead
                     // files, and a card whose picture is a broken-image icon
                     // reads as a broken site rather than as a missing upload.
-                    style={{ background: INDUSTRY_PAINT[colourIndex(p.category) % INDUSTRY_PAINT.length] }}
+                    style={{ background: INDUSTRY_PAINT[colourIndex(p.category, INDUSTRY_PAINT.length) % INDUSTRY_PAINT.length] }}
                   >
                     {!dead.includes(p.id) && (
                       // eslint-disable-next-line @next/next/no-img-element
@@ -127,7 +136,7 @@ export function JournalFilter({
                     <h3 className="font-display text-lg font-bold leading-snug tracking-tight text-foreground">{tr(locale, p.title, p.titleEn, p.titleAr)}</h3>
                     <p className="mt-2 line-clamp-2 flex-1 text-sm text-foreground-muted">{tr(locale, p.excerpt, p.excerptEn, p.excerptAr)}</p>
                     <div className="mt-4 flex items-center gap-3 border-t border-card-border pt-3 text-xs text-foreground-faint">
-                      <span className="flex items-center gap-1"><Clock className="h-3 w-3" /> {localeNumber(locale, p.readingMinutes)} {ui(locale).readingMinutesSuffix}</span>
+                      <span className="flex items-center gap-1"><Clock className="h-3 w-3" /> {localeNumber(locale, p.readingMinutes)} {t.readingMinutesSuffix}</span>
                       <span>·</span>
                       <span>{localeDate(locale, p.publishedAt, { month: "long", day: "numeric" })}</span>
                     </div>

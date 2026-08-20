@@ -18,17 +18,22 @@ import {
   getIndustries,
 } from "@/lib/queries";
 import { getLocale } from "@/lib/get-locale";
-import { tr, ui } from "@/lib/i18n";
+import { tr } from "@/lib/i18n";
 import { buildMetadata } from "@/lib/seo";
 import type { Metadata } from "next";
+import { getUi } from "@/lib/site-copy";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
+  // Interface strings, with anything edited in the panel applied. Cached per
+  // request, so every component asking for it costs one query between them.
+  const t = await getUi(locale);
   return buildMetadata({ path: "/", locale });
 }
 
 export default async function HomePage() {
   const locale = await getLocale();
+  const t = await getUi(locale);
   const [projects, stats, testimonials, clients, content, departments, showcase, industries] = await Promise.all([
     getFeaturedProjects(7),
     getStats(),
@@ -39,8 +44,6 @@ export default async function HomePage() {
     getHeroShowcase(locale),
     getIndustries(),
   ]);
-
-  const t = ui(locale);
   const statData = stats.map((s) => ({ label: tr(locale, s.label, s.labelEn, s.labelAr), value: s.value, suffix: s.suffix }));
   const testimonialData = testimonials.map((t) => ({
     id: t.id,

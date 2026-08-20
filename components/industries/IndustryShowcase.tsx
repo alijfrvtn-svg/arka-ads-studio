@@ -8,9 +8,10 @@ import { Icon } from "@/components/ui/Icon";
 import { EmbedFrame } from "@/components/media/EmbedFrame";
 import { getEmbedUrl } from "@/lib/embed";
 import { cn, labelOn } from "@/lib/utils";
-import { INDUSTRY_PAINT, INDUSTRY_PAINT_ORDER } from "@/lib/constants";
+import { INDUSTRY_PAINT_ORDER } from "@/lib/constants";
 import { tr } from "@/lib/i18n";
 import type { Locale } from "@/types";
+import { useAppearance } from "@/components/providers/Appearance";
 
 /**
  * The industries page: a list you run down, and a stage that answers it.
@@ -138,6 +139,9 @@ function Media({
 }
 
 export function IndustryShowcase({ industries, locale = "fa" }: { industries: Ind[]; locale?: Locale }) {
+  // The live identity, edited in the panel. Falls back to the shipped
+  // constants when there is nothing saved — see lib/appearance.ts.
+  const { industryPaint: INDUSTRY_PAINT } = useAppearance();
   const reduced = useReducedMotion();
   const c = COPY[locale] ?? COPY.fa;
   const [active, setActive] = useState(0);

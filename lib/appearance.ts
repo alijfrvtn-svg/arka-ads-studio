@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { db } from "@/lib/db";
 import {
   SITE_PAINT,
@@ -102,14 +103,18 @@ export function mergeAppearance(saved: Partial<Appearance> | null | undefined): 
 /**
  * The live identity.
  *
+ * `cache()` because a dozen server components ask for this while rendering one
+ * page, and without it that is a dozen round trips to a database that has been
+ * timing out all week. One per request instead.
+ *
  * Never throws. If the query fails the site gets the constants, which is the
  * design as shipped — a database blip should cost freshness, not colour.
  */
-export async function getAppearance(): Promise<Appearance> {
+export const getAppearance = cache(async (): Promise<Appearance> => {
   try {
     const row = await db.setting.findUnique({ where: { key: APPEARANCE_KEY } });
     return mergeAppearance(parseObj<Partial<Appearance>>(row?.value, {}));
   } catch {
     return APPEARANCE_DEFAULTS;
   }
-}
+});

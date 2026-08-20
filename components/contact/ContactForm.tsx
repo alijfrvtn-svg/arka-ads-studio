@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { CheckCircle2, Loader2, Send } from "lucide-react";
-import { ui } from "@/lib/i18n";
 import type { Locale } from "@/types";
+import { useUi } from "@/components/providers/SiteCopy";
 
 const field =
   "peer h-14 w-full rounded-[14px] border border-card-border bg-surface-2 px-4 pt-4 text-foreground outline-none transition-all duration-300 [transition-timing-function:var(--ease-apple)] focus:border-foreground focus:bg-background focus:shadow-[0_0_0_4px_rgba(0,0,0,0.05)] placeholder-transparent";
@@ -19,7 +19,10 @@ export function ContactForm({
   budgetOptions: string[];
   locale: Locale;
 }) {
-  const t = ui(locale);
+  // Interface strings, with anything edited in the panel applied. Resolved
+  // once here because `ui(locale)` also appeared inside .map() below, and a
+  // hook called a varying number of times per render is a different bug.
+  const t = useUi();
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
   const [error, setError] = useState("");

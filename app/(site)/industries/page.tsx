@@ -5,8 +5,8 @@ import { IndustryShowcase } from "@/components/industries/IndustryShowcase";
 import { getIndustries } from "@/lib/queries";
 import { buildMetadata } from "@/lib/seo";
 import { getLocale } from "@/lib/get-locale";
-import { ui } from "@/lib/i18n";
 import type { Locale } from "@/types";
+import { getUi } from "@/lib/site-copy";
 
 const COPY: Record<Locale, { title: string; highlight: string; description: string; metaDescription: string }> = {
   fa: {
@@ -31,8 +31,11 @@ const COPY: Record<Locale, { title: string; highlight: string; description: stri
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
+  // Interface strings, with anything edited in the panel applied. Cached per
+  // request, so every component asking for it costs one query between them.
+  const t = await getUi(locale);
   return buildMetadata({
-    title: ui(locale).navIndustries,
+    title: t.navIndustries,
     path: "/industries",
     description: COPY[locale].metaDescription,
     locale,
@@ -41,13 +44,14 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function IndustriesPage() {
   const locale = await getLocale();
+  const t = await getUi(locale);
   const industries = await getIndustries();
   const c = COPY[locale];
   return (
     <>
       <IndustriesHero
-        eyebrow={ui(locale).navIndustries}
-        breadcrumb={[{ label: ui(locale).navHome, href: "/" }, { label: ui(locale).navIndustries }]}
+        eyebrow={t.navIndustries}
+        breadcrumb={[{ label: t.navHome, href: "/" }, { label: t.navIndustries }]}
         title={<>{c.title} <span className="text-gradient">{c.highlight}</span></>}
         description={c.description}
         count={industries.length}

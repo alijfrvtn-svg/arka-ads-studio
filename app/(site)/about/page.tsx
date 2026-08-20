@@ -9,15 +9,19 @@ import { VideoPlayer } from "@/components/work/VideoPlayer";
 import { SocialIcon } from "@/components/layout/SocialIcon";
 import { getStats, getTeam, getAboutPage } from "@/lib/queries";
 import { buildMetadata } from "@/lib/seo";
-import { tr, ui } from "@/lib/i18n";
+import { tr } from "@/lib/i18n";
 import { parseArr, labelOn, cn } from "@/lib/utils";
-import { INDUSTRY_PAINT } from "@/lib/constants";
 import { getLocale } from "@/lib/get-locale";
 import { HighlightedTitle } from "@/components/ui/HighlightedTitle";
 import type { Social } from "@/types";
+import { getAppearance } from "@/lib/appearance";
+import { getUi } from "@/lib/site-copy";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
+  // Interface strings, with anything edited in the panel applied. Cached per
+  // request, so every component asking for it costs one query between them.
+  const t = await getUi(locale);
   const a = await getAboutPage(locale);
   return buildMetadata({ title: a.metaTitle, path: "/about", description: a.metaDescription, locale });
 }
@@ -25,7 +29,11 @@ export async function generateMetadata(): Promise<Metadata> {
 const ICONS: Record<string, LucideIcon> = { Target, Gem, Zap, Sparkles };
 
 export default async function AboutPage() {
+  // The live identity, edited in the panel; falls back to the shipped
+  // constants when nothing is saved. Cached per request.
+  const { industryPaint: INDUSTRY_PAINT } = await getAppearance();
   const locale = await getLocale();
+  const t = await getUi(locale);
   const [team, stats, a] = await Promise.all([getTeam(), getStats(), getAboutPage(locale)]);
   const statData = stats.map((s) => ({ label: tr(locale, s.label, s.labelEn, s.labelAr), value: s.value, suffix: s.suffix }));
 
@@ -33,7 +41,7 @@ export default async function AboutPage() {
     <>
       <WaveHero
         eyebrow={a.heroEyebrow}
-        breadcrumb={[{ label: ui(locale).navHome, href: "/" }, { label: ui(locale).navAbout }]}
+        breadcrumb={[{ label: t.navHome, href: "/" }, { label: t.navAbout }]}
         title={<HighlightedTitle title={a.heroTitle} highlight={a.heroTitleHighlight} />}
         description={a.heroDescription}
       />

@@ -13,10 +13,11 @@ import { Magnetic } from "@/components/fx/Magnetic";
 // LanguageSwitcher import removed while multi-language is paused — component kept at
 // components/layout/LanguageSwitcher.tsx for re-enabling later.
 import { NAV } from "@/lib/constants";
-import { tr, ui } from "@/lib/i18n";
+import { tr } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import type { CategoryItem } from "@/lib/queries";
 import type { Locale } from "@/types";
+import { useUi } from "@/components/providers/SiteCopy";
 
 const NAV_KEY: Record<string, string> = {
   "/": "navHome",
@@ -40,7 +41,10 @@ export function SiteHeader({
   departments: CategoryItem[];
   locale: Locale;
 }) {
-  const t = ui(locale);
+  // Interface strings, with anything edited in the panel applied. Resolved
+  // once here because `ui(locale)` also appeared inside .map() below, and a
+  // hook called a varying number of times per render is a different bug.
+  const t = useUi();
   const navLabel = (href: string) => (t as Record<string, string>)[NAV_KEY[href]] ?? href;
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);

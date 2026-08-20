@@ -3,9 +3,9 @@ import { ChevronLeft } from "lucide-react";
 import { Container, Eyebrow } from "@/components/ui/Section";
 import { Reveal } from "@/components/fx/Reveal";
 import { JournalDeck, type DeckPost } from "./JournalDeck";
-import { INDUSTRY_PAINT } from "@/lib/constants";
 import { localeDigits } from "@/lib/utils";
 import type { Locale } from "@/types";
+import { getAppearance } from "@/lib/appearance";
 
 /**
  * The journal opens on articles, not on a slogan.
@@ -52,7 +52,7 @@ const COPY: Record<Locale, { promise: (a: string, b: string) => string; noExcept
   },
 };
 
-export function JournalHero({
+export async function JournalHero({
   eyebrow,
   title,
   description,
@@ -71,6 +71,9 @@ export function JournalHero({
   maxMinutes: number;
   locale?: Locale;
 }) {
+  // The live identity, edited in the panel; falls back to the shipped
+  // constants when nothing is saved. Cached per request.
+  const { industryPaint: INDUSTRY_PAINT } = await getAppearance();
   const c = COPY[locale] ?? COPY.fa;
 
   return (

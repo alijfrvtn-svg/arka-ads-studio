@@ -4,10 +4,11 @@ import { useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ProjectCard } from "./ProjectCard";
 import { cn } from "@/lib/utils";
-import { tr, ui } from "@/lib/i18n";
+import { tr } from "@/lib/i18n";
 import type { CategoryItem } from "@/lib/queries";
 import type { Locale } from "@/types";
 import { projectStatus } from "@/lib/constants";
+import { useUi } from "@/components/providers/SiteCopy";
 
 interface P {
   id: string;
@@ -39,6 +40,10 @@ export function WorkFilter({
   categories: CategoryItem[];
   locale?: Locale;
 }) {
+  // Interface strings, with anything edited in the panel applied. Resolved
+  // once here because `ui(locale)` also appeared inside .map() below, and a
+  // hook called a varying number of times per render is a different bug.
+  const t = useUi();
   const ALL = "همه";
   const [cat, setCat] = useState(ALL);
 
@@ -100,7 +105,7 @@ export function WorkFilter({
                   : "border border-card-border text-foreground-muted hover:border-foreground/25 hover:text-foreground",
               )}
             >
-              {c === ALL ? ui(locale).filterAll : tr(locale, labels.get(c)?.title ?? c, labels.get(c)?.titleEn, labels.get(c)?.titleAr)}
+              {c === ALL ? t.filterAll : tr(locale, labels.get(c)?.title ?? c, labels.get(c)?.titleEn, labels.get(c)?.titleAr)}
             </button>
           ))}
         </div>
@@ -134,7 +139,7 @@ export function WorkFilter({
                       aria-hidden
                     />
                   )}
-                  {v === "ALL" ? ui(locale).filterAll : tr(locale, meta!.label, meta!.labelEn, meta!.labelAr)}
+                  {v === "ALL" ? t.filterAll : tr(locale, meta!.label, meta!.labelEn, meta!.labelAr)}
                 </button>
               );
             })}
@@ -161,7 +166,7 @@ export function WorkFilter({
           </AnimatePresence>
         </motion.div>
         {filtered.length === 0 && (
-          <p className="py-20 text-center text-foreground-muted">{ui(locale).workEmpty}</p>
+          <p className="py-20 text-center text-foreground-muted">{t.workEmpty}</p>
         )}
       </div>
     </div>

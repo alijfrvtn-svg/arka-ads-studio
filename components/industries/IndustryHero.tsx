@@ -6,8 +6,8 @@ import { Reveal } from "@/components/fx/Reveal";
 import { EmbedFrame } from "@/components/media/EmbedFrame";
 import { getEmbedUrl } from "@/lib/embed";
 import { cn } from "@/lib/utils";
-import { ui } from "@/lib/i18n";
 import type { Locale } from "@/types";
+import { useUi } from "@/components/providers/SiteCopy";
 
 /**
  * Static cover + title/description by default; hovering the background
@@ -27,6 +27,10 @@ export function IndustryHero({
   heroVideo: string | null;
   locale?: Locale;
 }) {
+  // Interface strings, with anything edited in the panel applied. Resolved
+  // once here because `ui(locale)` also appeared inside .map() below, and a
+  // hook called a varying number of times per render is a different bug.
+  const t = useUi();
   const [hover, setHover] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const embedUrl = heroVideo ? getEmbedUrl(heroVideo, { autoplay: true, mute: true, loop: true }) : null;
@@ -105,16 +109,16 @@ export function IndustryHero({
               still starts flush with the heading under it. */}
           <nav className="-mx-2 mb-4 flex flex-wrap items-center text-xs text-foreground-muted">
             <Link href="/" className="inline-flex min-h-11 items-center px-2 transition-colors hover:text-foreground">
-              {ui(locale).navHome}
+              {t.navHome}
             </Link>
             <span aria-hidden>‹</span>
             <Link href="/industries" className="inline-flex min-h-11 items-center px-2 transition-colors hover:text-foreground">
-              {ui(locale).navIndustries}
+              {t.navIndustries}
             </Link>
           </nav>
         </Reveal>
         <Reveal delay={0.05}>
-          <span className="eyebrow">{ui(locale).industryHeroEyebrow}</span>
+          <span className="eyebrow">{t.industryHeroEyebrow}</span>
         </Reveal>
         <Reveal delay={0.1}>
           <h1 className="mt-4 font-display text-5xl font-extrabold text-foreground md:text-7xl">{title}</h1>

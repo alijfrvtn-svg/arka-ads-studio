@@ -5,8 +5,8 @@ import { getAllProjects, getCategories } from "@/lib/queries";
 import { buildMetadata } from "@/lib/seo";
 import { breadcrumbJsonLd } from "@/lib/seo";
 import { getLocale } from "@/lib/get-locale";
-import { ui } from "@/lib/i18n";
 import type { Locale } from "@/types";
+import { getUi } from "@/lib/site-copy";
 
 /** Headline copy lives in WorkCinematicHero, which renders it. This is only
  *  what the page needs for its <meta>. */
@@ -18,11 +18,15 @@ const COPY: Record<Locale, { metaDescription: string }> = {
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
-  return buildMetadata({ title: ui(locale).navWork, path: "/work", description: COPY[locale].metaDescription, locale });
+  // Interface strings, with anything edited in the panel applied. Cached per
+  // request, so every component asking for it costs one query between them.
+  const t = await getUi(locale);
+  return buildMetadata({ title: t.navWork, path: "/work", description: COPY[locale].metaDescription, locale });
 }
 
 export default async function WorkPage() {
   const locale = await getLocale();
+  const t = await getUi(locale);
   const [projects, categories] = await Promise.all([getAllProjects(), getCategories("WORK")]);
   return (
     <>
@@ -30,8 +34,8 @@ export default async function WorkPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify(breadcrumbJsonLd([
-            { name: ui(locale).navHome, path: "/" },
-            { name: ui(locale).navWork, path: "/work" },
+            { name: t.navHome, path: "/" },
+            { name: t.navWork, path: "/work" },
           ])),
         }}
       />

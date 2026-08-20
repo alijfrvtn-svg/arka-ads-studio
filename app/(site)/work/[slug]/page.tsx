@@ -9,11 +9,12 @@ import { VideoPlayer } from "@/components/work/VideoPlayer";
 import { BeforeAfter } from "@/components/work/BeforeAfter";
 import { buildMetadata, creativeWorkJsonLd, breadcrumbJsonLd } from "@/lib/seo";
 import { parseArr, localeDigits } from "@/lib/utils";
-import { tr, trArr, ui } from "@/lib/i18n";
+import { tr, trArr } from "@/lib/i18n";
 import { getLocale } from "@/lib/get-locale";
 import type { Credit, Metric } from "@/types";
 import type { Locale } from "@/types";
 import { ProjectStatusDot } from "@/components/work/ProjectStatusDot";
+import { getUi } from "@/lib/site-copy";
 
 const STORY_LABEL: Record<Locale, Record<"goal" | "problem" | "idea" | "production" | "marketing" | "result", string>> = {
   fa: { goal: "هدف", problem: "چالش", idea: "ایده", production: "تولید", marketing: "بازاریابی", result: "نتیجه" },
@@ -31,6 +32,9 @@ const COPY: Record<Locale, { beforeAfterEyebrow: string; beforeAfterHeading: str
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const locale = await getLocale();
+  // Interface strings, with anything edited in the panel applied. Cached per
+  // request, so every component asking for it costs one query between them.
+  const t = await getUi(locale);
   const p = await db.project.findUnique({ where: { slug }, include: { seo: true } });
   if (!p) return {};
   return buildMetadata({
@@ -47,6 +51,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 export default async function CaseStudy({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const locale = await getLocale();
+  const t = await getUi(locale);
   const p = await db.project.findUnique({
     where: { slug },
     include: { client: true, services: true, industries: true, seo: true },
@@ -74,7 +79,7 @@ export default async function CaseStudy({ params }: { params: Promise<{ slug: st
   return (
     <article>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(creativeWorkJsonLd({ title, description: subtitle, image: p.cover, path: `/work/${p.slug}`, client: p.client?.name })) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd([{ name: ui(locale).navHome, path: "/" }, { name: ui(locale).navWork, path: "/work" }, { name: title, path: `/work/${p.slug}` }])) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd([{ name: t.navHome, path: "/" }, { name: t.navWork, path: "/work" }, { name: title, path: `/work/${p.slug}` }])) }} />
 
       {/* hero */}
       <section className="relative flex min-h-[86vh] items-end overflow-hidden pb-16 pt-32">
@@ -84,8 +89,8 @@ export default async function CaseStudy({ params }: { params: Promise<{ slug: st
         <Container className="relative">
           <Reveal>
             <nav className="mb-5 flex items-center gap-1.5 text-xs text-white/70">
-              <Link href="/" className="transition-colors hover:text-white">{ui(locale).navHome}</Link> ‹
-              <Link href="/work" className="transition-colors hover:text-white">{ui(locale).navWork}</Link>
+              <Link href="/" className="transition-colors hover:text-white">{t.navHome}</Link> ‹
+              <Link href="/work" className="transition-colors hover:text-white">{t.navWork}</Link>
             </nav>
           </Reveal>
           <Reveal delay={0.05}>
@@ -113,10 +118,10 @@ export default async function CaseStudy({ params }: { params: Promise<{ slug: st
       <div className="seam-top seam-bottom bg-surface/40">
         <Container>
           <div className="grid grid-cols-2 gap-6 py-8 md:grid-cols-4">
-            <Meta icon={Users2} label={ui(locale).metaClient} value={p.client ? tr(locale, p.client.name, p.client.nameEn, p.client.nameEn) : "—"} />
-            <Meta icon={Calendar} label={ui(locale).metaYear} value={localeDigits(locale, p.year)} />
-            <Meta icon={MapPin} label={ui(locale).metaLocation} value={location || "—"} />
-            <Meta icon={Tag} label={ui(locale).footerServices} value={p.services.map((s) => tr(locale, s.title, s.titleEn, s.titleAr)).join(locale === "fa" ? "، " : ", ") || "—"} />
+            <Meta icon={Users2} label={t.metaClient} value={p.client ? tr(locale, p.client.name, p.client.nameEn, p.client.nameEn) : "—"} />
+            <Meta icon={Calendar} label={t.metaYear} value={localeDigits(locale, p.year)} />
+            <Meta icon={MapPin} label={t.metaLocation} value={location || "—"} />
+            <Meta icon={Tag} label={t.footerServices} value={p.services.map((s) => tr(locale, s.title, s.titleEn, s.titleAr)).join(locale === "fa" ? "، " : ", ") || "—"} />
           </div>
         </Container>
       </div>
@@ -231,7 +236,7 @@ export default async function CaseStudy({ params }: { params: Promise<{ slug: st
           <div className="grid gap-10 md:grid-cols-2">
             {credits.length > 0 && (
               <div>
-                <Eyebrow>{ui(locale).credits}</Eyebrow>
+                <Eyebrow>{t.credits}</Eyebrow>
                 <dl className="mt-5 space-y-3">
                   {credits.map((cr, i) => (
                     <div key={i} className="flex justify-between border-b border-card-border pb-3">
@@ -244,7 +249,7 @@ export default async function CaseStudy({ params }: { params: Promise<{ slug: st
             )}
             {tags.length > 0 && (
               <div>
-                <Eyebrow>{ui(locale).tagsLabel}</Eyebrow>
+                <Eyebrow>{t.tagsLabel}</Eyebrow>
                 <div className="mt-5 flex flex-wrap gap-2">
                   {tags.map((t) => (
                     <span key={t} className="rounded-full border border-card-border px-4 py-2 text-sm text-foreground-muted">{t}</span>
@@ -263,11 +268,11 @@ export default async function CaseStudy({ params }: { params: Promise<{ slug: st
           <img src={next.cover} alt="" className="absolute inset-0 h-full w-full object-cover opacity-30 transition-transform duration-[900ms] [transition-timing-function:var(--ease-apple)] group-hover:scale-[1.04]" />
           <div className="absolute inset-0 bg-background/75" />
           <Container className="relative py-32 text-center">
-            <p className="text-[0.78rem] uppercase tracking-[0.18em] text-foreground-faint lg:text-[0.7rem] lg:tracking-[0.3em]">{ui(locale).nextProject}</p>
+            <p className="text-[0.78rem] uppercase tracking-[0.18em] text-foreground-faint lg:text-[0.7rem] lg:tracking-[0.3em]">{t.nextProject}</p>
             <h2 className="mx-auto mt-4 max-w-3xl font-display text-3xl font-extrabold tracking-[-0.03em] text-foreground md:text-5xl">{tr(locale, next.title, next.titleEn, next.titleAr)}</h2>
             <span className="liquid liquid-raised mt-10 inline-flex items-center gap-2 rounded-full px-8 py-4 font-semibold">
               <span className="inline-flex items-center gap-2">
-                {ui(locale).viewProject} <ArrowUpLeft className="h-5 w-5 transition-transform duration-500 group-hover:-translate-x-1 group-hover:-translate-y-1" />
+                {t.viewProject} <ArrowUpLeft className="h-5 w-5 transition-transform duration-500 group-hover:-translate-x-1 group-hover:-translate-y-1" />
               </span>
             </span>
           </Container>

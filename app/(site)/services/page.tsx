@@ -7,12 +7,14 @@ import { Reveal } from "@/components/fx/Reveal";
 import { ServiceArc } from "@/components/services/ServiceArc";
 import { Icon } from "@/components/ui/Icon";
 import { getServices } from "@/lib/queries";
-import { DEPARTMENTS, DEPARTMENT_PAINT } from "@/lib/constants";
+import { DEPARTMENTS } from "@/lib/constants";
 import { buildMetadata } from "@/lib/seo";
 import { cn, labelOn, localeNumber } from "@/lib/utils";
-import { tr, ui } from "@/lib/i18n";
+import { tr } from "@/lib/i18n";
 import { getLocale } from "@/lib/get-locale";
 import type { Locale } from "@/types";
+import { getAppearance } from "@/lib/appearance";
+import { getUi } from "@/lib/site-copy";
 
 const COPY: Record<Locale, { title: string; highlight: string; description: string; metaDescription: string; details: string; priceUnit: string }> = {
   fa: {
@@ -43,18 +45,25 @@ const COPY: Record<Locale, { title: string; highlight: string; description: stri
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
-  return buildMetadata({ title: ui(locale).navServices, path: "/services", description: COPY[locale].metaDescription, locale });
+  // Interface strings, with anything edited in the panel applied. Cached per
+  // request, so every component asking for it costs one query between them.
+  const t = await getUi(locale);
+  return buildMetadata({ title: t.navServices, path: "/services", description: COPY[locale].metaDescription, locale });
 }
 
 export default async function ServicesPage() {
+  // The live identity, edited in the panel; falls back to the shipped
+  // constants when nothing is saved. Cached per request.
+  const { departmentPaint: DEPARTMENT_PAINT } = await getAppearance();
   const locale = await getLocale();
+  const t = await getUi(locale);
   const services = await getServices();
   const c = COPY[locale];
   return (
     <>
       <ServicesHero
-        eyebrow={ui(locale).navServices}
-        breadcrumb={[{ label: ui(locale).navHome, href: "/" }, { label: ui(locale).navServices }]}
+        eyebrow={t.navServices}
+        breadcrumb={[{ label: t.navHome, href: "/" }, { label: t.navServices }]}
         title={<>{c.title} <span className="text-gradient">{c.highlight}</span></>}
         description={c.description}
         locale={locale}

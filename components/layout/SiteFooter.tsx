@@ -3,9 +3,9 @@ import { ArrowUpLeft, Mail, MapPin, Phone } from "lucide-react";
 import { Logo } from "@/components/brand/Logo";
 import { SocialIcon } from "./SocialIcon";
 import { SITE, NAV } from "@/lib/constants";
-import { ui } from "@/lib/i18n";
 import type { Locale } from "@/types";
 import type { ContactContent } from "@/lib/queries";
+import { getUi } from "@/lib/site-copy";
 
 const NAV_KEY: Record<string, string> = {
   "/": "navHome",
@@ -25,7 +25,7 @@ export interface FooterSettings {
   footerCopyright: string;
 }
 
-export function SiteFooter({
+export async function SiteFooter({
   services,
   industries,
   locale,
@@ -38,7 +38,9 @@ export function SiteFooter({
   footer: FooterSettings;
   contact: ContactContent;
 }) {
-  const t = ui(locale);
+  // Interface strings, with anything edited in the panel applied. Cached per
+  // request, so every component asking for it costs one query between them.
+  const t = await getUi(locale);
   // The admin-editable Settings fields are Persian-only for now (English/
   // Arabic content translation is a separate, paused stage) — fall back to
   // the static UI dictionary's own fa/en/ar copy for non-Persian visitors.

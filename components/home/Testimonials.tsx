@@ -6,12 +6,12 @@ import { motion, useReducedMotion } from "framer-motion";
 import { ChevronLeft, ChevronRight, Quote, Star } from "lucide-react";
 import { Section, Container, SectionHeading } from "@/components/ui/Section";
 import { HighlightedTitle } from "@/components/ui/HighlightedTitle";
-import { ui } from "@/lib/i18n";
 import { localeDigits, labelOn } from "@/lib/utils";
 import { useMediaQuery, DESKTOP } from "@/lib/use-media";
-import { SITE_PAINT } from "@/lib/constants";
 import type { HomeContent } from "@/lib/queries";
 import type { Locale } from "@/types";
+import { useAppearance } from "@/components/providers/Appearance";
+import { useUi } from "@/components/providers/SiteCopy";
 
 const REVIEW_WORD: Record<Locale, string> = { fa: "نظر", en: "Review", ar: "رأي" };
 
@@ -82,6 +82,13 @@ function seat(depth: number, last: boolean, flat: boolean) {
 }
 
 export function Testimonials({ items, content, locale = "fa" }: { items: T[]; content: HomeContent; locale?: Locale }) {
+  // Interface strings, with anything edited in the panel applied. Resolved
+  // once here because `ui(locale)` also appeared inside .map() below, and a
+  // hook called a varying number of times per render is a different bug.
+  const t = useUi();
+  // The live identity, edited in the panel. Falls back to the shipped
+  // constants when there is nothing saved — see lib/appearance.ts.
+  const { sitePaint: SITE_PAINT } = useAppearance();
   const reduced = useReducedMotion();
   const [i, setI] = useState(0);
   const [held, setHeld] = useState(false);
@@ -225,7 +232,7 @@ export function Testimonials({ items, content, locale = "fa" }: { items: T[]; co
           <div className="mt-10 flex items-center justify-center gap-2 sm:gap-4">
             <button
               onClick={() => go(-1)}
-              aria-label={ui(locale).testimonialPrev}
+              aria-label={t.testimonialPrev}
               className="liquid liquid-clear grid h-11 w-11 shrink-0 place-items-center rounded-full text-foreground"
             >
               <ChevronRight className="h-5 w-5" />
@@ -249,7 +256,7 @@ export function Testimonials({ items, content, locale = "fa" }: { items: T[]; co
             </div>
             <button
               onClick={() => go(1)}
-              aria-label={ui(locale).testimonialNext}
+              aria-label={t.testimonialNext}
               className="liquid liquid-clear grid h-11 w-11 shrink-0 place-items-center rounded-full text-foreground"
             >
               <ChevronLeft className="h-5 w-5" />

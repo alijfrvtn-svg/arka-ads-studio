@@ -6,25 +6,33 @@ import { Section, Container } from "@/components/ui/Section";
 import { Reveal } from "@/components/fx/Reveal";
 import { ContactForm } from "@/components/contact/ContactForm";
 import { SocialIcon } from "@/components/layout/SocialIcon";
-import { INDUSTRY_PAINT, DEPARTMENT_DESC_GRADIENT } from "@/lib/constants";
 import { labelOn } from "@/lib/utils";
 
-/** The teal of the four supplied pairs. */
-const SOCIAL_GRADIENT = DEPARTMENT_DESC_GRADIENT.DIGITAL;
 import { getContactPage } from "@/lib/queries";
 import { buildMetadata } from "@/lib/seo";
 import { getLocale } from "@/lib/get-locale";
-import { ui } from "@/lib/i18n";
 import { HighlightedTitle } from "@/components/ui/HighlightedTitle";
+import { getAppearance } from "@/lib/appearance";
+import { getUi } from "@/lib/site-copy";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
+  // Interface strings, with anything edited in the panel applied. Cached per
+  // request, so every component asking for it costs one query between them.
+  const t = await getUi(locale);
   const c = await getContactPage(locale);
   return buildMetadata({ title: c.metaTitle, path: "/contact", description: c.metaDescription, locale });
 }
 
 export default async function ContactPage() {
+  // The live identity, edited in the panel; falls back to the shipped
+  // constants when nothing is saved. Cached per request.
+  const { departmentGradient: DEPARTMENT_DESC_GRADIENT, industryPaint: INDUSTRY_PAINT } = await getAppearance();
+  // The teal of the four supplied pairs. Derived here rather than at module
+  // scope now that the palette is read per request.
+  const SOCIAL_GRADIENT = DEPARTMENT_DESC_GRADIENT.DIGITAL;
   const locale = await getLocale();
+  const t = await getUi(locale);
   const c = await getContactPage(locale);
   const bboxLat = 0.03;
   const bboxLng = 0.03;
@@ -34,7 +42,7 @@ export default async function ContactPage() {
     <>
       <WaveHero
         eyebrow={c.heroEyebrow}
-        breadcrumb={[{ label: ui(locale).navHome, href: "/" }, { label: ui(locale).navContact }]}
+        breadcrumb={[{ label: t.navHome, href: "/" }, { label: t.navContact }]}
         title={<HighlightedTitle title={c.heroTitle} highlight={c.heroTitleHighlight} />}
         description={c.heroDescription}
       />
@@ -65,7 +73,7 @@ export default async function ContactPage() {
               >
                 <span className="crystal" aria-hidden />
                 <div className="relative flex flex-wrap items-center justify-between gap-4">
-                  <p className="text-sm font-semibold text-white">{ui(locale).footerFollowUs}</p>
+                  <p className="text-sm font-semibold text-white">{t.footerFollowUs}</p>
                   <div className="flex gap-2">
                     {c.socials.map((s) => (
                       <a
@@ -89,10 +97,10 @@ export default async function ContactPage() {
                 {/* One of the four per row, in order — the same four that
                     carry every other coloured surface on the site. */}
                 <div className="space-y-4">
-                  <ContactRow colour={INDUSTRY_PAINT[0]} icon={MapPin} label={ui(locale).contactRowOffice} value={c.address} />
-                  <ContactRow colour={INDUSTRY_PAINT[1]} icon={Phone} label={ui(locale).contactRowPhone} value={c.phoneDisplay} href={`tel:${c.phone}`} ltr />
-                  <ContactRow colour={INDUSTRY_PAINT[2]} icon={Mail} label={ui(locale).contactRowEmail} value={c.email} href={`mailto:${c.email}`} ltr />
-                  <ContactRow colour={INDUSTRY_PAINT[3]} icon={Clock} label={ui(locale).contactRowHours} value={c.officeHours} />
+                  <ContactRow colour={INDUSTRY_PAINT[0]} icon={MapPin} label={t.contactRowOffice} value={c.address} />
+                  <ContactRow colour={INDUSTRY_PAINT[1]} icon={Phone} label={t.contactRowPhone} value={c.phoneDisplay} href={`tel:${c.phone}`} ltr />
+                  <ContactRow colour={INDUSTRY_PAINT[2]} icon={Mail} label={t.contactRowEmail} value={c.email} href={`mailto:${c.email}`} ltr />
+                  <ContactRow colour={INDUSTRY_PAINT[3]} icon={Clock} label={t.contactRowHours} value={c.officeHours} />
                 </div>
 
                 {/* The tiles keep their own colour now — parks green, water
@@ -102,7 +110,7 @@ export default async function ContactPage() {
                     carries colour of its own. */}
                 <div className="relative overflow-hidden rounded-[1.5rem] border border-card-border">
                   <iframe
-                    title={ui(locale).mapTitle}
+                    title={t.mapTitle}
                     src={`https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${c.mapLat}%2C${c.mapLng}`}
                     className="h-64 w-full"
                     loading="lazy"

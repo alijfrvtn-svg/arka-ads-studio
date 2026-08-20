@@ -5,10 +5,10 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion, useReducedMotion } from "framer-motion";
 import { ArrowUpLeft, Clock } from "lucide-react";
-import { INDUSTRY_PAINT } from "@/lib/constants";
 import { labelOn, localeDigits } from "@/lib/utils";
 import { useMediaQuery, DESKTOP } from "@/lib/use-media";
 import type { Locale } from "@/types";
+import { useAppearance } from "@/components/providers/Appearance";
 
 /**
  * The five most-read posts, as a deck.
@@ -89,6 +89,9 @@ export function JournalDeck({
   postLabel: string;
   locale?: Locale;
 }) {
+  // The live identity, edited in the panel. Falls back to the shipped
+  // constants when there is nothing saved — see lib/appearance.ts.
+  const { industryPaint: INDUSTRY_PAINT } = useAppearance();
   const reduced = useReducedMotion();
   const [i, setI] = useState(0);
   const [held, setHeld] = useState(false);

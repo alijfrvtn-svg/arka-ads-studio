@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { db } from "@/lib/db";
 import { UI } from "@/lib/i18n";
 import { parseObj } from "@/lib/utils";
@@ -78,15 +79,26 @@ export function groupCopyKeys(rows: { key: string }[]) {
   return [...out.entries()].map(([label, keys]) => ({ label, keys }));
 }
 
-/** Overrides only. Never throws. */
-export async function getCopyOverrides(): Promise<CopyOverrides> {
+/** Overrides only. Cached per request, and never throws. */
+export const getCopyOverrides = cache(async (): Promise<CopyOverrides> => {
   try {
     const row = await db.setting.findUnique({ where: { key: COPY_KEY } });
     return parseObj<CopyOverrides>(row?.value, {});
   } catch {
     return {};
   }
-}
+});
+
+/**
+ * What a server component should render.
+ *
+ * The drop-in for `ui(locale)`: same shape, same keys, with anything edited in
+ * the panel applied on top. Cached, so the twenty-nine components that ask for
+ * it while rendering one page share a single query.
+ */
+export const getUi = cache(async (locale: Locale): Promise<UiStrings> => {
+  return resolveCopy(locale, await getCopyOverrides());
+});
 
 /**
  * The strings a page should actually render.

@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { ArrowUpLeft } from "lucide-react";
 import { Reveal } from "@/components/fx/Reveal";
-import { DEPARTMENT_PRICE_FROM, PLAN_MULTIPLIER } from "@/lib/constants";
 import { labelOn, cn, localeNumber } from "@/lib/utils";
-import { ui } from "@/lib/i18n";
 import type { Locale } from "@/types";
+import { getAppearance } from "@/lib/appearance";
+import { getUi } from "@/lib/site-copy";
 
 /**
  * The four plans, replacing the closing "ready to talk?" block.
@@ -211,7 +211,7 @@ const COPY: Record<Locale, {
   },
 };
 
-export function ServicePlans({
+export async function ServicePlans({
   serviceTitle,
   department,
   priceFrom,
@@ -225,6 +225,12 @@ export function ServicePlans({
   priceUnit: string;
   locale?: Locale;
 }) {
+  // Interface strings, with anything edited in the panel applied. Cached per
+  // request, so every component asking for it costs one query between them.
+  const copy = await getUi(locale);
+  // The live identity, edited in the panel; falls back to the shipped
+  // constants when nothing is saved. Cached per request.
+  const { departmentPriceFrom: DEPARTMENT_PRICE_FROM, planMultiplier: PLAN_MULTIPLIER } = await getAppearance();
   const c = COPY[locale] ?? COPY.fa;
   // The service's own figure first, the department floor second — see
   // DEPARTMENT_PRICE_FROM. Rounded back to whole millions so the multipliers
@@ -268,7 +274,7 @@ export function ServicePlans({
                     brief cannot keep. */}
                 <div className={cn("mt-8 border-t pt-6", onDark ? "border-white/20" : "border-black/15")}>
                   <span className={cn("text-xs", onDark ? "text-white/70" : "text-black/60")}>
-                    {ui(locale).priceFromPrefix}
+                    {copy.priceFromPrefix}
                   </span>
                   <div className="mt-1.5 flex flex-wrap items-baseline gap-x-2">
                     <span className="font-display text-[1.7rem] font-extrabold leading-none tracking-tight ltr-nums md:text-3xl">

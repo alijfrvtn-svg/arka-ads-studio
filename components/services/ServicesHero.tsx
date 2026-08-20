@@ -5,10 +5,11 @@ import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 import { motion, useReducedMotion, useScroll, useSpring, useTransform } from "framer-motion";
 import { Icon } from "@/components/ui/Icon";
-import { DEPARTMENTS, DEPARTMENT_PAINT } from "@/lib/constants";
+import { DEPARTMENTS } from "@/lib/constants";
 import { labelOn, cn } from "@/lib/utils";
 import { tr } from "@/lib/i18n";
 import type { Locale } from "@/types";
+import { useAppearance } from "@/components/providers/Appearance";
 
 /**
  * The hero that turns into the page.
@@ -58,6 +59,9 @@ export function ServicesHero({
   breadcrumb: { label: string; href?: string }[];
   locale?: Locale;
 }) {
+  // The live identity, edited in the panel. Falls back to the shipped
+  // constants when there is nothing saved — see lib/appearance.ts.
+  const { departmentPaint: DEPARTMENT_PAINT } = useAppearance();
   const reduced = useReducedMotion();
   const c = COPY[locale] ?? COPY.fa;
   const trackRef = useRef<HTMLElement>(null);

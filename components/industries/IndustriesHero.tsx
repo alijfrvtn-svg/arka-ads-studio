@@ -5,9 +5,10 @@ import { ChevronLeft } from "lucide-react";
 import { motion, useReducedMotion } from "framer-motion";
 import { Container, Eyebrow } from "@/components/ui/Section";
 import { Reveal } from "@/components/fx/Reveal";
-import { INDUSTRY_PAINT, INDUSTRY_PAINT_ORDER } from "@/lib/constants";
+import { INDUSTRY_PAINT_ORDER } from "@/lib/constants";
 import { localeNumber } from "@/lib/utils";
 import type { Locale } from "@/types";
+import { useAppearance } from "@/components/providers/Appearance";
 
 /**
  * The industries hero.
@@ -61,6 +62,9 @@ export function IndustriesHero({
   count: number;
   locale?: Locale;
 }) {
+  // The live identity, edited in the panel. Falls back to the shipped
+  // constants when there is nothing saved — see lib/appearance.ts.
+  const { industryPaint: INDUSTRY_PAINT } = useAppearance();
   const reduced = useReducedMotion();
   const c = COPY[locale] ?? COPY.fa;
 

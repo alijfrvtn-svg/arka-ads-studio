@@ -3,7 +3,6 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowUpLeft, Check } from "lucide-react";
 import { db } from "@/lib/db";
-import { DEPARTMENT_DESC_GRADIENT } from "@/lib/constants";
 import { ServiceWaveFeatures } from "@/components/services/ServiceWaveFeatures";
 import { ServicePlans } from "@/components/services/ServicePlans";
 import { PageHero } from "@/components/ui/PageHero";
@@ -16,9 +15,11 @@ import { HeroShowcase } from "@/components/home/HeroShowcase";
 import { getServiceDeck } from "@/lib/queries";
 import { buildMetadata, breadcrumbJsonLd, serviceJsonLd, faqPageJsonLd } from "@/lib/seo";
 import { localeNumber } from "@/lib/utils";
-import { tr, trArr, ui } from "@/lib/i18n";
+import { tr, trArr } from "@/lib/i18n";
 import { getLocale } from "@/lib/get-locale";
 import type { Faq, PricingTier, WorkflowStep, Locale } from "@/types";
+import { getAppearance } from "@/lib/appearance";
+import { getUi } from "@/lib/site-copy";
 
 const COPY: Record<Locale, { defaultEyebrow: string; relatedProjects: string }> = {
   fa: { defaultEyebrow: "سرویس", relatedProjects: "پروژه‌های مرتبط" },
@@ -29,6 +30,9 @@ const COPY: Record<Locale, { defaultEyebrow: string; relatedProjects: string }> 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const locale = await getLocale();
+  // Interface strings, with anything edited in the panel applied. Cached per
+  // request, so every component asking for it costs one query between them.
+  const t = await getUi(locale);
   const s = await db.service.findUnique({ where: { slug } });
   if (!s) return {};
   return buildMetadata({
@@ -42,8 +46,12 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 }
 
 export default async function ServicePage({ params }: { params: Promise<{ slug: string }> }) {
+  // The live identity, edited in the panel; falls back to the shipped
+  // constants when nothing is saved. Cached per request.
+  const { departmentGradient: DEPARTMENT_DESC_GRADIENT } = await getAppearance();
   const { slug } = await params;
   const locale = await getLocale();
+  const t = await getUi(locale);
   const s = await db.service.findUnique({
     where: { slug },
     include: {
@@ -78,7 +86,7 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify([
-            breadcrumbJsonLd([{ name: ui(locale).navHome, path: "/" }, { name: ui(locale).navServices, path: "/services" }, { name: title, path: `/services/${s.slug}` }]),
+            breadcrumbJsonLd([{ name: t.navHome, path: "/" }, { name: t.navServices, path: "/services" }, { name: title, path: `/services/${s.slug}` }]),
             serviceJsonLd({ name: title, description, path: `/services/${s.slug}` }),
             ...(faqs.length ? [faqPageJsonLd(faqs)] : []),
           ]),
@@ -92,8 +100,8 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
           <div className="container-x pt-32 md:pt-36">
             <nav className="-mx-2 flex flex-wrap items-center text-xs text-foreground-faint">
               {[
-                { label: ui(locale).navHome, href: "/" },
-                { label: ui(locale).navServices, href: "/services" },
+                { label: t.navHome, href: "/" },
+                { label: t.navServices, href: "/services" },
                 { label: title },
               ].map((b, i, arr) => (
                 <span key={i} className="flex items-center gap-1.5">
@@ -119,7 +127,7 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
                 ...deck,
                 title,
                 tagline: tr(locale, s.tagline || "", s.taglineEn, s.taglineAr) || description,
-                ctaLabel: ui(locale).ctaRequestConsult,
+                ctaLabel: t.ctaRequestConsult,
                 ctaHref: "/contact",
               },
             ]}
@@ -130,7 +138,7 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
           {s.priceFrom && (
             <div className="container-x -mt-4 flex justify-center pb-8">
               <span className="liquid-clear inline-flex items-center rounded-full px-7 py-4 text-sm text-foreground-muted ltr-nums">
-                {ui(locale).priceFromPrefix} {localeNumber(locale, s.priceFrom)} {priceUnit}
+                {t.priceFromPrefix} {localeNumber(locale, s.priceFrom)} {priceUnit}
               </span>
             </div>
           )}
@@ -138,7 +146,7 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
       ) : (
         <PageHero
           eyebrow={tr(locale, s.tagline || "", s.taglineEn, s.taglineAr) || c.defaultEyebrow}
-          breadcrumb={[{ label: ui(locale).navHome, href: "/" }, { label: ui(locale).navServices, href: "/services" }, { label: title }]}
+          breadcrumb={[{ label: t.navHome, href: "/" }, { label: t.navServices, href: "/services" }, { label: title }]}
           title={title}
           description={description}
           image={s.cover}
@@ -146,12 +154,12 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
           <div className="mt-8 flex flex-wrap gap-4">
             <Link href="/contact" className="liquid liquid-raised inline-flex items-center gap-2 rounded-full px-8 py-4 font-semibold">
               <span className="inline-flex items-center gap-2">
-                {ui(locale).ctaRequestConsult} <ArrowUpLeft className="h-5 w-5" />
+                {t.ctaRequestConsult} <ArrowUpLeft className="h-5 w-5" />
               </span>
             </Link>
             {s.priceFrom && (
               <span className="liquid-clear inline-flex items-center rounded-full px-7 py-4 text-sm text-foreground-muted ltr-nums">
-                {ui(locale).priceFromPrefix} {localeNumber(locale, s.priceFrom)} {priceUnit}
+                {t.priceFromPrefix} {localeNumber(locale, s.priceFrom)} {priceUnit}
               </span>
             )}
           </div>
@@ -215,7 +223,7 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
       {workflow.length > 0 && (
         <Section className="bg-background-2">
           <Container>
-            <SectionHeading align="center" eyebrow={ui(locale).serviceWorkflowEyebrow} title={ui(locale).serviceWorkflowTitle} className="mx-auto mb-16 max-w-2xl" />
+            <SectionHeading align="center" eyebrow={t.serviceWorkflowEyebrow} title={t.serviceWorkflowTitle} className="mx-auto mb-16 max-w-2xl" />
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
               {workflow.map((w, i) => (
                 <Reveal key={i} delay={i * 0.08}>
@@ -235,7 +243,7 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
       {pricing.length > 0 && (
         <Section>
           <Container>
-            <SectionHeading align="center" eyebrow={ui(locale).servicePricingEyebrow} title={ui(locale).servicePricingTitle} className="mx-auto mb-16 max-w-2xl" />
+            <SectionHeading align="center" eyebrow={t.servicePricingEyebrow} title={t.servicePricingTitle} className="mx-auto mb-16 max-w-2xl" />
             <div className="grid min-w-0 gap-5 md:grid-cols-3">
               {pricing.map((tier, i) => (
                 <Reveal key={i} delay={i * 0.08}>
@@ -249,7 +257,7 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
                     }`}
                   >
                     {tier.featured && (
-                      <span className="absolute left-5 top-5 rounded-full bg-foreground px-3 py-1 text-xs font-semibold text-background">{ui(locale).pricingFeaturedBadge}</span>
+                      <span className="absolute left-5 top-5 rounded-full bg-foreground px-3 py-1 text-xs font-semibold text-background">{t.pricingFeaturedBadge}</span>
                     )}
                     <h3 className="font-display break-words text-lg font-bold tracking-tight text-foreground">{tier.name}</h3>
                     <div className="mt-4 flex items-end gap-1">
@@ -267,7 +275,7 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
                       href={`/contact?plan=${encodeURIComponent(`${tier.name} (${title})`)}`}
                       className={`liquid mt-8 inline-flex h-12 items-center justify-center rounded-2xl font-semibold ${tier.featured ? "liquid-raised" : "liquid-clear"}`}
                     >
-                      {ui(locale).selectPlan}
+                      {t.selectPlan}
                     </Link>
                   </div>
                 </Reveal>
@@ -281,7 +289,7 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
       {s.projects.length > 0 && (
         <Section className="bg-background-2">
           <Container>
-            <SectionHeading eyebrow={ui(locale).portfolioEyebrow} title={c.relatedProjects} className="mb-10" />
+            <SectionHeading eyebrow={t.portfolioEyebrow} title={c.relatedProjects} className="mb-10" />
             <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {s.projects.map((p) => (
                 <ProjectCard key={p.id} project={p} locale={locale} />
@@ -295,7 +303,7 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
       {faqs.length > 0 && (
         <Section>
           <Container className="max-w-3xl">
-            <SectionHeading align="center" eyebrow={ui(locale).serviceFaqEyebrow} title={ui(locale).serviceFaqTitle} className="mx-auto mb-10 max-w-2xl" />
+            <SectionHeading align="center" eyebrow={t.serviceFaqEyebrow} title={t.serviceFaqTitle} className="mx-auto mb-10 max-w-2xl" />
             <Accordion items={faqs} />
           </Container>
         </Section>

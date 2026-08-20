@@ -8,8 +8,9 @@ import { SERVICE_CARD_IMAGE } from "@/lib/constants";
 import { useMediaQuery, DESKTOP } from "@/lib/use-media";
 import { ARC_SMALL_VARIANTS, smallVariant } from "@/lib/marquee-variants";
 import { cn, localeNumber } from "@/lib/utils";
-import { tr, ui } from "@/lib/i18n";
+import { tr } from "@/lib/i18n";
 import type { Locale } from "@/types";
+import { useUi } from "@/components/providers/SiteCopy";
 
 export interface ArcService {
   id: string;
@@ -64,6 +65,10 @@ export function ServiceArc({
   detailsLabel: string;
   priceUnit: string;
 }) {
+  // Interface strings, with anything edited in the panel applied. Resolved
+  // once here because `ui(locale)` also appeared inside .map() below, and a
+  // hook called a varying number of times per render is a different bug.
+  const t = useUi();
   const scroller = useRef<HTMLDivElement>(null);
   const frame = useRef(0);
   /** Whether the row is drawn on a cylinder. A ref, because `paint` reads it
@@ -160,8 +165,6 @@ export function ServiceArc({
     const card = el.querySelector<HTMLElement>("[data-arc-card]");
     el.scrollBy({ left: dir * ((card?.offsetWidth ?? 290) + 20), behavior: "smooth" });
   };
-
-  const t = ui(locale);
 
   return (
     <div className="relative">
