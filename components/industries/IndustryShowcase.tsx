@@ -103,7 +103,7 @@ function Media({
   }, [play]);
 
   if (src && embed) {
-    return <EmbedFrame src={embed} className={cn("pointer-events-none h-full w-full", className)} />;
+    return <EmbedFrame src={embed} decorative className={cn("pointer-events-none h-full w-full", className)} />;
   }
   if (src) {
     return (

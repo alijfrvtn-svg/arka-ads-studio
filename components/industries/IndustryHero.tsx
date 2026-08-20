@@ -70,6 +70,7 @@ export function IndustryHero({
         (embedUrl ? (
           <EmbedFrame
             src={embedUrl}
+            decorative
             className={cn(
               "pointer-events-none absolute inset-0 h-full w-full object-cover transition-opacity duration-700",
               active ? "opacity-50" : "opacity-0",

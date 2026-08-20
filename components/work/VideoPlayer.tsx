@@ -27,7 +27,7 @@ export function VideoPlayer({
   if (play) {
     const embedUrl = getEmbedUrl(src, { autoplay: true });
     if (embedUrl) {
-      return <EmbedFrame src={embedUrl} className={cn("h-full w-full bg-black", className)} />;
+      return <EmbedFrame src={embedUrl} href={src} className={cn("h-full w-full bg-black", className)} />;
     }
     return <video src={src} controls autoPlay playsInline className={cn("h-full w-full bg-black object-cover", className)} />;
   }

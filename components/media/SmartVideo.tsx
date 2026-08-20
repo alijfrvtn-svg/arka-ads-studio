@@ -59,6 +59,8 @@ export function SmartVideo({
       <EmbedFrame
         src={embedSrc}
         title={title}
+        href={src}
+        decorative={background}
         className={cn(className, background && "pointer-events-none")}
       />
     );
